@@ -16,6 +16,22 @@ Template:
 
 ---
 
+## 2026-10-13 — T1.4: initial-URI builder
+- Done: Committed T1.3 (`5defa0e`). T1.4: `StatusFolders.initialUri(kind)` (uses
+  `Build.VERSION.SDK_INT`) over the testable `initialDocumentId(kind, sdkInt)`; folder
+  names became shared constants used by `classify` too.
+- Verified: 5 new JVM tests (22 total) green, including a round trip that every
+  start folder classifies as its own app on API 26/29/30/37; `>=` → `>` mutation on
+  the API 30 boundary failed the two Android 11 tests. `lintDebug`: only
+  MissingApplicationIcon.
+- Decisions: none new (design.md §3 step 1 already specified this).
+- Next: T1.5 — onboarding screen. Needs `StatusSaverApp` (Application) to create
+  the DataStore and `StatusSourceStore` (design.md §2), and emulator checks: picker
+  opens at `.Statuses`, grant survives restart, plus the two Pending checks.
+- Notes: The emulator has no WhatsApp; T1.5 will need to create the folder
+  (`adb shell mkdir -p /sdcard/Android/media/com.whatsapp/WhatsApp/Media/.Statuses`)
+  to test the picker.
+
 ## 2026-10-13 — T1.3: tree validation and classification
 - Done: Committed T1.2 (`30b0d14`). T1.3: `data/StatusFolders.kt` with
   `classify(treeDocumentId): StatusSourceKind?` (null = wrong folder). design.md §2

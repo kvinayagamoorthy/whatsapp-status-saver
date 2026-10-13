@@ -45,7 +45,7 @@ com.moorthy.statussaver
 ├── MainActivity.kt            Single activity, hosts Compose NavHost
 ├── data/
 │   ├── StatusSourceStore.kt   Persisted tree URIs (DataStore) + permission checks
-│   ├── StatusFolders.kt       Known statuses folder names; classify a picked tree
+│   ├── StatusFolders.kt       Known statuses folders: classify a picked tree, picker start URI
 │   ├── StatusRepository.kt    Lists StatusItems from all granted sources
 │   ├── SavedMediaRepository.kt Save to MediaStore, query saved names
 │   ├── SettingsStore.kt       Theme mode (DataStore)

@@ -1,14 +1,14 @@
 # Status Board
 
-Last updated: 2026-10-13 (T1.3 done)
+Last updated: 2026-10-13 (T1.4 done)
 
 ## Resume here
 
 - **Current milestone:** M1 — Folder access
-- **In progress:** none (T1.3 done, waiting for the user to say commit)
-- **Next task:** T1.4 — initial-URI builder (see `docs/plan.md` M1)
+- **In progress:** none (T1.4 done, waiting for the user to say commit)
+- **Next task:** T1.5 — onboarding screen (see `docs/plan.md` M1). First task with UI and device checks: also close the two T1.5 rows in Pending checks
 - **Blockers:** none
-- **Last task commit:** `30b0d14` (T1.2). Earlier: `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
+- **Last task commit:** `5defa0e` (T1.3). Earlier: `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
 - **Notes for next session:** Docs and trackers created. Scope confirmed: WhatsApp
   status saver, Kotlin + Compose, minSdk 26, package `com.moorthy.statussaver`,
   sideload distribution, app name "Keepsake" with bookmark-in-ring icon (D-009).
@@ -41,7 +41,7 @@ Things verified only partly so far. Close them in the task named.
 | Milestone | Status | Tasks done |
 |-----------|--------|------------|
 | M0 Project scaffold | DONE | 6 / 6 |
-| M1 Folder access | WIP | 3 / 6 |
+| M1 Folder access | WIP | 4 / 6 |
 | M2 Status list | TODO | 0 / 5 |
 | M3 Viewer | TODO | 0 / 4 |
 | M4 Save, indicator, share | TODO | 0 / 6 |
@@ -71,7 +71,7 @@ summary (world rule → code location). Keep each note to one or two lines.
 | T1.1 | Models | DONE | `data/model/`: `StatusSourceKind`, `MediaType`, `StatusItem` (adds `mimeType`, D-013). `assembleDebug` + `lintDebug` green, no new lint issues. No test: pure data, behavior arrives in T1.3/T2.1. Theory: status file → `StatusItem`, name is identity (I3) |
 | T1.2 | `StatusSourceStore` | DONE | `validSources()` + `grant()`; 7 Robolectric tests on SDK 37 (D-014); mutation checks showed the permission filter and old-grant release are covered. Lint unchanged. Theory: granted folder → `StatusSource` that counts only while the system still holds its read grant |
 | T1.3 | Tree validation + classification | DONE | `data/StatusFolders.kt` `classify(treeDocumentId)`; 10 plain JVM tests (both apps, both path styles, SD card volume, five wrong-folder cases); two mutation checks caught. Lint unchanged (D-015). Theory: picked tree → which app's `.Statuses` folder, or wrong folder |
-| T1.4 | Initial-URI builder | TODO | |
+| T1.4 | Initial-URI builder | DONE | `StatusFolders.initialUri(kind)` / `initialDocumentId(kind, sdkInt)`, Android/media path from API 30; paths built from the same name constants as `classify`. 5 JVM tests incl. round trip classify(initialDocumentId) = kind; API-boundary mutation caught. Picker actually opening there is checked in T1.5. Theory: app + Android version → where its statuses folder most likely is |
 | T1.5 | Onboarding screen | TODO | |
 | T1.6 | Start destination logic | TODO | |
 

@@ -73,4 +73,49 @@ class StatusFoldersTest {
     fun storageRootIsAWrongFolder() {
         assertNull(StatusFolders.classify("primary:"))
     }
+
+    @Test
+    fun pickerOpensAtWhatsAppMediaFolderOnAndroid11() {
+        assertEquals(
+            "primary:Android/media/com.whatsapp/WhatsApp/Media/.Statuses",
+            StatusFolders.initialDocumentId(StatusSourceKind.WHATSAPP, sdkInt = 30),
+        )
+    }
+
+    @Test
+    fun pickerOpensAtWhatsAppRootFolderOnAndroid10() {
+        assertEquals(
+            "primary:WhatsApp/Media/.Statuses",
+            StatusFolders.initialDocumentId(StatusSourceKind.WHATSAPP, sdkInt = 29),
+        )
+    }
+
+    @Test
+    fun pickerOpensAtBusinessMediaFolderOnAndroid11() {
+        assertEquals(
+            "primary:Android/media/com.whatsapp.w4b/WhatsApp Business/Media/.Statuses",
+            StatusFolders.initialDocumentId(StatusSourceKind.BUSINESS, sdkInt = 30),
+        )
+    }
+
+    @Test
+    fun pickerOpensAtBusinessRootFolderOnAndroid10() {
+        assertEquals(
+            "primary:WhatsApp Business/Media/.Statuses",
+            StatusFolders.initialDocumentId(StatusSourceKind.BUSINESS, sdkInt = 29),
+        )
+    }
+
+    @Test
+    fun folderThePickerOpensAtIsAcceptedForTheSameApp() {
+        for (kind in StatusSourceKind.entries) {
+            for (sdkInt in listOf(26, 29, 30, 37)) {
+                assertEquals(
+                    "kind=$kind sdkInt=$sdkInt",
+                    kind,
+                    StatusFolders.classify(StatusFolders.initialDocumentId(kind, sdkInt)),
+                )
+            }
+        }
+    }
 }
