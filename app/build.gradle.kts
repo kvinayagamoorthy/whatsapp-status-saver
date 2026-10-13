@@ -30,6 +30,16 @@ android {
     buildFeatures {
         compose = true
     }
+
+    testOptions {
+        // Lets Robolectric read the merged manifest, so tests run on the target SDK
+        // instead of Robolectric's oldest default.
+        unitTests.isIncludeAndroidResources = true
+        unitTests.all { test ->
+            // Robolectric's Android 16+ runtimes reach into this JDK-internal package.
+            test.jvmArgs("--add-exports=java.base/jdk.internal.access=ALL-UNNAMED")
+        }
+    }
 }
 
 dependencies {
@@ -54,6 +64,8 @@ dependencies {
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui)
 
-    // JVM unit tests (src/test).
+    // JVM unit tests (src/test). Robolectric provides working Android classes such as
+    // Uri and ContentResolver persisted permissions on the JVM (DECISIONS D-014).
     testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
 }

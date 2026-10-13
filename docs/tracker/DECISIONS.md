@@ -124,3 +124,21 @@ gallery folders.
 **Alternatives:** Derive the MIME type from the file extension when saving or sharing
 (a second, weaker source for a fact the provider already gives); send `image/*` or
 `video/*` (loses the exact type MediaStore and receiving apps use).
+
+## D-014 · 2026-10-13 · Accepted
+**Decision:** JVM unit tests use Robolectric 4.17 (test-only dependency) wherever code
+touches Android types. `testOptions` enables `isIncludeAndroidResources` so Robolectric
+runs on the target SDK (37), and passes
+`--add-exports=java.base/jdk.internal.access=ALL-UNNAMED` to the test JVM, which
+Robolectric's Android 16+ runtimes need on JDK 21.
+**Why:** `StatusSourceStore` works with `Uri` and `ContentResolver` persisted
+permissions, and `StatusItem` holds a `Uri` (T2.1/T2.2 tests need it too). Robolectric's
+`ContentResolver` keeps a real persisted-permission list, so the store takes a plain
+`ContentResolver` and no test-only interface exists in production code.
+**Consequences:** First test run downloads Robolectric's Android runtime (about
+100 MB) into `~/.m2`. Robolectric does not throw when releasing a grant the app no
+longer holds, while a device does, so that guard in `StatusSourceStore.grant()` is
+checked on a device (T1.5).
+**Alternatives:** A small permissions interface with a hand-written fake plus String
+URIs in the store (keeps tests plain JVM, but adds an abstraction with one production
+caller and a second encoding of the same URI); mocking libraries.

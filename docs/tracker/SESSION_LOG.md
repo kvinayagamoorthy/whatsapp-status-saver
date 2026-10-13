@@ -16,6 +16,22 @@ Template:
 
 ---
 
+## 2026-10-13 — T1.2: StatusSourceStore
+- Done: Committed T1.1 (`857cb99`). T1.2: `data/StatusSourceStore.kt` with
+  `StatusSource(kind, treeUri)`, `validSources()` (stored and still granted) and
+  `grant(kind, treeUri)` (takes the persisted read grant, stores it, releases a
+  replaced folder's grant if the system still holds it).
+- Verified: 7 unit tests green on Robolectric SDK 37; mutation checks (removed the
+  permission filter, broke the release condition) made tests fail as expected.
+  `assembleDebug` and `lintDebug` green, only MissingApplicationIcon.
+- Decisions: D-014 (Robolectric, test JVM flags). design.md §8 notes Robolectric.
+- Next: T1.3 — tree validation + classification.
+- Notes: Robolectric first ran on API 23 because it could not see the manifest;
+  `isIncludeAndroidResources` fixed that, then SDK 37 needed the `--add-exports` flag.
+  An unused Robolectric API 23 runtime (79 MB) stays in `~/.m2` from that first run.
+  `Application` wiring of the store waits for its first caller (T1.5/T1.6). No
+  revoke yet (T5.2).
+
 ## 2026-10-13 — T1.1: models
 - Done: `data/model/` with `StatusSourceKind` (WHATSAPP, BUSINESS), `MediaType`
   (IMAGE, VIDEO), and `StatusItem` (uri, name, type, mimeType, lastModifiedMillis,

@@ -1,14 +1,14 @@
 # Status Board
 
-Last updated: 2026-10-13 (T1.1 done)
+Last updated: 2026-10-13 (T1.2 done)
 
 ## Resume here
 
 - **Current milestone:** M1 — Folder access
-- **In progress:** none (T1.1 done, waiting for the user to say commit)
-- **Next task:** T1.2 — `StatusSourceStore` (see `docs/plan.md` M1)
+- **In progress:** none (T1.2 done, waiting for the user to say commit)
+- **Next task:** T1.3 — tree validation + classification (see `docs/plan.md` M1)
 - **Blockers:** none
-- **Last task commit:** `9e11289` (T0.6), followed by docs-only handoff commit `4cdea90`. T1.1 committed.
+- **Last task commit:** `857cb99` (T1.1). Earlier: `9e11289` (T0.6), then docs-only handoff `4cdea90`.
 - **Notes for next session:** Docs and trackers created. Scope confirmed: WhatsApp
   status saver, Kotlin + Compose, minSdk 26, package `com.moorthy.statussaver`,
   sideload distribution, app name "Keepsake" with bookmark-in-ring icon (D-009).
@@ -28,6 +28,7 @@ Things verified only partly so far. Close them in the task named.
 | Video playback with Media3 network/wake-lock permissions removed | No player yet (D-011) | T3.3 |
 | Status-bar icon colors follow the in-app theme override | `enableEdgeToEdge()` follows the system theme only | T5.1 |
 | Release APK under 10 MB | Debug APK is 16.5 MB unminified | T6.2 |
+| Re-picking a folder whose old grant the system already dropped does not crash | Robolectric does not throw on releasing a missing grant; a device does, and `StatusSourceStore.grant()` guards it (D-014) | T1.5 on emulator |
 
 ## Legend
 
@@ -39,7 +40,7 @@ Things verified only partly so far. Close them in the task named.
 | Milestone | Status | Tasks done |
 |-----------|--------|------------|
 | M0 Project scaffold | DONE | 6 / 6 |
-| M1 Folder access | WIP | 1 / 6 |
+| M1 Folder access | WIP | 2 / 6 |
 | M2 Status list | TODO | 0 / 5 |
 | M3 Viewer | TODO | 0 / 4 |
 | M4 Save, indicator, share | TODO | 0 / 6 |
@@ -67,7 +68,7 @@ summary (world rule → code location). Keep each note to one or two lines.
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
 | T1.1 | Models | DONE | `data/model/`: `StatusSourceKind`, `MediaType`, `StatusItem` (adds `mimeType`, D-013). `assembleDebug` + `lintDebug` green, no new lint issues. No test: pure data, behavior arrives in T1.3/T2.1. Theory: status file → `StatusItem`, name is identity (I3) |
-| T1.2 | `StatusSourceStore` | TODO | |
+| T1.2 | `StatusSourceStore` | DONE | `validSources()` + `grant()`; 7 Robolectric tests on SDK 37 (D-014); mutation checks showed the permission filter and old-grant release are covered. Lint unchanged. Theory: granted folder → `StatusSource` that counts only while the system still holds its read grant |
 | T1.3 | Tree validation + classification | TODO | |
 | T1.4 | Initial-URI builder | TODO | |
 | T1.5 | Onboarding screen | TODO | |

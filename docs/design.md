@@ -147,7 +147,8 @@ Only where the world can actually fail:
 
 ## 8. Testing strategy
 
-- JVM unit tests: folder classification from tree document id, MIME filtering,
+- JVM unit tests (Robolectric where Android types are involved, D-014): folder
+  classification from tree document id, MIME filtering,
   sorting, save-result aggregation, ViewModel state transitions with fake repositories.
 - Instrumented tests (emulator): MediaStore save + already-saved detection on API 29+
   and API 28; manifest has no `INTERNET` permission.
