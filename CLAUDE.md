@@ -75,6 +75,8 @@ must be updated in the same change, with a `DECISIONS.md` entry.
 - Saved files go to the shared gallery via MediaStore under `Pictures/Keepsake`
   and `Movies/Keepsake`. `WRITE_EXTERNAL_STORAGE` only with `maxSdkVersion="28"`.
 - Never modify or delete anything inside WhatsApp's folders.
+- Media3's `ACCESS_NETWORK_STATE` and `WAKE_LOCK` are removed in the manifest (D-011):
+  never call `ExoPlayer.setWakeMode()`.
 - Do not use "WhatsApp" in the app name or launcher label (trademark).
 - Keep it simple: no feature, setting, or abstraction without a current need in
   `docs/spec.md`.

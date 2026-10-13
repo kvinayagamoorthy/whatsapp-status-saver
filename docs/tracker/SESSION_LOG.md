@@ -16,6 +16,17 @@ Template:
 
 ---
 
+## 2026-10-13 — T0.5: manifest permissions
+- Done: Committed T0.4 (`a19a3cb`). T0.5: declared WRITE_EXTERNAL_STORAGE with
+  maxSdkVersion 28; removed Media3's ACCESS_NETWORK_STATE and WAKE_LOCK.
+- Verified: merged manifest and aapt2 badging; Media3 bytecode (SecurityException
+  catch in NetworkTypeObserver, wake lock only via setWakeMode); emulator API 35
+  launch with no crash and no android.permission.* requested.
+- Decisions: D-011.
+- Next: T0.6 — unit test + lint wiring.
+- Notes: Not yet committed. Playback without the removed permissions is confirmed in
+  T3.3.
+
 ## 2026-10-13 — T0.4: core dependencies
 - Done: Committed T0.3 (`9317d20`). T0.4 added Navigation Compose, Lifecycle
   ViewModel/runtime Compose, DataStore Preferences, Coil 3 (compose + video), and

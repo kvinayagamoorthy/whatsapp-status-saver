@@ -89,3 +89,16 @@ would hold SAF folder URIs whose permissions do not survive a restore, so restor
 state would only send the user through onboarding anyway.
 **Alternatives:** The older versions cached on this machine (Gradle 8.9, AGP 8.5.2,
 Kotlin 2.0.21); compileSdk 35 (the only platform installed before scaffolding).
+
+## D-011 · 2026-10-13 · Accepted
+**Decision:** Remove `ACCESS_NETWORK_STATE` and `WAKE_LOCK`, which Media3 ExoPlayer
+adds to the merged manifest, using `tools:node="remove"`.
+**Why:** The app plays only local files and never uses the network (D-006), so the
+fewest permissions possible. Checked in the Media3 1.11.1 bytecode: the network-type
+lookup catches `SecurityException` and falls back to "unknown", and the wake lock is
+only used when `ExoPlayer.setWakeMode()` is called, which this app must not do.
+**Consequences:** Never call `setWakeMode`; keep the screen on while a video plays
+instead. Re-check this if Media3 is upgraded across a major version. Playback is
+confirmed on device in T3.3.
+**Alternatives:** Keep both permissions (harmless, but against the minimal-permission
+goal in spec G6 / NFR4).

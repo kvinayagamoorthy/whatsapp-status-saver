@@ -1,5 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+        Saving to the shared gallery on Android 8-9 writes to public directories, which
+        needs this permission. Android 10+ saves through MediaStore without it.
+        Statuses are read through SAF folder grants, so no read permission is declared.
+    -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+
+    <!--
+        Added by Media3 but not needed: the app only plays local files.
+        Media3 treats a missing ACCESS_NETWORK_STATE as an unknown network type, and it
+        only takes a wake lock if ExoPlayer.setWakeMode() is called, which this app must
+        not do (playback happens only while the viewer is on screen).
+        The app must never declare INTERNET (design.md invariant I5).
+    -->
+    <uses-permission
+        android:name="android.permission.ACCESS_NETWORK_STATE"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.WAKE_LOCK"
+        tools:node="remove" />
 
     <application
         android:allowBackup="false"

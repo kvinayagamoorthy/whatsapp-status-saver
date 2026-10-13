@@ -1,12 +1,12 @@
 # Status Board
 
-Last updated: 2026-10-13 (T0.4 done)
+Last updated: 2026-10-13 (T0.5 done)
 
 ## Resume here
 
 - **Current milestone:** M0 — Project scaffold
 - **In progress:** none
-- **Next task:** T0.5 — manifest permissions (see `docs/plan.md` M0 and the T0.5 note below)
+- **Next task:** T0.6 — unit test + lint wiring (see `docs/plan.md` M0)
 - **Blockers:** none
 - **Notes for next session:** Docs and trackers created. Scope confirmed: WhatsApp
   status saver, Kotlin + Compose, minSdk 26, package `com.moorthy.statussaver`,
@@ -26,7 +26,7 @@ Last updated: 2026-10-13 (T0.4 done)
 
 | Milestone | Status | Tasks done |
 |-----------|--------|------------|
-| M0 Project scaffold | WIP | 4 / 6 |
+| M0 Project scaffold | WIP | 5 / 6 |
 | M1 Folder access | TODO | 0 / 6 |
 | M2 Status list | TODO | 0 / 5 |
 | M3 Viewer | TODO | 0 / 4 |
@@ -47,7 +47,7 @@ summary (world rule → code location). Keep each note to one or two lines.
 | T0.2 | `.gitignore` + Gradle wrapper | DONE | Done with T0.1 (needed to verify it). Wrapper 9.8.1 with pinned SHA-256; build outputs and local.properties ignored. One Gradle deprecation (`Configuration.setVisible`) comes from AGP, not our scripts |
 | T0.3 | Compose M3 theme, dynamic color, system dark, edge-to-edge | DONE | Emulator API 35: placeholder renders edge-to-edge; `cmd uimode night yes/no` flips theme live, dynamic color applied. Brand palette (API < 31) not yet seen on a device. Theory: system dark setting → `ui/theme/Theme.kt` `KeepsakeTheme` |
 | T0.4 | Core dependencies | DONE | Navigation 2.10.2, Lifecycle 2.11.0, DataStore 1.2.1, Coil 3.6.3 (+video, no network module), Media3 1.11.1. `assembleDebug` green at minSdk 26. Debug APK 16.5 MB unminified (release target < 10 MB is checked in T6.2) |
-| T0.5 | Manifest permissions and label | TODO | Merged manifest has no INTERNET, but Media3 exoplayer adds ACCESS_NETWORK_STATE and WAKE_LOCK. Decide whether to remove them with `tools:node="remove"`; check playback still works without them |
+| T0.5 | Manifest permissions and label | DONE | Merged manifest: WRITE_EXTERNAL_STORAGE (max 28) + AndroidX internal signature permission only; Media3 ACCESS_NETWORK_STATE and WAKE_LOCK removed (D-011, bytecode-checked). Emulator API 35: launches, no crash, no android.permission.* requested |
 | T0.6 | Unit test + lint wiring | TODO | |
 
 ### M1 — Folder access
@@ -77,7 +77,7 @@ summary (world rule → code location). Keep each note to one or two lines.
 |----|------|--------|-------|
 | T3.1 | Pager viewer route | TODO | |
 | T3.2 | Zoomable image | TODO | |
-| T3.3 | Video player page | TODO | |
+| T3.3 | Video player page | TODO | Confirm playback works with Media3's network/wake-lock permissions removed (D-011). Never call `setWakeMode`; use keep-screen-on while playing |
 | T3.4 | Vanished file handling | TODO | |
 
 ### M4 — Save, indicator, share
