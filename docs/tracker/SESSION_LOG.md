@@ -16,6 +16,18 @@ Template:
 
 ---
 
+## 2026-10-13 — T1.1: models
+- Done: `data/model/` with `StatusSourceKind` (WHATSAPP, BUSINESS), `MediaType`
+  (IMAGE, VIDEO), and `StatusItem` (uri, name, type, mimeType, lastModifiedMillis,
+  sizeBytes). design.md §1 table now lists the MIME type.
+- Verified: `assembleDebug` and `lintDebug` green; only MissingApplicationIcon remains.
+- Decisions: D-013 (`StatusItem.mimeType`).
+- Next: T1.2 — `StatusSourceStore`.
+- Notes: Folder paths deliberately not on `StatusSourceKind` yet; T1.3/T1.4 decide
+  where they live (one place, risk R1). `StatusItem` holds `android.net.Uri`: JVM
+  tests that build items (T2.1/T2.2) need a plan for the stubbed `Uri` (pure mapping
+  functions over plain values, or `isReturnDefaultValues`). Not yet committed.
+
 ## 2026-10-13 — Handoff before compaction (end of M0)
 - Done: Committed T0.6 (`9e11289`). M0 complete. Commits so far on `main`:
   `d238047` and `833927c` docs (made on branch `docs/project-setup`, fast-forward

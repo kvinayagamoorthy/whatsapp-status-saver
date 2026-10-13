@@ -113,3 +113,14 @@ new phone. Lint then asks for `fullBackupContent` for Android 8-11, but that fil
 never read when `allowBackup` is false, so the warning is a false positive here.
 **Alternatives:** Rely on allowBackup only (transfer would still copy DataStore on
 Android 12+); add an unused `fullBackupContent` file just to satisfy lint.
+
+## D-013 · 2026-10-13 · Accepted
+**Decision:** `StatusItem` carries the provider's MIME type (`mimeType`) next to
+`MediaType`. design.md §1 concept table updated to list it.
+**Why:** Saving needs the exact MIME type for the MediaStore row (§4) and sharing sets
+the intent type from the item (§5). The children query already returns it, so keeping
+it costs nothing. `MediaType` stays as the coarse image/video split used for tabs and
+gallery folders.
+**Alternatives:** Derive the MIME type from the file extension when saving or sharing
+(a second, weaker source for a fact the provider already gives); send `image/*` or
+`video/*` (loses the exact type MediaStore and receiving apps use).

@@ -1,14 +1,14 @@
 # Status Board
 
-Last updated: 2026-10-13 (M0 done, handoff before compaction)
+Last updated: 2026-10-13 (T1.1 done)
 
 ## Resume here
 
 - **Current milestone:** M1 — Folder access
-- **In progress:** none
-- **Next task:** T1.1 — models `StatusSourceKind`, `MediaType`, `StatusItem` (see `docs/plan.md` M1)
+- **In progress:** none (T1.1 done, waiting for the user to say commit)
+- **Next task:** T1.2 — `StatusSourceStore` (see `docs/plan.md` M1)
 - **Blockers:** none
-- **Last task commit:** `9e11289` (T0.6), followed by a docs-only handoff commit. Working tree clean.
+- **Last task commit:** `9e11289` (T0.6), followed by docs-only handoff commit `4cdea90`. T1.1 committed.
 - **Notes for next session:** Docs and trackers created. Scope confirmed: WhatsApp
   status saver, Kotlin + Compose, minSdk 26, package `com.moorthy.statussaver`,
   sideload distribution, app name "Keepsake" with bookmark-in-ring icon (D-009).
@@ -39,7 +39,7 @@ Things verified only partly so far. Close them in the task named.
 | Milestone | Status | Tasks done |
 |-----------|--------|------------|
 | M0 Project scaffold | DONE | 6 / 6 |
-| M1 Folder access | TODO | 0 / 6 |
+| M1 Folder access | WIP | 1 / 6 |
 | M2 Status list | TODO | 0 / 5 |
 | M3 Viewer | TODO | 0 / 4 |
 | M4 Save, indicator, share | TODO | 0 / 6 |
@@ -66,7 +66,7 @@ summary (world rule → code location). Keep each note to one or two lines.
 
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
-| T1.1 | Models | TODO | |
+| T1.1 | Models | DONE | `data/model/`: `StatusSourceKind`, `MediaType`, `StatusItem` (adds `mimeType`, D-013). `assembleDebug` + `lintDebug` green, no new lint issues. No test: pure data, behavior arrives in T1.3/T2.1. Theory: status file → `StatusItem`, name is identity (I3) |
 | T1.2 | `StatusSourceStore` | TODO | |
 | T1.3 | Tree validation + classification | TODO | |
 | T1.4 | Initial-URI builder | TODO | |

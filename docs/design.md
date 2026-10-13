@@ -17,7 +17,7 @@ the shared gallery. Nothing more.
 | Concept | Meaning | Code home |
 |---------|---------|-----------|
 | `StatusSource` | One granted statuses folder (WhatsApp or WhatsApp Business), identified by its SAF tree URI | `data/StatusSourceStore` |
-| `StatusItem` | One media file currently in a source folder: uri, file name, type (image/video), modified time, size | `data/StatusRepository` |
+| `StatusItem` | One media file currently in a source folder: uri, file name, type (image/video), MIME type, modified time, size | `data/StatusRepository` |
 | Saved copy | A copy of a `StatusItem` in the shared gallery, matched by file name | `data/SavedMediaRepository` |
 | Theme mode | System / Light / Dark | `data/SettingsStore`, `ui/theme/` |
 
