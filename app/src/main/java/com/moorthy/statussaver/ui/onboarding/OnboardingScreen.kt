@@ -26,9 +26,13 @@ import com.moorthy.statussaver.R
 import com.moorthy.statussaver.data.StatusFolders
 import com.moorthy.statussaver.data.model.StatusSourceKind
 
-/** First-run screen (FR1): explains the folder access and grants it per app. */
+/**
+ * First-run screen (FR1): explains the folder access and grants it per app. [onContinue]
+ * is offered once at least one app is granted, so the user can grant both apps first.
+ */
 @Composable
 fun OnboardingScreen(
+    onContinue: () -> Unit,
     viewModel: OnboardingViewModel = viewModel(factory = OnboardingViewModel.Factory),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -78,6 +82,14 @@ fun OnboardingScreen(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            if (uiState.grantedKinds.isNotEmpty()) {
+                Button(
+                    onClick = onContinue,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(stringResource(R.string.onboarding_continue))
+                }
+            }
         }
     }
 }

@@ -11,5 +11,8 @@
     <string name="onboarding_access_granted">Access granted</string>
     <string name="onboarding_choose_again">Choose again</string>
     <string name="onboarding_wrong_folder">That is not a statuses folder. Tap Grant access again and use the folder the picker opens at. If you look for it yourself, the .Statuses folder is hidden: turn on “Show hidden files” in the picker’s menu.</string>
+    <string name="onboarding_continue">Continue</string>
     <string name="onboarding_read_only_note">Keepsake only reads this folder. It never changes or deletes anything in it.</string>
+
+    <string name="statuses_placeholder">Statuses will appear here.</string>
 </resources>

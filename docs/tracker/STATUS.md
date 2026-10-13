@@ -1,22 +1,24 @@
 # Status Board
 
-Last updated: 2026-10-13 (T1.5 done)
+Last updated: 2026-10-13 (T1.6 done and uncommitted, M1 complete, handoff before compaction)
 
 ## Resume here
 
-- **Current milestone:** M1 — Folder access
-- **In progress:** none (T1.5 done, waiting for the user to say commit)
-- **Next task:** T1.6 — start destination logic (see `docs/plan.md` M1). Brings Navigation Compose; onboarding currently is the only screen
+- **Current milestone:** M2 — Status list (M1 complete)
+- **In progress:** none (T1.6 done, waiting for the user to say commit)
+- **Next task:** T2.1 — `StatusRepository.load()` (see `docs/plan.md` M2)
 - **Blockers:** none
-- **Last task commit:** `b9c966c` (T1.4). Earlier: `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
-- **Notes for next session:** Docs and trackers created. Scope confirmed: WhatsApp
-  status saver, Kotlin + Compose, minSdk 26, package `com.moorthy.statussaver`,
-  sideload distribution, app name "Keepsake" with bookmark-in-ring icon (D-009).
-  No open questions. Toolchain: Gradle 9.8.1 wrapper, AGP 9.4.1 (built-in Kotlin, so
-  no `org.jetbrains.kotlin.android` plugin), compileSdk/targetSdk 37, JDK 21, SDK at
-  `~/Android/Sdk` (D-010). Compose plugin pins Kotlin to 2.4.21 (AGP's bundled 2.2.10
-  is upgraded). Emulator AVD `keepsake_api35` exists for device checks (see
-  CLAUDE.md Commands). Only add dependencies a task actually uses.
+- **Last task commit:** `39aace7` (T1.5). Earlier: `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`. T1.6 changes uncommitted.
+- **Notes for next session:** T1.6 is finished and verified but NOT committed: the
+  first action is to commit it when the user says so (subject
+  `feat: route to onboarding or statuses at start (T1.6)`), then start T2.1.
+  Code so far: `data/model/` (T1.1), `data/StatusSourceStore.kt` (T1.2),
+  `data/StatusFolders.kt` (T1.3, T1.4), `StatusSaverApp.kt` + `ui/onboarding/`
+  (T1.5), `ui/KeepsakeNavHost.kt` + `ui/StartViewModel.kt` + placeholder
+  `ui/statuses/StatusesScreen.kt` (T1.6). 22 unit tests (Robolectric where Android
+  types are involved, D-014). Toolchain and settled scope: D-001 to D-017; see
+  SESSION_LOG "Handoff after M1" for environment and emulator tips. Only add
+  dependencies a task actually uses.
 
 ## Pending checks
 
@@ -39,7 +41,7 @@ Things verified only partly so far. Close them in the task named.
 | Milestone | Status | Tasks done |
 |-----------|--------|------------|
 | M0 Project scaffold | DONE | 6 / 6 |
-| M1 Folder access | WIP | 5 / 6 |
+| M1 Folder access | DONE | 6 / 6 |
 | M2 Status list | TODO | 0 / 5 |
 | M3 Viewer | TODO | 0 / 4 |
 | M4 Save, indicator, share | TODO | 0 / 6 |
@@ -71,7 +73,7 @@ summary (world rule → code location). Keep each note to one or two lines.
 | T1.3 | Tree validation + classification | DONE | `data/StatusFolders.kt` `classify(treeDocumentId)`; 10 plain JVM tests (both apps, both path styles, SD card volume, five wrong-folder cases); two mutation checks caught. Lint unchanged (D-015). Theory: picked tree → which app's `.Statuses` folder, or wrong folder |
 | T1.4 | Initial-URI builder | DONE | `StatusFolders.initialUri(kind)` / `initialDocumentId(kind, sdkInt)`, Android/media path from API 30; paths built from the same name constants as `classify`. 5 JVM tests incl. round trip classify(initialDocumentId) = kind; API-boundary mutation caught. Picker actually opening there is checked in T1.5. Theory: app + Android version → where its statuses folder most likely is |
 | T1.5 | Onboarding screen | DONE | Emulator API 35: picker opens at `.Statuses`; WhatsApp grant survives force-stop; wrong folder (`Media`) shows error, nothing stored or persisted; Business granted by hand via "Show hidden files"; re-pick to legacy path released the old grant (2 persisted grants left); light/dark OK, no crashes. Closed Pending checks: real document id is `primary:Android/media/com.whatsapp/WhatsApp/Media/.Statuses`; device throws SecurityException releasing a missing grant (throwaway probe, reverted). No ViewModel unit test: logic is classify + grant, both tested. Theory: user picks folder → classify decides app → store keeps grant (D-016) |
-| T1.6 | Start destination logic | TODO | |
+| T1.6 | Start destination logic | DONE | `ui/KeepsakeNavHost.kt` (routes `onboarding`, `statuses`) + `ui/StartViewModel.kt`; placeholder `StatusesScreen` until T2.3. Emulator API 35: fresh install (`pm clear`) → onboarding without Continue; grant → Continue → statuses; Back exits to launcher; relaunch and cold start → statuses; landscape keeps statuses; no crashes (D-017). Theory: readable source exists → list first, else onboarding |
 
 ### M2 — Status list
 

@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.moorthy.statussaver.ui.onboarding.OnboardingScreen
+import com.moorthy.statussaver.ui.KeepsakeNavHost
 import com.moorthy.statussaver.ui.theme.KeepsakeTheme
 
 /** Single activity that hosts all Compose screens. */
@@ -16,8 +16,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             KeepsakeTheme {
-                // Onboarding is the only screen until navigation arrives in T1.6.
-                OnboardingScreen()
+                KeepsakeNavHost()
             }
         }
     }

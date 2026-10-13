@@ -68,6 +68,11 @@ task's notes in `STATUS.md`.
 If a change contradicts `docs/design.md`, either the change is wrong or the design
 must be updated in the same change, with a `DECISIONS.md` entry.
 
+Show that new tests can fail: break the code briefly (a mutation such as flipping a
+condition), confirm the expected tests fail, then restore it. Report which mutations
+were caught and which survived; a surviving mutation is a gap to close or to record in
+"Pending checks" in `STATUS.md`. Do not commit placeholder tests.
+
 ## Tech stack
 
 - Kotlin, Jetpack Compose, Material 3 (dynamic color on Android 12+, system light/dark).
@@ -118,6 +123,22 @@ adb -s emulator-5554 shell cmd uimode night yes   # or "no": flip system dark mo
 adb -s emulator-5554 exec-out screencap -p > screen.png
 adb -s emulator-5554 emu kill
 ```
+
+Useful for device checks (the emulator has no WhatsApp):
+
+```bash
+# Fake statuses folders (mkdir works under Android/media; touch there does not).
+adb -s emulator-5554 shell 'mkdir -p "/sdcard/Android/media/com.whatsapp/WhatsApp/Media/.Statuses"'
+adb -s emulator-5554 shell pm clear com.moorthy.statussaver            # fresh-install state, drops grants
+adb -s emulator-5554 shell run-as com.moorthy.statussaver cat files/datastore/status_sources.preferences_pb | strings
+adb -s emulator-5554 shell dumpsys activity permissions | grep -B4 "persisted=0x1"   # persisted SAF grants
+adb -s emulator-5554 shell uiautomator dump /sdcard/ui.xml            # then tap a node's bounds centre
+adb -s emulator-5554 shell input tap <x> <y>
+```
+
+The folder picker's buttons read "USE THIS FOLDER" and "ALLOW"; it hides `.Statuses`
+unless "Show hidden files" is on in its menu. A cold boot may show "System UI isn't
+responding": tap Wait.
 
 Update this section if commands change.
 

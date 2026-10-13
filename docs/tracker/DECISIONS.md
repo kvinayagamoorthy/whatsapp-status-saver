@@ -168,3 +168,14 @@ screen needs no memory of which button was pressed.
 **Alternatives:** Reject a folder that does not match the button's app (an extra error
 for a correct folder); remember the requested kind and store under it (could store a
 Business folder as WhatsApp).
+
+## D-017 · 2026-10-13 · Accepted
+**Decision:** Onboarding shows a "Continue" button once at least one app is granted,
+instead of moving on automatically after the first grant. Continuing removes
+onboarding from the back stack. The start route is decided once per app start in
+`StartViewModel`.
+**Why:** FR1 lets the user grant both WhatsApp and WhatsApp Business; jumping away
+after the first grant would hide the second card until settings exist (T5.2). Popping
+onboarding makes Back from the list leave the app, as users expect from a home screen.
+**Alternatives:** Navigate right after the first grant (simpler, but blocks granting
+the second app); keep onboarding on the back stack (Back would return to setup).

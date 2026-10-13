@@ -16,6 +16,46 @@ Template:
 
 ---
 
+## 2026-10-13 — Handoff before compaction (end of M1)
+- Done: M1 complete. Commits on `main` this block: `857cb99` T1.1, `30b0d14` T1.2,
+  `5defa0e` T1.3, `b9c966c` T1.4, `39aace7` T1.5. T1.6 is done and verified but not
+  committed (user had not said "commit" yet).
+- Verified: working tree holds only the T1.6 changes plus these tracker updates.
+- Decisions: D-013 to D-017 added in this block.
+- Next: commit T1.6 when asked, then T2.1 — `StatusRepository.load()`.
+- Notes:
+  - Workflow the user confirmed by repetition: one task per turn; "commit and start
+    T<next>" commits the finished task and starts the next. Report as Theory /
+    What the skill changed / Verified / Risk / Files, no diffs.
+  - Theory-skill habits used every task and worth keeping: five questions before
+    coding; mutation checks after tests (now written into CLAUDE.md); throwaway
+    device probes for platform facts (e.g. the SecurityException check in T1.5),
+    always reverted before commit.
+  - Emulator tips moved into CLAUDE.md Commands (fake folders, `pm clear`, `run-as`
+    DataStore read, persisted-grant dump, uiautomator tapping). The tap helper
+    script lived in the session scratchpad and is gone after this session; rebuild
+    it from those commands if needed.
+  - Robolectric left an unused API 23 runtime (79 MB) in `~/.m2` from its first run;
+    the user has not asked to delete it.
+  - Emulator state: fake `.Statuses` folders exist for both apps (Android/media) and
+    the legacy `/sdcard/WhatsApp/Media/.Statuses`; all empty. The app on it has one
+    WhatsApp grant from the T1.6 run.
+
+## 2026-10-13 — T1.6: start destination; M1 complete
+- Done: Committed T1.5 (`39aace7`). T1.6: `ui/KeepsakeNavHost.kt` (string routes,
+  NavHost), `ui/StartViewModel.kt` (start route decided once from `validSources()`),
+  placeholder `ui/statuses/StatusesScreen.kt`, "Continue" on onboarding once an app
+  is granted. design.md §2 tree and navigation note updated. M1 complete.
+- Verified on emulator: see the T1.6 row in STATUS.md. Unit tests and lint green.
+- Decisions: D-017 (Continue button; onboarding popped from the back stack).
+- Next: T2.1 — `StatusRepository.load()`. Reuse `StatusSourceStore.validSources()`;
+  remember `StatusItem.mimeType` (D-013); Robolectric is available for `Uri` (D-014).
+  The emulator's `.Statuses` folders are empty, and `touch` under `Android/media` from
+  `adb shell` fails with "Operation not permitted": find another way to put sample
+  files there (e.g. `adb push`, or the legacy `/sdcard/WhatsApp/Media/.Statuses`).
+- Notes: Nothing is drawn while the start route loads (a few ms). Not yet committed
+  (see the handoff entry above).
+
 ## 2026-10-13 — T1.5: onboarding screen
 - Done: Committed T1.4 (`b9c966c`). T1.5: `StatusSaverApp` (Application; DataStore
   `status_sources` + `StatusSourceStore`), `ui/onboarding/OnboardingViewModel` and

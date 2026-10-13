@@ -51,6 +51,8 @@ com.moorthy.statussaver
 │   ├── SettingsStore.kt       Theme mode (DataStore)
 │   └── model/                 StatusItem, MediaType, StatusSourceKind
 └── ui/
+    ├── KeepsakeNavHost.kt     Routes and NavHost
+    ├── StartViewModel.kt      First route: statuses if a source is readable, else onboarding
     ├── theme/                 Material 3 theme, dynamic color, ThemeMode handling
     ├── onboarding/            FR1 access explanation + picker launch
     ├── statuses/              FR2 grid with Images/Videos tabs, multi-select
@@ -64,7 +66,8 @@ No Hilt/Koin: one module and a handful of classes do not need it.
 
 Navigation: Navigation Compose with routes `onboarding`, `statuses`,
 `viewer/{tab}/{index}`, `settings`. Start destination chosen from whether any
-`StatusSource` has a valid persisted permission.
+`StatusSource` has a valid persisted permission. Onboarding offers "Continue" once one
+app is granted and leaves the back stack when the user continues (D-017).
 
 ## 3. Reading statuses (SAF)
 
