@@ -179,3 +179,20 @@ after the first grant would hide the second card until settings exist (T5.2). Po
 onboarding makes Back from the list leave the app, as users expect from a home screen.
 **Alternatives:** Navigate right after the first grant (simpler, but blocks granting
 the second app); keep onboarding on the back stack (Back would return to setup).
+
+## D-018 · 2026-10-13 · Accepted
+**Decision:** `StatusRepository.load()` lists each valid source with one children query
+and keeps only rows whose MIME type starts with `image/` or `video/` (this also drops
+`.nomedia`, sub-folders and other files). Items are sorted by last-modified time,
+newest first, and items with the same time by file name. A source whose folder no
+longer exists gives no items instead of an error: on a device the documents provider
+logs `FileNotFoundException` and returns a null cursor. Missing time or size columns
+read as zero.
+**Why:** FR2 asks for newest first; the name tie-break keeps the grid from reshuffling
+between refreshes. A deleted folder with a kept grant is a real case (WhatsApp
+uninstalled; checked on the emulator in T2.1) and should look like an empty folder, not
+a crash. `Cursor.getLong` on a null value is implementation-defined, so the zero is
+explicit.
+**Alternatives:** Treat a missing folder as a lost grant and send the user to onboarding
+(re-granting cannot help until WhatsApp recreates the folder); sort by name only (not
+newest first).

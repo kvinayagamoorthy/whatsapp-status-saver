@@ -94,7 +94,9 @@ Approach (one code path for all API levels 26+):
 4. List with `DocumentsContract.buildChildDocumentsUriUsingTree` and a single
    `ContentResolver.query` projecting id, display name, mime type, last modified,
    size. Avoid `DocumentFile.listFiles()` + per-file calls (slow on large folders).
-5. Keep rows whose MIME type starts with `image/` or `video/`; drop `.nomedia`.
+5. Keep rows whose MIME type starts with `image/` or `video/`; this drops `.nomedia`
+   and sub-folders. Merge all sources, newest first, same time ordered by name. A
+   granted folder that no longer exists lists as empty (D-018).
 6. On each load, check `contentResolver.persistedUriPermissions`; a missing grant
    marks the source invalid and routes to onboarding.
 

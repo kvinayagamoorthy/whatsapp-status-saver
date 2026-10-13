@@ -16,6 +16,27 @@ Template:
 
 ---
 
+## 2026-10-13 — T1.6 committed, T2.1 StatusRepository
+- Done: Committed T1.6 as `77332dc`. T2.1 `data/StatusRepository.kt` `load()`: one
+  children query per valid source, image/video MIME filter, merge, newest first with
+  name tie-break; wired into `StatusSaverApp`. Not yet committed.
+- Verified: 8 Robolectric tests against a fake documents provider (30 unit tests in
+  total); 7 of 8 mutations caught (video dropped, any MIME accepted, wrong document id,
+  oldest first, no tie-break, valid-source filter ignored, null cursor throws).
+  Emulator API 35 with a throwaway probe (reverted): 3 items newest first with correct
+  MIME/size/time, `.nomedia`, `notes.txt` and a sub-folder dropped; every item URI
+  opens and reads its full size; deleting the granted folder gives 0 items, no crash
+  (provider logs FileNotFoundException, null cursor). First load ~330 ms cold.
+- Decisions: D-018.
+- Next: T2.2 — `StatusesViewModel` + `UiState`.
+- Notes: Surviving mutation: dropping the null guard on last-modified, because
+  MatrixCursor and SQLite both return 0 for null; kept since the Cursor contract calls
+  it implementation-defined. Emulator now holds fake statuses: WhatsApp folder has
+  w1.png, w2.png, w3.mp4, .nomedia, notes.txt, sub/; Business folder has b1.png (not
+  granted). `adb push` works under Android/media (CLAUDE.md tips updated). Mutation
+  runs: delete `app/build/test-results` first and check the Gradle exit code, or a
+  mutant that fails to compile leaves old results that look like a catch.
+
 ## 2026-10-13 — Handoff before compaction (end of M1)
 - Done: M1 complete. Commits on `main` this block: `857cb99` T1.1, `30b0d14` T1.2,
   `5defa0e` T1.3, `b9c966c` T1.4, `39aace7` T1.5. T1.6 is done and verified but not

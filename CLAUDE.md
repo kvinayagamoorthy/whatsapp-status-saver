@@ -129,6 +129,9 @@ Useful for device checks (the emulator has no WhatsApp):
 ```bash
 # Fake statuses folders (mkdir works under Android/media; touch there does not).
 adb -s emulator-5554 shell 'mkdir -p "/sdcard/Android/media/com.whatsapp/WhatsApp/Media/.Statuses"'
+# Fake statuses: adb push works there; -a keeps the local modified time (set it with touch -d).
+# ffmpeg is installed for a tiny test video: ffmpeg -f lavfi -i color=c=red:s=64x64:d=1 -pix_fmt yuv420p v.mp4
+adb -s emulator-5554 push -a w1.png v.mp4 "/sdcard/Android/media/com.whatsapp/WhatsApp/Media/.Statuses/"
 adb -s emulator-5554 shell pm clear com.moorthy.statussaver            # fresh-install state, drops grants
 adb -s emulator-5554 shell run-as com.moorthy.statussaver cat files/datastore/status_sources.preferences_pb | strings
 adb -s emulator-5554 shell dumpsys activity permissions | grep -B4 "persisted=0x1"   # persisted SAF grants
