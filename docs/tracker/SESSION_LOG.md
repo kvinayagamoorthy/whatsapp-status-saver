@@ -16,6 +16,32 @@ Template:
 
 ---
 
+## 2026-10-13 — Handoff before compaction (end of M0)
+- Done: Committed T0.6 (`9e11289`). M0 complete. Commits so far on `main`:
+  `d238047` and `833927c` docs (made on branch `docs/project-setup`, fast-forward
+  merged); `03b3c8a` T0.1+T0.2; `9317d20` T0.3; `a19a3cb` T0.4; `35ca13e` T0.5;
+  `9e11289` T0.6.
+- Verified: working tree clean after commit.
+- Decisions: D-001 to D-012 cover everything decided so far.
+- Next: T1.1 — models (`StatusSourceKind`, `MediaType`, `StatusItem`). M1 is the
+  first milestone where design.md §1 concepts become code: use the
+  `programming-as-theory-building` skill and its five questions before T1.1.
+- Notes:
+  - The user is trying out the programming-as-theory-building skill on this
+    project. Show it in each report (Theory / Verified / Risk), carry the theory
+    line into STATUS notes, and say plainly when the skill changed a choice (e.g.
+    no placeholder test committed, `documentfile` left out, scope asked first).
+  - Environment: JDK 21 at `/usr/lib64/jvm/java-21-openjdk-21`; Android SDK at
+    `~/Android/Sdk` with platforms 35 and 37.0, build-tools 34/35; no system Gradle
+    (use `./gradlew`). First build after a clean cache takes about 5-7 minutes.
+  - Tool quirks: `sdkmanager` is deprecated in favour of the `android` CLI in
+    `cmdline-tools/latest/bin`; `avdmanager create avd` silently does nothing, so
+    AVD `keepsake_api35` was written by hand under `~/.android/avd/`. Emulator
+    boots in about 15 s.
+  - A physical phone is attached over adb. Target the emulator with
+    `-s emulator-5554`; ask before installing on or changing the phone.
+  - See "Pending checks" in STATUS.md for partly verified items.
+
 ## 2026-10-13 — T0.6: test and lint wiring; M0 complete
 - Done: Committed T0.5 (`35ca13e`). T0.6: JUnit 4.13.2 added; backup/transfer
   exclusion rules for Android 12+ (D-012). M0 is complete.

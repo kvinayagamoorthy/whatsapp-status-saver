@@ -1,6 +1,6 @@
 # Status Board
 
-Last updated: 2026-10-13 (M0 done)
+Last updated: 2026-10-13 (M0 done, handoff before compaction)
 
 ## Resume here
 
@@ -8,6 +8,7 @@ Last updated: 2026-10-13 (M0 done)
 - **In progress:** none
 - **Next task:** T1.1 — models `StatusSourceKind`, `MediaType`, `StatusItem` (see `docs/plan.md` M1)
 - **Blockers:** none
+- **Last task commit:** `9e11289` (T0.6), followed by a docs-only handoff commit. Working tree clean.
 - **Notes for next session:** Docs and trackers created. Scope confirmed: WhatsApp
   status saver, Kotlin + Compose, minSdk 26, package `com.moorthy.statussaver`,
   sideload distribution, app name "Keepsake" with bookmark-in-ring icon (D-009).
@@ -16,6 +17,17 @@ Last updated: 2026-10-13 (M0 done)
   `~/Android/Sdk` (D-010). Compose plugin pins Kotlin to 2.4.21 (AGP's bundled 2.2.10
   is upgraded). Emulator AVD `keepsake_api35` exists for device checks (see
   CLAUDE.md Commands). Only add dependencies a task actually uses.
+
+## Pending checks
+
+Things verified only partly so far. Close them in the task named.
+
+| Check | Why it is open | Close in |
+|-------|----------------|----------|
+| Brand (terracotta) palette on Android 8-11 | Only an API 35 system image is installed; dynamic color hides the palette there | T5.4 or earlier on an API 26-30 emulator image |
+| Video playback with Media3 network/wake-lock permissions removed | No player yet (D-011) | T3.3 |
+| Status-bar icon colors follow the in-app theme override | `enableEdgeToEdge()` follows the system theme only | T5.1 |
+| Release APK under 10 MB | Debug APK is 16.5 MB unminified | T6.2 |
 
 ## Legend
 

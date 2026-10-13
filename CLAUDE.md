@@ -33,6 +33,19 @@ trackers are. Before doing any work:
 - Trackers are the source of truth for progress. Never leave them stale after a
   code change.
 
+## Working agreement with the user
+
+- One task at a time. Finish the task, verify it, update the trackers, then report
+  and stop. Do not commit or start the next task until the user says so (usually
+  "commit and start T<next>").
+- One commit per task on `main`, Conventional Commits, task ID in the subject.
+- Report each finished task as Theory / Verified / Risk, then the list of files
+  created or modified with one line each. No code diffs in the report.
+- Settle anything that is the user's call (scope, naming, distribution) with a
+  question before writing it into the docs.
+- Look up library and tool versions from the live repositories (Gradle services,
+  Google Maven, Maven Central `maven-metadata.xml`) rather than from memory.
+
 ## Documents
 
 | File | Purpose |
