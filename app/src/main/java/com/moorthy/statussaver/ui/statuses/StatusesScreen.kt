@@ -2,16 +2,21 @@ package com.moorthy.statussaver.ui.statuses
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -19,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -34,6 +40,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
@@ -48,6 +56,11 @@ fun StatusesScreen(
     viewModel: StatusesViewModel = viewModel(factory = StatusesViewModel.Factory),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
+    // Also fires when the screen first appears, so this is the first load too.
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.reload()
+    }
     // The tab is a MediaType, so it survives rotation and later names the viewer's tab.
     var selectedTab by rememberSaveable { mutableStateOf(MediaType.IMAGE) }
 
@@ -71,22 +84,28 @@ fun StatusesScreen(
                     )
                 }
             }
-            when (val state = uiState) {
-                StatusesUiState.Loading -> CenteredBox {
-                    CircularProgressIndicator()
-                }
-                is StatusesUiState.Content -> {
-                    val tabItems = remember(state, selectedTab) { state.itemsOf(selectedTab) }
-                    if (tabItems.isEmpty()) {
-                        CenteredMessage(stringResource(selectedTab.noItemsRes))
-                    } else {
-                        StatusGrid(items = tabItems)
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                onRefresh = viewModel::refresh,
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                when (val state = uiState) {
+                    StatusesUiState.Loading -> CenteredBox {
+                        CircularProgressIndicator()
                     }
+                    is StatusesUiState.Content -> {
+                        val tabItems = remember(state, selectedTab) { state.itemsOf(selectedTab) }
+                        if (tabItems.isEmpty()) {
+                            CenteredMessage(stringResource(selectedTab.noItemsRes))
+                        } else {
+                            StatusGrid(items = tabItems)
+                        }
+                    }
+                    // Both get their own explanation and actions in T2.5.
+                    StatusesUiState.Empty,
+                    StatusesUiState.NeedsAccess,
+                    -> CenteredMessage(stringResource(R.string.statuses_placeholder))
                 }
-                // Both get their own explanation and actions in T2.5.
-                StatusesUiState.Empty,
-                StatusesUiState.NeedsAccess,
-                -> CenteredMessage(stringResource(R.string.statuses_placeholder))
             }
         }
     }
@@ -147,15 +166,20 @@ private fun CenteredMessage(text: String) {
     }
 }
 
+/** Scrollable even when its content fits, so pull-to-refresh also works on messages. */
 @Composable
 private fun CenteredBox(content: @Composable () -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        content()
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .fillMaxWidth()
+                .heightIn(min = maxHeight)
+                .padding(24.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            content()
+        }
     }
 }
 

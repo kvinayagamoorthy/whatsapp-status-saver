@@ -1,24 +1,24 @@
 # Status Board
 
-Last updated: 2026-10-13 (T2.3 done, uncommitted)
+Last updated: 2026-10-13 (T2.4 done, uncommitted)
 
 ## Resume here
 
 - **Current milestone:** M2 — Status list (M1 complete)
-- **In progress:** none (T2.3 done, waiting for the user to say commit)
-- **Next task:** T2.4 — pull-to-refresh and reload on resume
+- **In progress:** none (T2.4 done, waiting for the user to say commit)
+- **Next task:** T2.5 — empty and lost-permission states
 - **Blockers:** none
-- **Last task commit:** `ccbec21` (T2.2). Earlier: `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
-- **Notes for next session:** T2.3 is finished and verified but NOT committed (subject
-  `feat: show statuses in a thumbnail grid with image and video tabs (T2.3)`); commit
-  it first when the user says so. Start the emulator with `-gpu host` (CLAUDE.md).
+- **Last task commit:** `000d410` (T2.3). Earlier: `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
+- **Notes for next session:** T2.4 is finished and verified but NOT committed (subject
+  `feat: reload statuses on resume and on pull to refresh (T2.4)`); commit it first
+  when the user says so. Start the emulator with `-gpu host` (CLAUDE.md).
   Code so far: `data/model/` (T1.1), `data/StatusSourceStore.kt` (T1.2),
   `data/StatusFolders.kt` (T1.3, T1.4), `StatusSaverApp.kt` + `ui/onboarding/`
   (T1.5), `ui/KeepsakeNavHost.kt` + `ui/StartViewModel.kt` + placeholder
   `ui/statuses/StatusesScreen.kt` (T1.6), `data/StatusRepository.kt` (T2.1),
   `ui/statuses/StatusesViewModel.kt` (T2.2), grid in `ui/statuses/StatusesScreen.kt`
-  (T2.3). 37 unit tests (Robolectric where Android types are involved, D-014). Toolchain and settled
-  scope: D-001 to D-020; see
+  (T2.3), refresh (T2.4). 43 unit tests (Robolectric where Android types are involved, D-014). Toolchain and settled
+  scope: D-001 to D-021; see
   SESSION_LOG "Handoff after M1" for environment and emulator tips. Only add
   dependencies a task actually uses.
 
@@ -46,7 +46,7 @@ Things verified only partly so far. Close them in the task named.
 |-----------|--------|------------|
 | M0 Project scaffold | DONE | 6 / 6 |
 | M1 Folder access | DONE | 6 / 6 |
-| M2 Status list | WIP | 3 / 5 |
+| M2 Status list | WIP | 4 / 5 |
 | M3 Viewer | TODO | 0 / 4 |
 | M4 Save, indicator, share | TODO | 0 / 6 |
 | M5 Settings and polish | TODO | 0 / 6 |
@@ -86,7 +86,7 @@ summary (world rule → code location). Keep each note to one or two lines.
 | T2.1 | `StatusRepository.load()` | DONE | 8 Robolectric tests on a fake documents provider, 7 of 8 mutations caught (null-time guard survives by design, D-018). Emulator API 35 (probe reverted): lists 3 fake statuses newest first, drops `.nomedia`/txt/sub-folder, item URIs open; deleted folder → 0 items, no crash. Theory: granted folders' image/video files → merged `StatusItem`s, newest first |
 | T2.2 | `StatusesViewModel` + `UiState` | DONE | `ui/statuses/StatusesViewModel.kt`; `load()` returns null when no folder is readable (D-019). 4 VM tests with fake load + 3 repository tests, 4/4 mutations caught. Emulator (probe reverted): Loading → Content newest first; empty folder → Empty; rotation keeps state. Theory: folder readability + contents → Loading / Content / Empty / NeedsAccess |
 | T2.3 | Grid UI with tabs and thumbnails | DONE | Emulator API 35 `-gpu host`, 146 statuses (120 phone-size JPEGs, 21 videos): thumbnails and video frames newest first, badges, light/dark, tab kept in landscape. 24-swipe `gfxinfo`: release 2.1% janky (p50 17 ms), debug 1.9%, Settings 0.2%. Tab-split test + mutation caught (D-020). Theory: newest-first statuses → one grid per media type |
-| T2.4 | Pull-to-refresh + reload on resume | TODO | |
+| T2.4 | Pull-to-refresh + reload on resume | DONE | Emulator API 35: image added while app in background shows first on return; image added while open appears after pull, indicator clears. 11 VM tests, 4/4 mutations caught (D-021). Theory: user returns from WhatsApp or pulls → folders read again, one load at a time |
 | T2.5 | Empty and lost-permission states | TODO | |
 
 ### M3 — Viewer

@@ -145,7 +145,8 @@ and `FLAG_GRANT_READ_URI_PERMISSION`. No `FileProvider` and no temp copies neede
   one player instance released on dispose.
 - Multi-select: long-press enters selection mode; top app bar switches to
   "N selected" with Save action.
-- Refresh: pull-to-refresh plus reload on `ON_RESUME`.
+- Refresh: pull-to-refresh plus reload on `ON_RESUME` (also the first load); one load
+  at a time, quiet reloads keep the current list on screen (D-021).
 
 ## 7. Error handling
 

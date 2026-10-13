@@ -229,3 +229,20 @@ call per video, which is not "cheaply available" (FR2).
 **Alternatives:** Per-tab ViewModel lists (more state for a one-line filter); name as
 grid key (crash on a cross-app duplicate); `material-icons-core` for the play icon;
 reading duration lazily per tile (more work per scroll for a small detail).
+
+## D-021 · 2026-10-13 · Accepted
+**Decision:** The status list loads only through `StatusesViewModel.reload()`, which the
+screen calls on every `ON_RESUME` (the first appearance included); there is no load in
+`init`. Pull-to-refresh calls `refresh()`, which shows the indicator and then reloads.
+Only one load runs at a time: a request made while one is running is dropped, and a
+pull during a quiet reload keeps the indicator until that load ends. Quiet reloads keep
+the current list on screen without a spinner.
+**Why:** Each time the user returns from WhatsApp there may be new files, and the first
+appearance is just another return, so one trigger covers both. Without `init` loading
+there is no double load on start. A load takes a few hundred milliseconds, so a second
+one started meanwhile would read the same files; dropping it avoids racing results
+and needs no cancellation.
+**Alternatives:** Load in `init` and on resume (two loads at start); cancel and restart
+on each request (the cancelled load's indicator state is easy to get wrong); watching
+the folder for changes (a SAF tree cannot be observed with `FileObserver`, and resume
+covers the real flow).

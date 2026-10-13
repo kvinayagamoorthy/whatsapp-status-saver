@@ -16,6 +16,21 @@ Template:
 
 ---
 
+## 2026-10-13 — T2.3 committed, T2.4 refresh
+- Done: Committed T2.3 as `000d410`. T2.4: `StatusesViewModel.reload()` (quiet, on every
+  `ON_RESUME` via `LifecycleEventEffect`, replaces the `init` load) and `refresh()`
+  (pull-to-refresh indicator); one load at a time. `PullToRefreshBox` wraps the tab
+  content; centered messages scroll so pulling works on them too. Not yet committed.
+- Verified: 11 ViewModel tests (43 unit tests in total), 4 of 4 mutations caught (no
+  in-flight guard, indicator never cleared, quiet reload shows indicator, load back in
+  `init`). Emulator API 35 `-gpu host`: new image pushed while the app was in the
+  background showed first on return; image pushed while open did not show until a pull,
+  then did; indicator cleared; no crashes. Lint: only MissingApplicationIcon.
+- Decisions: D-021.
+- Next: T2.5 — empty and lost-permission states.
+- Notes: Emulator WhatsApp folder now also has NEW-1.jpg (yellow) and NEW-2.jpg (cyan).
+  Pull on the centered message (empty tab) was not exercised on the device.
+
 ## 2026-10-13 — T2.2 committed, T2.3 status grid
 - Done: Committed T2.2 as `ccbec21`. T2.3 `StatusesScreen`: top bar, Images/Videos
   tabs (`MediaType`, saved across rotation), adaptive `LazyVerticalGrid` of square Coil

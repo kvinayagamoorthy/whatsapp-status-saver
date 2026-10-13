@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.moorthy.statussaver.StatusSaverApp
 import com.moorthy.statussaver.data.model.MediaType
 import com.moorthy.statussaver.data.model.StatusItem
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,6 +41,10 @@ sealed interface StatusesUiState {
  * Holds the status list for the statuses screen. [loadStatuses] is
  * `StatusRepository.load`: null means no readable folder, an empty list means empty
  * folders.
+ *
+ * WhatsApp adds a file whenever the user views a status, so the list is read again each
+ * time the screen comes to the front ([reload]) and when the user pulls to refresh
+ * ([refresh]). Nothing is loaded until the first [reload].
  */
 class StatusesViewModel(
     private val loadStatuses: suspend () -> List<StatusItem>?,
@@ -48,15 +53,37 @@ class StatusesViewModel(
     private val mutableUiState = MutableStateFlow<StatusesUiState>(StatusesUiState.Loading)
     val uiState: StateFlow<StatusesUiState> = mutableUiState.asStateFlow()
 
-    init {
-        viewModelScope.launch {
+    private val mutableIsRefreshing = MutableStateFlow(false)
+
+    /** True while a load the user asked for by pulling down is running. */
+    val isRefreshing: StateFlow<Boolean> = mutableIsRefreshing.asStateFlow()
+
+    private var loadJob: Job? = null
+
+    /**
+     * Reads the folders again without a visible indicator; the current list stays on
+     * screen until the new one is ready. Ignored while a load is already running, since
+     * that load started moments ago and will show the same files.
+     */
+    fun reload() {
+        if (loadJob?.isActive == true) {
+            return
+        }
+        loadJob = viewModelScope.launch {
             val items = loadStatuses()
             mutableUiState.value = when {
                 items == null -> StatusesUiState.NeedsAccess
                 items.isEmpty() -> StatusesUiState.Empty
                 else -> StatusesUiState.Content(items)
             }
+            mutableIsRefreshing.value = false
         }
+    }
+
+    /** Like [reload], but shows the pull-to-refresh indicator until the load finishes. */
+    fun refresh() {
+        mutableIsRefreshing.value = true
+        reload()
     }
 
     companion object {
