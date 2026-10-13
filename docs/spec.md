@@ -1,4 +1,4 @@
-# Product Spec — Status Saver (Android)
+# Product Spec — Keepsake (Android status saver)
 
 Status: Draft v1 (2026-10-13)
 
@@ -61,7 +61,7 @@ tap save, done.
 - Actions in the viewer: **Save** and **Share**.
 
 ### FR4 — Save to gallery
-- Saves a copy into `Pictures/StatusSaver` (images) or `Movies/StatusSaver` (videos).
+- Saves a copy into `Pictures/Keepsake` (images) or `Movies/Keepsake` (videos).
 - Visible immediately in the phone's gallery apps.
 - Saving the same item twice does not create a duplicate; show "Already saved".
 - Show a short confirmation (snackbar) on success, clear message on failure.
@@ -101,5 +101,5 @@ tap save, done.
 
 ## 8. Open questions
 
-- OQ1. Distribution: Play Store, F-Droid, or sideload only? (Affects release milestone.)
-- OQ2. App display name and icon.
+- OQ1. ~~Distribution channel~~ Resolved: sideloaded APK for now; Play Store maybe later (D-008).
+- OQ2. ~~App display name and icon~~ Resolved: "Keepsake", bookmark-in-a-ring icon (D-009).

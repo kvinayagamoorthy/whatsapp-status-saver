@@ -4,7 +4,7 @@ Guidance for Claude Code working in this repository.
 
 ## What this is
 
-An Android-only app that lets a user browse the WhatsApp status images and videos
+**Keepsake** — an Android-only app that lets a user browse the WhatsApp status images and videos
 already cached on their phone, preview them, and save chosen ones into the phone's
 local gallery. Simple and hassle free: no account, no network, no ads, no analytics.
 Light and dark themes follow the system setting by default.
@@ -70,8 +70,8 @@ must be updated in the same change, with a `DECISIONS.md` entry.
 - No `INTERNET` permission. The app never touches the network.
 - Read statuses only through the SAF tree URI the user granted. No
   `MANAGE_EXTERNAL_STORAGE`, no `READ_MEDIA_*` or `READ_EXTERNAL_STORAGE` for reading.
-- Saved files go to the shared gallery via MediaStore under `Pictures/StatusSaver`
-  and `Movies/StatusSaver`. `WRITE_EXTERNAL_STORAGE` only with `maxSdkVersion="28"`.
+- Saved files go to the shared gallery via MediaStore under `Pictures/Keepsake`
+  and `Movies/Keepsake`. `WRITE_EXTERNAL_STORAGE` only with `maxSdkVersion="28"`.
 - Never modify or delete anything inside WhatsApp's folders.
 - Do not use "WhatsApp" in the app name or launcher label (trademark).
 - Keep it simple: no feature, setting, or abstraction without a current need in
@@ -93,7 +93,7 @@ Update this section if commands change.
 
 ## Conventions
 
-- Package root: `com.moothy.statussaver` (change only via a `DECISIONS.md` entry).
+- Package root: `com.moorthy.statussaver` (change only via a `DECISIONS.md` entry).
 - Packages by layer inside the single module: `data/`, `ui/<screen>/`, `ui/theme/`.
 - Commit messages: Conventional Commits, normal English.
 - One task per commit where practical; reference the task ID (e.g. `T2.3`).

@@ -1,4 +1,4 @@
-# Implementation Plan — Status Saver (Android)
+# Implementation Plan — Keepsake (Android status saver)
 
 Status: Draft v1 (2026-10-13). Live progress lives in `tracker/STATUS.md`, not here.
 This file defines *what* each task is and *when it is done*.
@@ -11,11 +11,11 @@ Goal: an empty app that builds, runs, and follows system light/dark.
 
 | ID | Task | Done when |
 |----|------|-----------|
-| T0.1 | Create Gradle project: Kotlin DSL, version catalog, `:app` module, package `com.moothy.statussaver`, minSdk 26, compileSdk/targetSdk latest stable | `./gradlew assembleDebug` succeeds |
+| T0.1 | Create Gradle project: Kotlin DSL, version catalog, `:app` module, package `com.moorthy.statussaver`, minSdk 26, compileSdk/targetSdk latest stable | `./gradlew assembleDebug` succeeds |
 | T0.2 | Add `.gitignore` for Android/Gradle/IDE files and Gradle wrapper | Clean `git status` after a build |
 | T0.3 | Compose + Material 3 theme with dynamic color and system dark mode; `MainActivity` edge-to-edge with placeholder screen | App launches; theme flips with system setting |
 | T0.4 | Add dependencies: Navigation Compose, Lifecycle ViewModel Compose, DataStore, Coil 3 (+ video), Media3 ExoPlayer/UI | Builds; versions recorded in `libs.versions.toml` |
-| T0.5 | Manifest: no `INTERNET`; `WRITE_EXTERNAL_STORAGE` with `maxSdkVersion="28"`; app label without "WhatsApp" | Merged manifest checked (`processDebugManifest` output) |
+| T0.5 | Manifest: no `INTERNET`; `WRITE_EXTERNAL_STORAGE` with `maxSdkVersion="28"`; app label "Keepsake" | Merged manifest checked (`processDebugManifest` output) |
 | T0.6 | Unit test + lint wiring | `testDebugUnitTest` and `lintDebug` run green |
 
 ## M1 — Folder access (FR1, FR8 core)
@@ -56,7 +56,7 @@ Goal: grid shows current statuses from all granted sources.
 
 | ID | Task | Done when |
 |----|------|-----------|
-| T4.1 | `SavedMediaRepository.save()` API 29+ MediaStore path with `IS_PENDING` | Instrumented test: file visible in MediaStore under `Pictures/StatusSaver` |
+| T4.1 | `SavedMediaRepository.save()` API 29+ MediaStore path with `IS_PENDING` | Instrumented test: file visible in MediaStore under `Pictures/Keepsake` |
 | T4.2 | API 26–28 path with runtime `WRITE_EXTERNAL_STORAGE` + media scan | Verified on API 28 emulator |
 | T4.3 | Saved-names flow and idempotent save (I3, I4) | Saving twice yields one file and "Already saved" |
 | T4.4 | Save action in viewer + snackbar; check mark on tiles and viewer | Visible on device |
@@ -71,7 +71,7 @@ Goal: grid shows current statuses from all granted sources.
 | T5.2 | Access management: show granted sources, re-pick, revoke | Revoke releases persisted permission |
 | T5.3 | About section: non-affiliation disclaimer, responsibility note, version | Visible in settings |
 | T5.4 | Accessibility pass: content descriptions, touch targets, TalkBack, font scale 200% | Manual checklist recorded in STATUS notes |
-| T5.5 | App icon and display name (resolves OQ2) | Adaptive icon shows on launcher |
+| T5.5 | Adaptive launcher icon: bookmark ribbon inside a circle, plus monochrome layer for themed icons (D-009) | Icon shows on launcher, including Android 13+ themed icons |
 | T5.6 | Performance check vs NFR2/NFR3 | Measured numbers recorded in STATUS notes |
 
 ## M6 — Release
@@ -79,9 +79,10 @@ Goal: grid shows current statuses from all granted sources.
 | ID | Task | Done when |
 |----|------|-----------|
 | T6.1 | Decide distribution channel (resolves OQ1) | Entry in DECISIONS.md |
-| T6.2 | Release build: R8/minify, resource shrinking, signing config (keystore outside repo) | `assembleRelease` produces signed APK/AAB < 10 MB |
+| T6.2 | Release build: R8/minify, resource shrinking, signing config (keystore outside repo, backed up; the same key must sign every update or sideloaded upgrades fail) | `assembleRelease` produces signed APK < 10 MB |
 | T6.3 | Release manual test pass (design.md §8 checklist) on real device | Checklist recorded |
-| T6.4 | Store listing text, screenshots, privacy policy (no data collected) | Ready to upload |
+| T6.4 | Store listing text, screenshots, privacy policy (no data collected). Deferred: only needed if moving to Play Store (D-008) | Ready to upload |
+| T6.5 | Sideload install notes: how to install the APK and allow "install unknown apps" | Short section in README, tested on a real device |
 
 ## Risks
 

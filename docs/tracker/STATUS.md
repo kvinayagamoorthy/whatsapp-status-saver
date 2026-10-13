@@ -9,8 +9,10 @@ Last updated: 2026-10-13
 - **Next task:** T0.1 — Create Gradle project (see `docs/plan.md` M0)
 - **Blockers:** none
 - **Notes for next session:** Docs and trackers created. Scope confirmed: WhatsApp
-  status saver, Kotlin + Compose, minSdk 26. Verify Android SDK / JDK availability
-  on this machine before T0.1.
+  status saver, Kotlin + Compose, minSdk 26, package `com.moorthy.statussaver`,
+  sideload distribution, app name "Keepsake" with bookmark-in-ring icon (D-009).
+  No open questions. Verify Android SDK / JDK availability on this machine before
+  T0.1.
 
 ## Legend
 
@@ -27,7 +29,7 @@ Last updated: 2026-10-13
 | M3 Viewer | TODO | 0 / 4 |
 | M4 Save, indicator, share | TODO | 0 / 6 |
 | M5 Settings and polish | TODO | 0 / 6 |
-| M6 Release | TODO | 0 / 4 |
+| M6 Release | TODO | 1 / 5 |
 
 ## Tasks
 
@@ -94,21 +96,22 @@ summary (world rule → code location). Keep each note to one or two lines.
 | T5.2 | Access management | TODO | |
 | T5.3 | About section | TODO | |
 | T5.4 | Accessibility pass | TODO | |
-| T5.5 | Icon and display name | TODO | |
+| T5.5 | Launcher icon (bookmark in ring) | TODO | Name already decided: Keepsake (D-009) |
 | T5.6 | Performance check | TODO | |
 
 ### M6 — Release
 
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
-| T6.1 | Distribution decision | TODO | |
+| T6.1 | Distribution decision | DONE | Sideloaded APK for now; Play Store maybe later (D-008) |
 | T6.2 | Release build + signing | TODO | |
 | T6.3 | Release manual test | TODO | |
-| T6.4 | Store listing + privacy policy | TODO | |
+| T6.4 | Store listing + privacy policy | TODO | Deferred until a Play Store move (D-008) |
+| T6.5 | Sideload install notes | TODO | |
 
 ## Open questions
 
 | ID | Question | Status |
 |----|----------|--------|
-| OQ1 | Distribution channel (Play / F-Droid / sideload) | Open — resolve in T6.1 |
-| OQ2 | App display name and icon | Open — resolve in T5.5 |
+| OQ1 | Distribution channel (Play / F-Droid / sideload) | Resolved — sideload for now (D-008) |
+| OQ2 | App display name and icon | Resolved — Keepsake, bookmark-in-ring icon (D-009) |

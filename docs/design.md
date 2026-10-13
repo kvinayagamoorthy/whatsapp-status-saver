@@ -1,4 +1,4 @@
-# Design — Status Saver (Android)
+# Design — Keepsake (Android status saver)
 
 Status: Draft v1 (2026-10-13). Changes to this file need a `tracker/DECISIONS.md` entry.
 
@@ -40,7 +40,7 @@ need network, WhatsApp interaction, or editing are out of scope (see `spec.md` �
 Single Gradle module `:app`. Layers by package:
 
 ```
-com.moothy.statussaver
+com.moorthy.statussaver
 ├── StatusSaverApp.kt          Application; builds repositories (manual DI)
 ├── MainActivity.kt            Single activity, hosts Compose NavHost
 ├── data/
@@ -99,11 +99,11 @@ See DECISIONS D-003.
 
 - **API 29+:** insert into `MediaStore.Images.Media` / `MediaStore.Video.Media`
   (`VOLUME_EXTERNAL_PRIMARY`) with `DISPLAY_NAME` = original file name,
-  `RELATIVE_PATH` = `Pictures/StatusSaver/` or `Movies/StatusSaver/`, `IS_PENDING=1`;
+  `RELATIVE_PATH` = `Pictures/Keepsake/` or `Movies/Keepsake/`, `IS_PENDING=1`;
   stream-copy from the SAF URI; then set `IS_PENDING=0`. Delete the row on failure.
 - **API 26–28:** requires `WRITE_EXTERNAL_STORAGE` (manifest `maxSdkVersion="28"`,
   requested at first save). Copy into
-  `Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES|MOVIES)/StatusSaver/`,
+  `Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES|MOVIES)/Keepsake/`,
   then `MediaScannerConnection.scanFile`.
 - **Already-saved check (I3, I4):** API 29+ query MediaStore for our `RELATIVE_PATH`
   and collect `DISPLAY_NAME`s (own files are visible without read permission);
