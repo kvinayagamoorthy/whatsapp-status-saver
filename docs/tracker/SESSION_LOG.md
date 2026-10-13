@@ -16,6 +16,17 @@ Template:
 
 ---
 
+## 2026-10-13 — T0.4: core dependencies
+- Done: Committed T0.3 (`9317d20`). T0.4 added Navigation Compose, Lifecycle
+  ViewModel/runtime Compose, DataStore Preferences, Coil 3 (compose + video), and
+  Media3 (exoplayer + ui) at the latest stable versions to the catalog and `:app`.
+- Verified: `assembleDebug` green; merged manifest checked: no INTERNET.
+- Decisions: none new (the libraries were chosen in design.md; versions are in the
+  catalog). `documentfile` was not added because design.md §3 avoids
+  `DocumentFile.listFiles()`.
+- Next: T0.5 — manifest permissions. Media3 brings ACCESS_NETWORK_STATE and WAKE_LOCK.
+- Notes: Not yet committed.
+
 ## 2026-10-13 — T0.3: Compose theme and MainActivity
 - Done: T0.3 Compose + Material 3 (`KeepsakeTheme`: system dark, dynamic color on
   API 31+, terracotta brand palette below), edge-to-edge `MainActivity` with a
