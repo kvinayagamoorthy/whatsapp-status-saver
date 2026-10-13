@@ -1,16 +1,17 @@
 # Status Board
 
-Last updated: 2026-10-13 (T3.2 done, not yet committed)
+Last updated: 2026-10-13 (T3.3 done, not yet committed)
 
 ## Resume here
 
 - **Current milestone:** M3 — Viewer
-- **In progress:** none (T3.2 done, waiting for the user to commit)
-- **Next task:** T3.3 — video player page
+- **In progress:** none (T3.3 done, waiting for the user to commit)
+- **Next task:** T3.4 — vanished file handling
 - **Blockers:** none
-- **Last task commit:** `2904702` (T3.1). Earlier: `aa73d2c` (T2.5), `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
-- **Notes for next session:** T3.2 is done but not committed; commit it as
-  `feat: zoom images in the viewer with pinch and double-tap (T3.2)` when the user says so. Read
+- **Last task commit:** `3486a37` (T3.2). Earlier: `2904702` (T3.1), `aa73d2c` (T2.5), `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
+- **Notes for next session:** T3.3 is done but not committed; commit it as
+  `feat: play videos in the viewer with Compose Media3 controls (T3.3)` when the user
+  says so. Read
   SESSION_LOG "Handoff before compaction (end of M2)" for the emulator state. Start the emulator
   with `-gpu host` (CLAUDE.md). Code so far: `data/model/` (T1.1),
   `data/StatusSourceStore.kt` (T1.2), `data/StatusFolders.kt` (T1.3, T1.4),
@@ -18,9 +19,10 @@ Last updated: 2026-10-13 (T3.2 done, not yet committed)
   `ui/StartViewModel.kt` (T1.6), `data/StatusRepository.kt` (T2.1),
   `ui/statuses/StatusesViewModel.kt` (T2.2) and `ui/statuses/StatusesScreen.kt`
   (grid T2.3, refresh T2.4, empty and lost access T2.5), `ui/viewer/ViewerScreen.kt`
-  (pager T3.1; player T3.3 goes in its `ViewerPage`), `ui/viewer/Zoomable.kt` (T3.2). 53 unit tests (Robolectric
+  (pager T3.1), `ui/viewer/Zoomable.kt` (T3.2), `ui/viewer/VideoPlayerViewModel.kt` +
+  `ui/viewer/VideoPage.kt` (T3.3). 58 unit tests (Robolectric
   where Android types are involved, D-014). Toolchain and settled scope: D-001 to
-  D-024. Only add dependencies a task actually uses.
+  D-025. Only add dependencies a task actually uses.
 
 ## Pending checks
 
@@ -29,7 +31,6 @@ Things verified only partly so far. Close them in the task named.
 | Check | Why it is open | Close in |
 |-------|----------------|----------|
 | Brand (terracotta) palette on Android 8-11 | Only an API 35 system image is installed; dynamic color hides the palette there | T5.4 or earlier on an API 26-30 emulator image |
-| Video playback with Media3 network/wake-lock permissions removed | No player yet (D-011) | T3.3 |
 | Status-bar icon colors follow the in-app theme override | `enableEdgeToEdge()` follows the system theme only | T5.1 |
 | Release APK under 10 MB | Debug APK is 16.5 MB unminified | T6.2 |
 | Grid smoothness on a real phone with real WhatsApp media | Measured only on the emulator with generated files | T5.6 |
@@ -46,7 +47,7 @@ Things verified only partly so far. Close them in the task named.
 | M0 Project scaffold | DONE | 6 / 6 |
 | M1 Folder access | DONE | 6 / 6 |
 | M2 Status list | DONE | 5 / 5 |
-| M3 Viewer | WIP | 2 / 4 |
+| M3 Viewer | WIP | 3 / 4 |
 | M4 Save, indicator, share | TODO | 0 / 6 |
 | M5 Settings and polish | TODO | 0 / 6 |
 | M6 Release | TODO | 1 / 5 |
@@ -94,7 +95,7 @@ summary (world rule → code location). Keep each note to one or two lines.
 |----|------|--------|-------|
 | T3.1 | Pager viewer route | DONE | `ui/viewer/ViewerScreen.kt` + route `viewer/{tab}/{index}`; tiles clickable ("Open"). Emulator API 35: tapped tile opens that item, swipes go forward and back in order, rotation keeps the page, Back returns with tab kept, videos show first frame + badge, app killed in viewer restores the same item. Device mutation (no load in viewer) → endless spinner, caught. No unit test: navigation glue (as T1.6). Theory: tap → same list, same index (D-023) |
 | T3.2 | Zoomable image | DONE | `ui/viewer/Zoomable.kt` (`ZoomState` + `Modifier.zoomable`), images decoded at full size. 10 JVM tests on the zoom arithmetic; 8 of 8 mutations caught. Emulator API 35 with raw touch injection: double-tap zooms at the tap and back; zoomed drag pans to the image edge without paging; pinch out and back in; then a swipe pages again (bug found and fixed: scale ended at 1.000000119, snap added); rotation resets zoom, keeps the page. Theory: fingers on an image → scale and offset clamped to its edges (D-024) |
-| T3.3 | Video player page | TODO | Confirm playback works with Media3's network/wake-lock permissions removed (D-011). Never call `setWakeMode`; use keep-screen-on while playing |
+| T3.3 | Video player page | DONE | `VideoPlayerViewModel` (one ExoPlayer per viewer) + `VideoPage` (Compose `ContentFrame` + Material 3 controls, D-025); `media3-ui` swapped for `media3-ui-compose-material3`. 5 Robolectric tests with a real ExoPlayer; 5 of 5 mutations caught. Emulator API 35 with 30 s videos with sound, `dumpsys audio` states: plays on open (keep-screen-on set), mute/unmute, seek by tap and by drag (page stays), rotation keeps playing and position, Home → paused and stays paused on return, swipe → next video from the start, Back → no audio player left, keep-screen-on cleared. Merged manifest: no network or wake-lock permission. Theory: the settled page's video → one player owned by the viewer, released with it |
 | T3.4 | Vanished file handling | TODO | |
 
 ### M4 — Save, indicator, share

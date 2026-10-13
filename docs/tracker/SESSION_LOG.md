@@ -16,6 +16,28 @@ Template:
 
 ---
 
+## 2026-10-13 — T3.2 committed, T3.3 video player
+- Done: Committed T3.2 as `3486a37`. T3.3: `VideoPlayerViewModel` (one ExoPlayer for the
+  viewer: `show(uri)` plays from the start unless already shown, `pause()`, released in
+  `onCleared`; audio focus and becoming-noisy handled) and `VideoPage` (`ContentFrame`
+  with TextureView and the first frame as shutter, bottom bar with play/pause, position,
+  seek slider, duration, mute). The pager plays the settled page; other video pages show
+  first frame + badge. ON_STOP pauses unless the activity is rotating. Swapped
+  `media3-ui` (PlayerView, no mute button) for `media3-ui-compose-material3`. Not yet
+  committed.
+- Verified: 5 new Robolectric tests with a real ExoPlayer (58 in total), 5 of 5
+  mutations caught. Emulator API 35 with 30 s H.264 + AAC test videos (AUD-1 test
+  pattern 440 Hz, AUD-2 orange 880 Hz), checked through `dumpsys audio` player states and
+  screenshots: plays on open, mute/unmute (`mutedState:client`), tap and drag seek
+  without paging, rotation keeps playing and position, Home pauses and it stays paused
+  on return, swipe plays the next video from the start, Back leaves no audio player,
+  keep-screen-on only while playing. Merged manifest still has no network or wake-lock
+  permission (closes that pending check). Lint: only MissingApplicationIcon.
+- Decisions: D-025.
+- Next: T3.4 — vanished file handling.
+- Notes: the emulator's `.Statuses` now also holds AUD-1.mp4 and AUD-2.mp4 (newest
+  videos). An empty file pushed by mistake was overwritten. Debug APK 16.8 MB.
+
 ## 2026-10-13 — T3.1 committed, T3.2 zoomable image
 - Done: Committed T3.1 as `2904702`. T3.2: `ui/viewer/Zoomable.kt` with `ZoomState`
   (scale 1 to 4, focal-point pinch, double-tap 2.5x toggle, pan clamped to the fitted

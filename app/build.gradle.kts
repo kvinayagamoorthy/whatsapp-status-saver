@@ -60,9 +60,9 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.video)
 
-    // Video playback in the viewer.
+    // Video playback in the viewer, with Compose Material 3 controls (D-025).
     implementation(libs.androidx.media3.exoplayer)
-    implementation(libs.androidx.media3.ui)
+    implementation(libs.androidx.media3.ui.compose.material3)
 
     // JVM unit tests (src/test). Robolectric provides working Android classes such as
     // Uri and ContentResolver persisted permissions on the JVM (DECISIONS D-014).

@@ -149,8 +149,14 @@ and `FLAG_GRANT_READ_URI_PERMISSION`. No `FileProvider` and no temp copies neede
   are decoded at full size with a small hand-written zoomable modifier
   (`ui/viewer/Zoomable.kt`): pinch zooms around the fingers up to 4x, double-tap zooms
   to 2.5x at the tap or back out, panning stops at the image's edges, and one-finger
-  drags pan only while zoomed, otherwise they change page (D-024). Videos with Media3
-  `ExoPlayer` + `PlayerView` in `AndroidView`, one player instance released on dispose.
+  drags pan only while zoomed, otherwise they change page (D-024). Videos: one Media3
+  `ExoPlayer` per viewer, held by `VideoPlayerViewModel` (kept across rotation, released
+  when the viewer leaves the back stack); the settled page plays from the start, other
+  video pages show their first frame. The page is drawn with Media3's Compose
+  `ContentFrame` (TextureView) under a Material 3 control bar from
+  `media3-ui-compose-material3`: play/pause, position, seek slider, duration, mute.
+  Leaving the app pauses (not a rotation); the screen stays on only while playing
+  (D-025).
 - Multi-select: long-press enters selection mode; top app bar switches to
   "N selected" with Save action.
 - Refresh: pull-to-refresh plus reload on `ON_RESUME` (also the first load); one load

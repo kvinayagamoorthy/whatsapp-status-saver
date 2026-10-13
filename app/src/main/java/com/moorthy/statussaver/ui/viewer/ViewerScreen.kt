@@ -1,5 +1,6 @@
 package com.moorthy.statussaver.ui.viewer
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,7 +24,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.size.Size as CoilSize
@@ -71,7 +75,7 @@ fun ViewerScreen(
                         onClose()
                     }
                 } else {
-                    ViewerPager(items = items, startIndex = startIndex)
+                    ViewerPager(tab = tab, items = items, startIndex = startIndex)
                 }
             }
             StatusesUiState.Empty, StatusesUiState.NeedsAccess -> LaunchedEffect(Unit) {
@@ -82,44 +86,66 @@ fun ViewerScreen(
 }
 
 @Composable
-private fun ViewerPager(items: List<StatusItem>, startIndex: Int) {
+private fun ViewerPager(tab: MediaType, items: List<StatusItem>, startIndex: Int) {
     // The pager state is saved, so the current page survives rotation.
     val pagerState = rememberPagerState(initialPage = startIndex.coerceIn(0, items.lastIndex)) {
         items.size
+    }
+    // The tab never changes while the viewer is open, so only the Videos tab ever makes
+    // a player, and it has exactly one (T3.3).
+    val videoPlayer = if (tab == MediaType.VIDEO) {
+        viewModel<VideoPlayerViewModel>(factory = VideoPlayerViewModel.Factory)
+    } else {
+        null
+    }
+    if (videoPlayer != null) {
+        // The video plays once its page has settled, not while it slides past.
+        LaunchedEffect(videoPlayer, pagerState.settledPage) {
+            items.getOrNull(pagerState.settledPage)?.let { item -> videoPlayer.show(item.uri) }
+        }
+        val activity = LocalActivity.current
+        LifecycleEventEffect(Lifecycle.Event.ON_STOP) {
+            // A rotation also stops the screen briefly; the video keeps playing then.
+            if (activity?.isChangingConfigurations != true) {
+                videoPlayer.pause()
+            }
+        }
     }
     HorizontalPager(
         state = pagerState,
         modifier = Modifier.fillMaxSize(),
         key = { page -> items[page].uri.toString() },
     ) { page ->
-        ViewerPage(items[page])
+        val item = items[page]
+        when {
+            item.type == MediaType.IMAGE -> ZoomableImage(item)
+            videoPlayer != null && page == pagerState.settledPage ->
+                VideoPage(item = item, player = videoPlayer.player)
+            else -> VideoPreview(item)
+        }
     }
 }
 
+/** A video page that is not playing: its first frame with a play badge. */
 @Composable
-private fun ViewerPage(item: StatusItem) {
+private fun VideoPreview(item: StatusItem) {
     Box(modifier = Modifier.fillMaxSize()) {
-        if (item.type == MediaType.IMAGE) {
-            ZoomableImage(item)
-        } else {
-            // A video shows its first frame until the player arrives in T3.3.
-            AsyncImage(
-                model = item.uri,
-                contentDescription = null,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier.fillMaxSize(),
-            )
-            Icon(
-                painter = painterResource(R.drawable.ic_play_badge),
-                contentDescription = stringResource(R.string.statuses_video_badge),
-                tint = Color.White,
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .size(64.dp)
-                    .background(Color.Black.copy(alpha = 0.45f), CircleShape)
-                    .padding(12.dp),
-            )
-        }
+        AsyncImage(
+            model = item.uri,
+            contentDescription = null,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier.fillMaxSize(),
+        )
+        Icon(
+            painter = painterResource(R.drawable.ic_play_badge),
+            contentDescription = stringResource(R.string.statuses_video_badge),
+            tint = Color.White,
+            modifier = Modifier
+                .align(Alignment.Center)
+                .size(64.dp)
+                .background(Color.Black.copy(alpha = 0.45f), CircleShape)
+                .padding(12.dp),
+        )
     }
 }
 

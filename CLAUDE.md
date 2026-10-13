@@ -88,7 +88,8 @@ reverted before the commit. Copy the file aside first and `cmp` it after restori
 - Gradle 9 wrapper, AGP 9 with built-in Kotlin: do not apply `org.jetbrains.kotlin.android`.
   Exact versions live in the version catalog and DECISIONS D-010.
 - MVVM: `ViewModel` + `StateFlow`; no DI framework (manual wiring in `Application`).
-- Coil 3 (with video frame decoder) for thumbnails; Media3 ExoPlayer for video.
+- Coil 3 (with video frame decoder) for thumbnails; Media3 ExoPlayer for video, with
+  Media3's Compose Material 3 controls (no View-based `PlayerView`, D-025).
 - Storage Access Framework (SAF) to read statuses; MediaStore to save to gallery.
 - DataStore (Preferences) for the persisted folder URI and theme preference.
 

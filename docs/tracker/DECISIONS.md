@@ -98,8 +98,8 @@ fewest permissions possible. Checked in the Media3 1.11.1 bytecode: the network-
 lookup catches `SecurityException` and falls back to "unknown", and the wake lock is
 only used when `ExoPlayer.setWakeMode()` is called, which this app must not do.
 **Consequences:** Never call `setWakeMode`; keep the screen on while a video plays
-instead. Re-check this if Media3 is upgraded across a major version. Playback is
-confirmed on device in T3.3.
+instead. Re-check this if Media3 is upgraded across a major version. Playback was
+confirmed on the emulator in T3.3 (merged manifest still without both permissions).
 **Alternatives:** Keep both permissions (harmless, but against the minimal-permission
 goal in spec G6 / NFR4).
 
@@ -303,3 +303,32 @@ image at its edge over to the pager mid-gesture is more code for a small gain.
 **Alternatives:** Telephoto or another zoom library; `detectTransformGestures` (it
 consumes one-finger drags too, which would stop paging); pan hand-off to the pager at
 the edges; saving zoom across rotation.
+
+## D-025 · 2026-10-13 · Accepted
+**Decision:** Videos in the viewer play with one ExoPlayer owned by
+`VideoPlayerViewModel`, scoped to the viewer's back stack entry, and are drawn with
+Media3's Compose modules instead of the View-based `PlayerView`: `ContentFrame` (from
+`media3-ui-compose`) for the picture and `PlayPauseButton`, `PositionText`,
+`ProgressSlider`, `DurationText` and `MuteButton` (from `media3-ui-compose-material3`)
+in an always-visible bottom bar. `media3-ui` is removed. The video on the settled page
+starts playing from the start; swiping to another video replaces it. Going to the
+background pauses it (a rotation does not), returning leaves it paused, and leaving the
+viewer releases the player. The picture uses a TextureView. The player takes audio
+focus and pauses when headphones are unplugged. The screen is kept on only while a
+video plays (no wake lock, D-011).
+**Why:** `PlayerView` has no mute button (checked in the 1.11.1 AAR), and adding one
+means a custom controller layout; the Compose controls have all five the spec asks for
+(FR3), follow the app's Material 3 theme and dynamic colour, and carry their own content
+descriptions. The full `Player` composable is `@ExperimentalApi`, so the stable-ish
+(`@UnstableApi`) building blocks are used instead. Holding the player in a ViewModel
+keeps playback going through a rotation (NFR7) without saving and restoring a position,
+and gives one clear release point. A TextureView moves with the page while swiping; a
+SurfaceView does not follow view movement before Android 10, and minSdk is 26. One player
+also means one hardware decoder in use. Autoplay matches how statuses are watched.
+**Alternatives:** `PlayerView` in `AndroidView` with a separate mute button; the
+experimental all-in-one `Player` composable; a player per page (two decoders while
+swiping); a player remembered in the composable with its position saved across rotation;
+controls that hide after a few seconds.
+**Consequences:** Media3 Compose APIs need `@OptIn(UnstableApi::class)`; re-check them
+when Media3 is upgraded. Debug APK went from 16.5 to 16.8 MB; the release size is checked
+in T6.2.
