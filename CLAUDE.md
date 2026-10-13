@@ -162,6 +162,16 @@ tapText() {  # usage: tapText "Grant access"
 # Re-grant: tapText "Grant access"; tapText "USE THIS FOLDER"; tapText "ALLOW"; tapText "Continue"
 ```
 
+`adb shell input` cannot pinch, and two `input tap` calls are too slow for a
+double-tap. For those, write raw multi-touch events to the emulator's touch device
+`/dev/input/event2` (`virtio_input_multi_touch_1`, axes 0..32767): this needs
+`adb -s emulator-5554 root` (SELinux blocks the shell user; `adb unroot` afterwards),
+each touch-down needs `ABS_MT_PRESSURE` > 0 or Android ignores it, and `sendevent` is
+too slow (about 20 ms per call). Instead build 24-byte `struct input_event` records on
+the host (`struct.pack("<qqHHi", 0, 0, type, code, value)`; slot 47, x 53, y 54,
+tracking id 57, pressure 58, `BTN_TOUCH` 330, SYN 0), push one file per frame and `cat`
+each to the device with short sleeps between frames.
+
 If `adb devices` lists only the physical phone, the emulator is not running: start it
 rather than using the phone.
 

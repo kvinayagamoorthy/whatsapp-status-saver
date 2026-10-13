@@ -145,9 +145,12 @@ and `FLAG_GRANT_READ_URI_PERMISSION`. No `FileProvider` and no temp copies neede
   `AsyncImage`; videos via Coil `VideoFrameDecoder` registered in `StatusSaverApp`.
   Tabs are keyed by `MediaType`; grid items by document URI (D-020).
 - Viewer: `HorizontalPager` over the tapped tab's items, keyed by URI, starting at the
-  tapped index; the saved pager state keeps the page across rotation (D-023); images with a small zoomable modifier (pinch,
-  double-tap); videos with Media3 `ExoPlayer` + `PlayerView` in `AndroidView`,
-  one player instance released on dispose.
+  tapped index; the saved pager state keeps the page across rotation (D-023). Images
+  are decoded at full size with a small hand-written zoomable modifier
+  (`ui/viewer/Zoomable.kt`): pinch zooms around the fingers up to 4x, double-tap zooms
+  to 2.5x at the tap or back out, panning stops at the image's edges, and one-finger
+  drags pan only while zoomed, otherwise they change page (D-024). Videos with Media3
+  `ExoPlayer` + `PlayerView` in `AndroidView`, one player instance released on dispose.
 - Multi-select: long-press enters selection mode; top app bar switches to
   "N selected" with Save action.
 - Refresh: pull-to-refresh plus reload on `ON_RESUME` (also the first load); one load

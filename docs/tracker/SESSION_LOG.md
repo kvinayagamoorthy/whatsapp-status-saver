@@ -16,6 +16,25 @@ Template:
 
 ---
 
+## 2026-10-13 — T3.1 committed, T3.2 zoomable image
+- Done: Committed T3.1 as `2904702`. T3.2: `ui/viewer/Zoomable.kt` with `ZoomState`
+  (scale 1 to 4, focal-point pinch, double-tap 2.5x toggle, pan clamped to the fitted
+  image's edges, snap to fitted below 1.05x at gesture end) and `Modifier.zoomable`
+  (one-finger drags only consumed while zoomed, so the pager still swipes). Image pages
+  decode at original size. Not yet committed.
+- Verified: 10 new JVM tests (53 in total), 8 of 8 mutations caught (focal point,
+  clamp, image shape, double-tap out, min scale, late size re-clamp, no snap, snap too
+  wide). Emulator API 35: `adb input` cannot pinch or double-tap, so touches were
+  injected as raw multi-touch events (see CLAUDE.md). Double-tap in and out, zoomed drag
+  pans without paging, pinch out and in, swipe pages afterwards, rotation resets zoom.
+  Lint: only MissingApplicationIcon.
+- Bug found on the device: after pinching back in, swipes stopped paging. A throwaway
+  log showed the scale at 1.000000119; fixed by the snap at gesture end and covered by
+  a test. Probe reverted and checked with `cmp`.
+- Decisions: D-024.
+- Next: T3.3 — video player page.
+- Notes: the emulator's adbd was put back to non-root (`adb unroot`) after the checks.
+
 ## 2026-10-13 — T3.1 pager viewer
 - Done: `ui/viewer/ViewerScreen.kt` (`HorizontalPager` over `itemsOf(tab)`, keyed by
   URI, fitted `AsyncImage`, video first frame with play badge until T3.3); route

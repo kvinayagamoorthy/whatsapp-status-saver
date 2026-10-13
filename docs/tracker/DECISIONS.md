@@ -282,3 +282,24 @@ serializable routes (needs the serialization plugin for one route).
 **Known gap:** After the app is killed in the viewer, the reloaded list can differ from
 the one tapped, so the restored page can be a neighbouring item. Vanished files are
 T3.4.
+
+## D-024 · 2026-10-13 · Accepted
+**Decision:** Image zoom in the viewer is a small hand-written modifier
+(`ui/viewer/Zoomable.kt`, `ZoomState` plus `Modifier.zoomable`), not a library. Pinch
+zooms around the fingers between 1x (fitted) and 4x; double-tap zooms to 2.5x at the tap
+or back to fitted. Panning stops where the image's edges meet the screen's, using the
+image's real aspect ratio, so letterbox bands never grow. While fitted, one-finger drags
+are left to the pager; while zoomed they pan the image and never change page, so the
+user zooms out to swipe on. A gesture that ends below 1.05x snaps back to fitted. The
+viewer decodes images at their original size. Zoom is not saved: it resets when the
+page leaves the pager or the screen rotates.
+**Why:** The spec asks only for pinch and double-tap, which take about 150 lines; a
+zoom library would add a dependency and APK size for features not in the spec. The
+snap exists because a pinch back in multiplies per-event factors to values such as
+1.000000119 (seen on the emulator), which counted as zoomed and blocked paging; snapping
+inside each step instead would stall a slow pinch. Original-size decoding lets zoom show
+real detail; status images are at most a few megapixels. Handing a drag from a zoomed
+image at its edge over to the pager mid-gesture is more code for a small gain.
+**Alternatives:** Telephoto or another zoom library; `detectTransformGestures` (it
+consumes one-finger drags too, which would stop paging); pan hand-off to the pager at
+the edges; saving zoom across rotation.

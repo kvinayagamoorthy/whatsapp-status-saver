@@ -19,11 +19,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.size.Size as CoilSize
 import com.moorthy.statussaver.R
 import com.moorthy.statussaver.data.model.MediaType
 import com.moorthy.statussaver.data.model.StatusItem
@@ -96,15 +99,16 @@ private fun ViewerPager(items: List<StatusItem>, startIndex: Int) {
 @Composable
 private fun ViewerPage(item: StatusItem) {
     Box(modifier = Modifier.fillMaxSize()) {
-        // Whole image fitted to the screen; zoom arrives in T3.2.
-        AsyncImage(
-            model = item.uri,
-            contentDescription = null,
-            contentScale = ContentScale.Fit,
-            modifier = Modifier.fillMaxSize(),
-        )
-        // A video shows its first frame until the player arrives in T3.3.
-        if (item.type == MediaType.VIDEO) {
+        if (item.type == MediaType.IMAGE) {
+            ZoomableImage(item)
+        } else {
+            // A video shows its first frame until the player arrives in T3.3.
+            AsyncImage(
+                model = item.uri,
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize(),
+            )
             Icon(
                 painter = painterResource(R.drawable.ic_play_badge),
                 contentDescription = stringResource(R.string.statuses_video_badge),
@@ -117,4 +121,31 @@ private fun ViewerPage(item: StatusItem) {
             )
         }
     }
+}
+
+/**
+ * The whole image fitted to the screen, zoomable (T3.2). Its zoom is forgotten when the
+ * page leaves the pager or the screen rotates, so each visit starts fitted.
+ */
+@Composable
+private fun ZoomableImage(item: StatusItem) {
+    val context = LocalContext.current
+    val zoomState = remember(item.uri) { ZoomState() }
+    // Decoded at full resolution rather than screen size, so zooming in shows real
+    // detail. Status images are at most a few megapixels.
+    val request = remember(item.uri) {
+        ImageRequest.Builder(context)
+            .data(item.uri)
+            .size(CoilSize.ORIGINAL)
+            .build()
+    }
+    AsyncImage(
+        model = request,
+        contentDescription = null,
+        contentScale = ContentScale.Fit,
+        onSuccess = { success -> zoomState.setContentSize(success.painter.intrinsicSize) },
+        modifier = Modifier
+            .fillMaxSize()
+            .zoomable(zoomState),
+    )
 }
