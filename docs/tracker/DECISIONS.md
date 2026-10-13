@@ -77,3 +77,15 @@ in D-004) so the gallery album matches the app name.
 as a monochrome themed icon. Package ID stays `com.moorthy.statussaver` (D-007).
 **Alternatives:** Status Saver, Glimpse, Stashy, Kept; icons "ring + down arrow"
 and "photo/play stack with check".
+
+## D-010 · 2026-10-13 · Accepted
+**Decision:** Toolchain: Gradle 9.8.1 (wrapper with pinned distribution SHA-256),
+AGP 9.4.1 using its built-in Kotlin support, Kotlin 2.4.21, compileSdk and targetSdk
+37, Java 17 bytecode compiled with JDK 21. `android:allowBackup="false"`.
+**Why:** Latest stable versions at scaffold time (checked against the Gradle, Google
+Maven, and Maven Central metadata). AGP 9 compiles Kotlin itself, so the separate
+Kotlin Android plugin is not applied. Backup is off because a restored DataStore
+would hold SAF folder URIs whose permissions do not survive a restore, so restored
+state would only send the user through onboarding anyway.
+**Alternatives:** The older versions cached on this machine (Gradle 8.9, AGP 8.5.2,
+Kotlin 2.0.21); compileSdk 35 (the only platform installed before scaffolding).

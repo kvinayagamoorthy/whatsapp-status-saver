@@ -1,0 +1,22 @@
+# Gradle
+.gradle/
+build/
+.kotlin/
+
+# Local machine configuration (SDK path, secrets)
+local.properties
+
+# IntelliJ / Android Studio
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Signing material must never be committed (see DECISIONS D-008)
+*.jks
+*.keystore
+keystore.properties
+
+# OS files
+.DS_Store

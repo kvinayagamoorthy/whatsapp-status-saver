@@ -16,6 +16,19 @@ Template:
 
 ---
 
+## 2026-10-13 — T0.1 and T0.2: Gradle scaffold
+- Done: Merged `docs/project-setup` into `main` (fast-forward). T0.1 Gradle project
+  (`settings.gradle.kts`, root and `:app` build files, version catalog, manifest,
+  `app_name` = Keepsake). T0.2 `.gitignore` and Gradle wrapper, done together with
+  T0.1 because the wrapper is needed to verify it.
+- Verified: `./gradlew assembleDebug` succeeded (first run 6m 48s, downloads platform
+  37); `aapt2 dump badging` shows package, minSdk 26, targetSdk 37, label, no
+  permissions.
+- Decisions: D-010 (toolchain versions, allowBackup off).
+- Next: T0.3 — Compose + Material 3 theme and `MainActivity`.
+- Notes: `local.properties` (sdk.dir) is created locally and git-ignored. Not yet
+  committed.
+
 ## 2026-10-13 — Package rename, distribution, name/icon candidates
 - Done: Package changed to `com.moorthy.statussaver` (D-007). T6.1 resolved:
   sideload APK for now (D-008); T6.4 deferred, T6.5 (sideload install notes) added.

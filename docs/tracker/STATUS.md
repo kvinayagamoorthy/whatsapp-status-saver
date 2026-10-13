@@ -1,18 +1,20 @@
 # Status Board
 
-Last updated: 2026-10-13
+Last updated: 2026-10-13 (T0.1, T0.2 done)
 
 ## Resume here
 
 - **Current milestone:** M0 — Project scaffold
 - **In progress:** none
-- **Next task:** T0.1 — Create Gradle project (see `docs/plan.md` M0)
+- **Next task:** T0.3 — Compose + Material 3 theme, `MainActivity` (see `docs/plan.md` M0)
 - **Blockers:** none
 - **Notes for next session:** Docs and trackers created. Scope confirmed: WhatsApp
   status saver, Kotlin + Compose, minSdk 26, package `com.moorthy.statussaver`,
   sideload distribution, app name "Keepsake" with bookmark-in-ring icon (D-009).
-  No open questions. Verify Android SDK / JDK availability on this machine before
-  T0.1.
+  No open questions. Toolchain: Gradle 9.8.1 wrapper, AGP 9.4.1 (built-in Kotlin, so
+  no `org.jetbrains.kotlin.android` plugin), compileSdk/targetSdk 37, JDK 21, SDK at
+  `~/Android/Sdk` (D-010). T0.3 adds the Kotlin Compose compiler plugin pinned to
+  Kotlin 2.4.21 and the Compose BOM; there is no Kotlin source yet.
 
 ## Legend
 
@@ -23,7 +25,7 @@ Last updated: 2026-10-13
 
 | Milestone | Status | Tasks done |
 |-----------|--------|------------|
-| M0 Project scaffold | TODO | 0 / 6 |
+| M0 Project scaffold | WIP | 2 / 6 |
 | M1 Folder access | TODO | 0 / 6 |
 | M2 Status list | TODO | 0 / 5 |
 | M3 Viewer | TODO | 0 / 4 |
@@ -40,8 +42,8 @@ summary (world rule → code location). Keep each note to one or two lines.
 
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
-| T0.1 | Gradle project, version catalog, `:app`, minSdk 26 | TODO | |
-| T0.2 | `.gitignore` + Gradle wrapper | TODO | |
+| T0.1 | Gradle project, version catalog, `:app`, minSdk 26 | DONE | `assembleDebug` green; aapt2 badging: package com.moorthy.statussaver, min 26, target 37, label Keepsake, no permissions |
+| T0.2 | `.gitignore` + Gradle wrapper | DONE | Done with T0.1 (needed to verify it). Wrapper 9.8.1 with pinned SHA-256; build outputs and local.properties ignored. One Gradle deprecation (`Configuration.setVisible`) comes from AGP, not our scripts |
 | T0.3 | Compose M3 theme, dynamic color, system dark, edge-to-edge | TODO | |
 | T0.4 | Core dependencies | TODO | |
 | T0.5 | Manifest permissions and label | TODO | |

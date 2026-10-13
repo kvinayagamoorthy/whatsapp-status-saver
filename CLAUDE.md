@@ -60,6 +60,8 @@ must be updated in the same change, with a `DECISIONS.md` entry.
 - Kotlin, Jetpack Compose, Material 3 (dynamic color on Android 12+, system light/dark).
 - minSdk 26 (Android 8.0), targetSdk / compileSdk: latest stable.
 - Single Gradle module `:app`, Kotlin DSL, version catalog `gradle/libs.versions.toml`.
+- Gradle 9 wrapper, AGP 9 with built-in Kotlin: do not apply `org.jetbrains.kotlin.android`.
+  Exact versions live in the version catalog and DECISIONS D-010.
 - MVVM: `ViewModel` + `StateFlow`; no DI framework (manual wiring in `Application`).
 - Coil 3 (with video frame decoder) for thumbnails; Media3 ExoPlayer for video.
 - Storage Access Framework (SAF) to read statuses; MediaStore to save to gallery.
@@ -79,7 +81,8 @@ must be updated in the same change, with a `DECISIONS.md` entry.
 
 ## Commands
 
-The Android project is scaffolded in milestone M0. Once it exists:
+Requires JDK 17+ (JDK 21 used) and the Android SDK; set `sdk.dir` in
+`local.properties` (git-ignored) or `ANDROID_HOME`.
 
 ```bash
 ./gradlew assembleDebug          # build debug APK
