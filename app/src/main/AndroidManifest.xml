@@ -25,11 +25,19 @@
         android:name="android.permission.WAKE_LOCK"
         tools:node="remove" />
 
+    <!--
+        No backup or device transfer (DECISIONS D-010). allowBackup="false" covers
+        Android 8-11 completely, and dataExtractionRules covers Android 12+. Lint's
+        DataExtractionRules check asks for fullBackupContent as well, but that file is
+        never read when allowBackup is false, so the check is suppressed here.
+    -->
     <application
         android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Keepsake">
+        android:theme="@style/Theme.Keepsake"
+        tools:ignore="DataExtractionRules">
 
         <activity
             android:name=".MainActivity"

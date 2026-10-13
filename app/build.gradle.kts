@@ -53,4 +53,7 @@ dependencies {
     // Video playback in the viewer.
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui)
+
+    // JVM unit tests (src/test).
+    testImplementation(libs.junit)
 }

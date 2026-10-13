@@ -102,3 +102,14 @@ instead. Re-check this if Media3 is upgraded across a major version. Playback is
 confirmed on device in T3.3.
 **Alternatives:** Keep both permissions (harmless, but against the minimal-permission
 goal in spec G6 / NFR4).
+
+## D-012 · 2026-10-13 · Accepted
+**Decision:** Add `data_extraction_rules.xml` that excludes everything from cloud
+backup and device transfer, alongside `allowBackup="false"`. Suppress lint's
+`DataExtractionRules` check on `<application>`.
+**Why:** Extends D-010. On Android 12+ `allowBackup="false"` no longer stops
+device-to-device transfer, so the rules file is needed to keep stale folder URIs off a
+new phone. Lint then asks for `fullBackupContent` for Android 8-11, but that file is
+never read when `allowBackup` is false, so the warning is a false positive here.
+**Alternatives:** Rely on allowBackup only (transfer would still copy DataStore on
+Android 12+); add an unused `fullBackupContent` file just to satisfy lint.

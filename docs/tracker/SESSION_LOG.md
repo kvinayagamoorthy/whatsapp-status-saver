@@ -16,6 +16,18 @@ Template:
 
 ---
 
+## 2026-10-13 — T0.6: test and lint wiring; M0 complete
+- Done: Committed T0.5 (`35ca13e`). T0.6: JUnit 4.13.2 added; backup/transfer
+  exclusion rules for Android 12+ (D-012). M0 is complete.
+- Verified: a temporary probe test ran green through `testDebugUnitTest`, then was
+  deleted (no placeholder tests in the repo; real tests start in T1.2/T1.3).
+  `lintDebug` with `--rerun-tasks`: only MissingApplicationIcon (T5.5).
+  `aapt2` shows allowBackup=false and dataExtractionRules in the APK manifest.
+- Decisions: D-012.
+- Next: T1.1 — models.
+- Notes: One lint run returned stale results after a manifest change; `--rerun-tasks`
+  gave the correct report. Not yet committed.
+
 ## 2026-10-13 — T0.5: manifest permissions
 - Done: Committed T0.4 (`a19a3cb`). T0.5: declared WRITE_EXTERNAL_STORAGE with
   maxSdkVersion 28; removed Media3's ACCESS_NETWORK_STATE and WAKE_LOCK.

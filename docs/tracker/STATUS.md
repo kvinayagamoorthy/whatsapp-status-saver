@@ -1,12 +1,12 @@
 # Status Board
 
-Last updated: 2026-10-13 (T0.5 done)
+Last updated: 2026-10-13 (M0 done)
 
 ## Resume here
 
-- **Current milestone:** M0 — Project scaffold
+- **Current milestone:** M1 — Folder access
 - **In progress:** none
-- **Next task:** T0.6 — unit test + lint wiring (see `docs/plan.md` M0)
+- **Next task:** T1.1 — models `StatusSourceKind`, `MediaType`, `StatusItem` (see `docs/plan.md` M1)
 - **Blockers:** none
 - **Notes for next session:** Docs and trackers created. Scope confirmed: WhatsApp
   status saver, Kotlin + Compose, minSdk 26, package `com.moorthy.statussaver`,
@@ -26,7 +26,7 @@ Last updated: 2026-10-13 (T0.5 done)
 
 | Milestone | Status | Tasks done |
 |-----------|--------|------------|
-| M0 Project scaffold | WIP | 5 / 6 |
+| M0 Project scaffold | DONE | 6 / 6 |
 | M1 Folder access | TODO | 0 / 6 |
 | M2 Status list | TODO | 0 / 5 |
 | M3 Viewer | TODO | 0 / 4 |
@@ -48,7 +48,7 @@ summary (world rule → code location). Keep each note to one or two lines.
 | T0.3 | Compose M3 theme, dynamic color, system dark, edge-to-edge | DONE | Emulator API 35: placeholder renders edge-to-edge; `cmd uimode night yes/no` flips theme live, dynamic color applied. Brand palette (API < 31) not yet seen on a device. Theory: system dark setting → `ui/theme/Theme.kt` `KeepsakeTheme` |
 | T0.4 | Core dependencies | DONE | Navigation 2.10.2, Lifecycle 2.11.0, DataStore 1.2.1, Coil 3.6.3 (+video, no network module), Media3 1.11.1. `assembleDebug` green at minSdk 26. Debug APK 16.5 MB unminified (release target < 10 MB is checked in T6.2) |
 | T0.5 | Manifest permissions and label | DONE | Merged manifest: WRITE_EXTERNAL_STORAGE (max 28) + AndroidX internal signature permission only; Media3 ACCESS_NETWORK_STATE and WAKE_LOCK removed (D-011, bytecode-checked). Emulator API 35: launches, no crash, no android.permission.* requested |
-| T0.6 | Unit test + lint wiring | TODO | |
+| T0.6 | Unit test + lint wiring | DONE | JUnit 4.13.2 as testImplementation; a temporary probe test ran green (1 test) and was removed so no placeholder test is committed. `lintDebug`: only MissingApplicationIcon left (fixed by T5.5). Added data_extraction_rules.xml (D-012). If lint or test output looks stale, rerun with `--rerun-tasks` |
 
 ### M1 — Folder access
 
@@ -99,7 +99,7 @@ summary (world rule → code location). Keep each note to one or two lines.
 | T5.2 | Access management | TODO | |
 | T5.3 | About section | TODO | |
 | T5.4 | Accessibility pass | TODO | |
-| T5.5 | Launcher icon (bookmark in ring) | TODO | Name already decided: Keepsake (D-009) |
+| T5.5 | Launcher icon (bookmark in ring) | TODO | Name already decided: Keepsake (D-009). Setting `android:icon` clears the last lint warning (MissingApplicationIcon) |
 | T5.6 | Performance check | TODO | |
 
 ### M6 — Release
