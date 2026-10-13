@@ -98,7 +98,8 @@ Approach (one code path for all API levels 26+):
    and sub-folders. Merge all sources, newest first, same time ordered by name. A
    granted folder that no longer exists lists as empty (D-018).
 6. On each load, check `contentResolver.persistedUriPermissions`; a missing grant
-   marks the source invalid and routes to onboarding.
+   marks the source invalid. When no source is valid, `load()` returns null (not an
+   empty list), the list shows `NeedsAccess` and routes to onboarding (D-019).
 
 Why SAF everywhere: avoids `MANAGE_EXTERNAL_STORAGE` (Play policy risk) and broad
 read permissions, and `Android/media` stays reachable through SAF on Android 11+.

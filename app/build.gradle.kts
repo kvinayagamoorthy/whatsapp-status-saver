@@ -68,4 +68,6 @@ dependencies {
     // Uri and ContentResolver persisted permissions on the JVM (DECISIONS D-014).
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
+    // Replaces the main dispatcher so ViewModel coroutines run under test control.
+    testImplementation(libs.kotlinx.coroutines.test)
 }

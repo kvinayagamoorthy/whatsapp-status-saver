@@ -1,22 +1,22 @@
 # Status Board
 
-Last updated: 2026-10-13 (T2.1 done, uncommitted)
+Last updated: 2026-10-13 (T2.2 done, uncommitted)
 
 ## Resume here
 
 - **Current milestone:** M2 — Status list (M1 complete)
-- **In progress:** none (T2.1 done, waiting for the user to say commit)
-- **Next task:** T2.2 — `StatusesViewModel` + `UiState`
+- **In progress:** none (T2.2 done, waiting for the user to say commit)
+- **Next task:** T2.3 — grid UI with tabs and thumbnails
 - **Blockers:** none
-- **Last task commit:** `77332dc` (T1.6). Earlier: `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
-- **Notes for next session:** T2.1 is finished and verified but NOT committed (subject
-  `feat: list statuses from all granted folders (T2.1)`); commit it first when the user
-  says so. Code so far: `data/model/` (T1.1), `data/StatusSourceStore.kt` (T1.2),
+- **Last task commit:** `a6e2a28` (T2.1). Earlier: `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
+- **Notes for next session:** T2.2 is finished and verified but NOT committed (subject
+  `feat: add status list view model and screen states (T2.2)`); commit it first when
+  the user says so. T2.3 wires `StatusesViewModel` into `StatusesScreen`. Code so far: `data/model/` (T1.1), `data/StatusSourceStore.kt` (T1.2),
   `data/StatusFolders.kt` (T1.3, T1.4), `StatusSaverApp.kt` + `ui/onboarding/`
   (T1.5), `ui/KeepsakeNavHost.kt` + `ui/StartViewModel.kt` + placeholder
-  `ui/statuses/StatusesScreen.kt` (T1.6), `data/StatusRepository.kt` (T2.1). 30 unit
-  tests (Robolectric where Android types are involved, D-014). Toolchain and settled
-  scope: D-001 to D-018; see
+  `ui/statuses/StatusesScreen.kt` (T1.6), `data/StatusRepository.kt` (T2.1),
+  `ui/statuses/StatusesViewModel.kt` (T2.2). 36 unit tests (Robolectric where Android types are involved, D-014). Toolchain and settled
+  scope: D-001 to D-019; see
   SESSION_LOG "Handoff after M1" for environment and emulator tips. Only add
   dependencies a task actually uses.
 
@@ -30,6 +30,7 @@ Things verified only partly so far. Close them in the task named.
 | Video playback with Media3 network/wake-lock permissions removed | No player yet (D-011) | T3.3 |
 | Status-bar icon colors follow the in-app theme override | `enableEdgeToEdge()` follows the system theme only | T5.1 |
 | Release APK under 10 MB | Debug APK is 16.5 MB unminified | T6.2 |
+| `NeedsAccess` seen on a device | A fresh install starts on onboarding, so the state was only unit tested in T2.2 | T2.5 |
 
 ## Legend
 
@@ -42,7 +43,7 @@ Things verified only partly so far. Close them in the task named.
 |-----------|--------|------------|
 | M0 Project scaffold | DONE | 6 / 6 |
 | M1 Folder access | DONE | 6 / 6 |
-| M2 Status list | WIP | 1 / 5 |
+| M2 Status list | WIP | 2 / 5 |
 | M3 Viewer | TODO | 0 / 4 |
 | M4 Save, indicator, share | TODO | 0 / 6 |
 | M5 Settings and polish | TODO | 0 / 6 |
@@ -80,7 +81,7 @@ summary (world rule → code location). Keep each note to one or two lines.
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
 | T2.1 | `StatusRepository.load()` | DONE | 8 Robolectric tests on a fake documents provider, 7 of 8 mutations caught (null-time guard survives by design, D-018). Emulator API 35 (probe reverted): lists 3 fake statuses newest first, drops `.nomedia`/txt/sub-folder, item URIs open; deleted folder → 0 items, no crash. Theory: granted folders' image/video files → merged `StatusItem`s, newest first |
-| T2.2 | `StatusesViewModel` + `UiState` | TODO | |
+| T2.2 | `StatusesViewModel` + `UiState` | DONE | `ui/statuses/StatusesViewModel.kt`; `load()` returns null when no folder is readable (D-019). 4 VM tests with fake load + 3 repository tests, 4/4 mutations caught. Emulator (probe reverted): Loading → Content newest first; empty folder → Empty; rotation keeps state. Theory: folder readability + contents → Loading / Content / Empty / NeedsAccess |
 | T2.3 | Grid UI with tabs and thumbnails | TODO | |
 | T2.4 | Pull-to-refresh + reload on resume | TODO | |
 | T2.5 | Empty and lost-permission states | TODO | |

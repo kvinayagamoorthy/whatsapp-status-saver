@@ -16,6 +16,25 @@ Template:
 
 ---
 
+## 2026-10-13 — T2.1 committed, T2.2 StatusesViewModel
+- Done: Committed T2.1 as `a6e2a28`. T2.2 `ui/statuses/StatusesViewModel.kt` with
+  `StatusesUiState` (Loading, Content, Empty, NeedsAccess); `StatusRepository.load()`
+  now returns null when no folder is readable (D-019). `kotlinx-coroutines-test` added
+  as a test dependency. Screen not wired yet (T2.3). Not yet committed.
+- Verified: 4 ViewModel tests with a fake load function plus 3 new repository tests
+  (36 unit tests in total); 4 of 4 mutations caught (null shown as empty, empty shown as
+  content, no loading state, repository answering empty instead of null). Emulator API
+  35 with a throwaway screen probe (reverted): Loading → Content [w3.mp4, w2.png,
+  w1.png]; empty `.Statuses` → Empty; rotation keeps Content without reloading. Lint:
+  only MissingApplicationIcon.
+- Decisions: D-019.
+- Next: T2.3 — grid UI with tabs and thumbnails.
+- Notes: NeedsAccess not seen on the device (start routing sends a fresh install to
+  onboarding first); it is reached in T2.5. Lint ignores `#noinspection` in
+  `libs.versions.toml`, and `lintDebug --rerun` does not rewrite the report: use
+  `--rerun-tasks` after catalog changes. The emulator's fake statuses are back in place
+  and auto-rotate is off (user_rotation 0).
+
 ## 2026-10-13 — T1.6 committed, T2.1 StatusRepository
 - Done: Committed T1.6 as `77332dc`. T2.1 `data/StatusRepository.kt` `load()`: one
   children query per valid source, image/video MIME filter, merge, newest first with

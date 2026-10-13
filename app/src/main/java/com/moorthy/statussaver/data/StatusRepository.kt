@@ -20,10 +20,17 @@ class StatusRepository(
 
     /**
      * Images and videos from all still-readable sources, newest first. Sources whose
-     * grant was lost are skipped, so the result is empty when none is readable.
+     * grant was lost are skipped.
+     *
+     * Returns null when no source is readable at all, so callers can tell "the user must
+     * grant a folder again" apart from "the folders are empty" (an empty list).
      */
-    suspend fun load(): List<StatusItem> = withContext(Dispatchers.IO) {
-        statusSourceStore.validSources()
+    suspend fun load(): List<StatusItem>? = withContext(Dispatchers.IO) {
+        val sources = statusSourceStore.validSources()
+        if (sources.isEmpty()) {
+            return@withContext null
+        }
+        sources
             .flatMap { source -> queryChildren(source) }
             .sortedWith(newestFirst)
     }

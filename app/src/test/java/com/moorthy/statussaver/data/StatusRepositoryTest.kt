@@ -20,6 +20,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -63,8 +64,29 @@ class StatusRepositoryTest {
     }
 
     @Test
-    fun noGrantedSourceGivesNoItems() = runBlocking {
+    fun noGrantedSourceGivesNull() = runBlocking {
         FakeDocumentsProvider.folders[WHATSAPP_TREE_ID] = listOf(image("a.jpg", modified = 1))
+
+        assertNull(repository.load())
+    }
+
+    @Test
+    fun everySourceWithItsPermissionLostGivesNull() = runBlocking {
+        FakeDocumentsProvider.folders[WHATSAPP_TREE_ID] = listOf(image("a.jpg", modified = 1))
+        statusSourceStore.grant(StatusSourceKind.WHATSAPP, WHATSAPP_TREE)
+
+        contentResolver.releasePersistableUriPermission(
+            WHATSAPP_TREE,
+            Intent.FLAG_GRANT_READ_URI_PERMISSION,
+        )
+
+        assertNull(repository.load())
+    }
+
+    @Test
+    fun grantedButEmptyFolderGivesAnEmptyList() = runBlocking {
+        FakeDocumentsProvider.folders[WHATSAPP_TREE_ID] = emptyList()
+        statusSourceStore.grant(StatusSourceKind.WHATSAPP, WHATSAPP_TREE)
 
         assertEquals(emptyList<StatusItem>(), repository.load())
     }
@@ -117,7 +139,7 @@ class StatusRepositoryTest {
         )
         statusSourceStore.grant(StatusSourceKind.WHATSAPP, WHATSAPP_TREE)
 
-        assertEquals(listOf("a.jpg"), repository.load().map { it.name })
+        assertEquals(listOf("a.jpg"), repository.load()!!.map { it.name })
     }
 
     @Test
@@ -134,7 +156,7 @@ class StatusRepositoryTest {
 
         assertEquals(
             listOf("w-new.jpg", "b-mid.jpg", "w-old.jpg"),
-            repository.load().map { it.name },
+            repository.load()!!.map { it.name },
         )
     }
 
@@ -147,7 +169,7 @@ class StatusRepositoryTest {
         )
         statusSourceStore.grant(StatusSourceKind.WHATSAPP, WHATSAPP_TREE)
 
-        assertEquals(listOf("a.jpg", "b.jpg", "c.jpg"), repository.load().map { it.name })
+        assertEquals(listOf("a.jpg", "b.jpg", "c.jpg"), repository.load()!!.map { it.name })
     }
 
     @Test
@@ -163,7 +185,7 @@ class StatusRepositoryTest {
             Intent.FLAG_GRANT_READ_URI_PERMISSION,
         )
 
-        assertEquals(listOf("b.jpg"), repository.load().map { it.name })
+        assertEquals(listOf("b.jpg"), repository.load()!!.map { it.name })
     }
 
     // On a device, the provider answers null for a granted folder that was deleted, for
@@ -175,7 +197,7 @@ class StatusRepositoryTest {
         statusSourceStore.grant(StatusSourceKind.WHATSAPP, WHATSAPP_TREE)
         statusSourceStore.grant(StatusSourceKind.BUSINESS, BUSINESS_TREE)
 
-        assertEquals(listOf("b.jpg"), repository.load().map { it.name })
+        assertEquals(listOf("b.jpg"), repository.load()!!.map { it.name })
     }
 
     @Test
@@ -186,7 +208,7 @@ class StatusRepositoryTest {
         )
         statusSourceStore.grant(StatusSourceKind.WHATSAPP, WHATSAPP_TREE)
 
-        val items = repository.load()
+        val items = repository.load()!!
 
         assertEquals(listOf("dated.jpg", "undated.jpg"), items.map { it.name })
         assertEquals(0L, items.last().lastModifiedMillis)

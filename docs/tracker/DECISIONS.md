@@ -196,3 +196,20 @@ explicit.
 **Alternatives:** Treat a missing folder as a lost grant and send the user to onboarding
 (re-granting cannot help until WhatsApp recreates the folder); sort by name only (not
 newest first).
+
+## D-019 · 2026-10-13 · Accepted
+**Decision:** `StatusRepository.load()` returns null when no granted folder is readable
+and an empty list when readable folders hold no statuses. `StatusesViewModel` maps this
+to `NeedsAccess`, `Empty` or `Content` (plus `Loading` before the answer) and takes the
+load as a `suspend () -> List<StatusItem>?` function, so tests pass a fake answer
+without an interface. `kotlinx-coroutines-test` 1.11.0 is a test-only dependency for
+`Dispatchers.setMain`.
+**Why:** "Grant again" and "nothing viewed yet" need different screens (FR2 empty
+state, FR8 lost permission), and only the repository's single `validSources()` read
+can tell them apart without a race. A function parameter is the smallest seam for one
+caller. The test library is one minor version ahead of the core the app resolves to
+(1.10.2): pinning it to 1.10.2 left a lint warning that the version catalog cannot
+suppress, and core 1.11 is backward compatible.
+**Alternatives:** A sealed result type from the repository (one more type for the same
+two cases); the ViewModel calling `validSources()` itself (two reads, can disagree); a
+`StatusRepository` interface with a fake class (abstraction for one caller).
