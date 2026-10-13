@@ -15,4 +15,9 @@
     <string name="onboarding_read_only_note">Keepsake only reads this folder. It never changes or deletes anything in it.</string>
 
     <string name="statuses_placeholder">Statuses will appear here.</string>
+    <string name="statuses_tab_images">Images</string>
+    <string name="statuses_tab_videos">Videos</string>
+    <string name="statuses_no_images">No image statuses right now.</string>
+    <string name="statuses_no_videos">No video statuses right now.</string>
+    <string name="statuses_video_badge">Video</string>
 </resources>

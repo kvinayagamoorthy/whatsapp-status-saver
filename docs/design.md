@@ -138,7 +138,8 @@ and `FLAG_GRANT_READ_URI_PERMISSION`. No `FileProvider` and no temp copies neede
 - `ThemeMode` (System/Light/Dark) from `SettingsStore`; `System` uses
   `isSystemInDarkTheme()`. Applied in `MainActivity` before first frame; edge-to-edge.
 - Grid: `LazyVerticalGrid` adaptive columns (min ~110 dp), square tiles, Coil
-  `AsyncImage`; videos via Coil `VideoFrameDecoder`.
+  `AsyncImage`; videos via Coil `VideoFrameDecoder` registered in `StatusSaverApp`.
+  Tabs are keyed by `MediaType`; grid items by document URI (D-020).
 - Viewer: `HorizontalPager`; images with a small zoomable modifier (pinch,
   double-tap); videos with Media3 `ExoPlayer` + `PlayerView` in `AndroidView`,
   one player instance released on dispose.

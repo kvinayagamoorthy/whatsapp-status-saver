@@ -213,3 +213,19 @@ suppress, and core 1.11 is backward compatible.
 **Alternatives:** A sealed result type from the repository (one more type for the same
 two cases); the ViewModel calling `validSources()` itself (two reads, can disagree); a
 `StatusRepository` interface with a fake class (abstraction for one caller).
+
+## D-020 · 2026-10-13 · Accepted
+**Decision:** The status grid's tabs are keyed by `MediaType` (Images = `IMAGE`, Videos
+= `VIDEO`) and the selected tab is saved across rotation. Grid items are keyed by
+document URI, not by file name. Coil's shared `ImageLoader` is built in
+`StatusSaverApp` (`SingletonImageLoader.Factory`) with `VideoFrameDecoder` and
+crossfade. The video badge is a local vector drawable. Video duration is not shown.
+**Why:** `MediaType` already names the two kinds, so no tab type is needed and the
+viewer route can reuse it. Names are the identity for saved copies (I3), but two
+granted folders could hold the same name, and a duplicate key crashes a lazy grid.
+Video frames need the decoder registered once for every `AsyncImage`. A vector avoids
+the Material icons dependency for one icon. Duration needs a `MediaMetadataRetriever`
+call per video, which is not "cheaply available" (FR2).
+**Alternatives:** Per-tab ViewModel lists (more state for a one-line filter); name as
+grid key (crash on a cross-app duplicate); `material-icons-core` for the play icon;
+reading duration lazily per tile (more work per scroll for a small detail).

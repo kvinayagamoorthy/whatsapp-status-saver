@@ -117,7 +117,7 @@ Device checks use the local emulator `keepsake_api35` (API 35, config under
 attached; do not install on or change settings of the user's phone without asking.
 
 ```bash
-~/Android/Sdk/emulator/emulator -avd keepsake_api35 -no-window -no-audio -no-snapshot &
+~/Android/Sdk/emulator/emulator -avd keepsake_api35 -no-window -no-audio -no-snapshot -gpu host &
 adb -s emulator-5554 install -r app/build/outputs/apk/debug/app-debug.apk
 adb -s emulator-5554 shell cmd uimode night yes   # or "no": flip system dark mode
 adb -s emulator-5554 exec-out screencap -p > screen.png
@@ -138,6 +138,11 @@ adb -s emulator-5554 shell dumpsys activity permissions | grep -B4 "persisted=0x
 adb -s emulator-5554 shell uiautomator dump /sdcard/ui.xml            # then tap a node's bounds centre
 adb -s emulator-5554 shell input tap <x> <y>
 ```
+
+Use `-gpu host` for anything about smoothness: without it a headless emulator renders
+with SwiftShader on the CPU and even a plain grid janks. Measure with
+`adb -s emulator-5554 shell dumpsys gfxinfo com.moorthy.statussaver` (`reset` first,
+then scripted `input swipe`); compare against Settings as a baseline.
 
 The folder picker's buttons read "USE THIS FOLDER" and "ALLOW"; it hides `.Statuses`
 unless "Show hidden files" is on in its menu. A cold boot may show "System UI isn't

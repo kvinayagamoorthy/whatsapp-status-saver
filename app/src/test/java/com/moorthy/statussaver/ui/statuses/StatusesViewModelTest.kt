@@ -78,6 +78,24 @@ class StatusesViewModelTest {
         assertEquals(StatusesUiState.NeedsAccess, viewModel.uiState.value)
     }
 
+    @Test
+    fun eachTabGetsItsOwnTypeInNewestFirstOrder() {
+        val content = StatusesUiState.Content(
+            listOf(
+                item("new.mp4", MediaType.VIDEO),
+                item("new.jpg"),
+                item("old.mp4", MediaType.VIDEO),
+                item("old.jpg"),
+            ),
+        )
+
+        assertEquals(listOf(item("new.jpg"), item("old.jpg")), content.itemsOf(MediaType.IMAGE))
+        assertEquals(
+            listOf(item("new.mp4", MediaType.VIDEO), item("old.mp4", MediaType.VIDEO)),
+            content.itemsOf(MediaType.VIDEO),
+        )
+    }
+
     private fun item(name: String, type: MediaType = MediaType.IMAGE) = StatusItem(
         uri = Uri.parse("content://test/$name"),
         name = name,

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.moorthy.statussaver.StatusSaverApp
+import com.moorthy.statussaver.data.model.MediaType
 import com.moorthy.statussaver.data.model.StatusItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +20,11 @@ sealed interface StatusesUiState {
     data object Loading : StatusesUiState
 
     /** Statuses from all granted folders, newest first. */
-    data class Content(val items: List<StatusItem>) : StatusesUiState
+    data class Content(val items: List<StatusItem>) : StatusesUiState {
+
+        /** The items of one tab (Images or Videos), still newest first. */
+        fun itemsOf(type: MediaType): List<StatusItem> = items.filter { item -> item.type == type }
+    }
 
     /**
      * A folder is readable but holds no statuses: the user has not viewed any in

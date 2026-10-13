@@ -16,6 +16,28 @@ Template:
 
 ---
 
+## 2026-10-13 — T2.2 committed, T2.3 status grid
+- Done: Committed T2.2 as `ccbec21`. T2.3 `StatusesScreen`: top bar, Images/Videos
+  tabs (`MediaType`, saved across rotation), adaptive `LazyVerticalGrid` of square Coil
+  thumbnails keyed by URI, play badge on videos, spinner while loading, per-tab "none
+  right now" text. `StatusSaverApp` provides Coil's loader with `VideoFrameDecoder`.
+  `StatusesUiState.Content.itemsOf(type)` splits tabs. Not yet committed.
+- Verified: 37 unit tests (new tab-split test; its mutation caught). Lint: only
+  MissingApplicationIcon. Emulator API 35 with 140 extra statuses (120 JPEG 720x1280,
+  20 H.264 720x1280 5 s, made with ffmpeg): images and video frames render newest
+  first, badges shown, light and dark OK, Videos tab kept in landscape (8 columns), no
+  crashes. Scroll jank via `dumpsys gfxinfo` over 24 swipes, `-gpu host`: release 2.1%
+  janky (p50 17 ms, 1 slow UI frame), debug 1.9%; Settings baseline 0.2%.
+- Decisions: D-020.
+- Next: T2.4 — pull-to-refresh and reload on resume.
+- Notes: First measurement on the default headless emulator (SwiftShader) gave ~50%
+  janky even for a grid without images, Settings 3%: the CPU renderer, not the app.
+  Restarted with `-gpu host` (CLAUDE.md updated). A temporarily debug-signed release
+  build was used for one measurement and reverted. Reinstalling via uninstall drops the
+  SAF grant; `install -r` keeps it. ffmpeg here has no libx264: use `-c:v libopenh264`.
+  Emulator WhatsApp folder now holds 146 files (w1, w2, w3, IMG-001..120, VID-01..20,
+  .nomedia, notes.txt, sub/); the WhatsApp grant was re-made through onboarding.
+
 ## 2026-10-13 — T2.1 committed, T2.2 StatusesViewModel
 - Done: Committed T2.1 as `a6e2a28`. T2.2 `ui/statuses/StatusesViewModel.kt` with
   `StatusesUiState` (Loading, Content, Empty, NeedsAccess); `StatusRepository.load()`
