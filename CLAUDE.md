@@ -92,6 +92,18 @@ Requires JDK 17+ (JDK 21 used) and the Android SDK; set `sdk.dir` in
 ./gradlew lintDebug              # Android lint
 ```
 
+Device checks use the local emulator `keepsake_api35` (API 35, config under
+`~/.android/avd/`). Always target it by serial, because a physical phone may also be
+attached; do not install on or change settings of the user's phone without asking.
+
+```bash
+~/Android/Sdk/emulator/emulator -avd keepsake_api35 -no-window -no-audio -no-snapshot &
+adb -s emulator-5554 install -r app/build/outputs/apk/debug/app-debug.apk
+adb -s emulator-5554 shell cmd uimode night yes   # or "no": flip system dark mode
+adb -s emulator-5554 exec-out screencap -p > screen.png
+adb -s emulator-5554 emu kill
+```
+
 Update this section if commands change.
 
 ## Conventions

@@ -16,6 +16,19 @@ Template:
 
 ---
 
+## 2026-10-13 — T0.3: Compose theme and MainActivity
+- Done: T0.3 Compose + Material 3 (`KeepsakeTheme`: system dark, dynamic color on
+  API 31+, terracotta brand palette below), edge-to-edge `MainActivity` with a
+  placeholder screen, light/dark window themes to avoid a launch flash.
+- Verified: `assembleDebug` green; Kotlin compiled with 2.4.21. On emulator
+  `keepsake_api35`: installed, launched, screenshots in light and dark after
+  `cmd uimode night no/yes`; no crashes in the crash log.
+- Decisions: none new.
+- Next: T0.4 — remaining core dependencies.
+- Notes: `avdmanager create avd` silently does nothing with cmdline-tools 23 (the
+  new `android` CLI replaces it), so the AVD config was written by hand under
+  `~/.android/avd/`. Not yet committed.
+
 ## 2026-10-13 — T0.1 and T0.2: Gradle scaffold
 - Done: Merged `docs/project-setup` into `main` (fast-forward). T0.1 Gradle project
   (`settings.gradle.kts`, root and `:app` build files, version catalog, manifest,
