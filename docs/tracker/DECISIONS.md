@@ -263,3 +263,22 @@ folder deleted by uninstalling WhatsApp keeps its grant and shows as empty, not 
 access (seen in T2.1).
 **Alternatives:** A message with a "Grant again" button on the list (one more screen
 for the same action as onboarding); keeping the list under onboarding on the back stack.
+
+## D-023 · 2026-10-13 · Accepted
+**Decision:** The viewer (`viewer/{tab}/{index}`) reads its items from the status
+list's own `StatusesViewModel`, obtained with the `statuses` back stack entry as owner,
+and pages through `itemsOf(tab)` starting at `index`. It has no ViewModel or load of its
+own, except that it starts the list's load when that list was never loaded (the app was
+killed while the viewer was open). If the tab has nothing to show, or there is no
+readable folder, the viewer closes and the list shows why.
+**Why:** The index must mean the item the user tapped. The list only reloads when its
+own screen resumes (D-021), which cannot happen while the viewer is on top, so the
+shared list stays fixed for as long as the viewer is open and no index can drift. A
+separate load in the viewer could see new statuses at the front and open the wrong
+item. Returning from the viewer resumes the list, which then reloads quietly as usual.
+**Alternatives:** A viewer ViewModel loading on its own (index can drift); passing the
+item's URI in the route (longer route, and the pager still needs the list); type-safe
+serializable routes (needs the serialization plugin for one route).
+**Known gap:** After the app is killed in the viewer, the reloaded list can differ from
+the one tapped, so the restored page can be a neighbouring item. Vanished files are
+T3.4.

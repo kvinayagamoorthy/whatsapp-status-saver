@@ -1,25 +1,26 @@
 # Status Board
 
-Last updated: 2026-10-13 (M2 complete and committed, handoff before compaction)
+Last updated: 2026-10-13 (T3.1 done, not yet committed)
 
 ## Resume here
 
-- **Current milestone:** M3 — Viewer (M2 complete)
-- **In progress:** none
-- **Next task:** T3.1 — pager viewer route (M3)
+- **Current milestone:** M3 — Viewer
+- **In progress:** none (T3.1 done, waiting for the user to commit)
+- **Next task:** T3.2 — zoomable image
 - **Blockers:** none
 - **Last task commit:** `aa73d2c` (T2.5). Earlier: `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
-- **Notes for next session:** everything is committed (T2.5 plus a docs-only handoff
-  commit after it). Start T3.1 when the user says so; read SESSION_LOG "Handoff before
-  compaction (end of M2)" for T3.1 notes and the emulator state. Start the emulator
+- **Notes for next session:** T3.1 is done but not committed; commit it as
+  `feat: open statuses in a swipeable viewer (T3.1)` when the user says so. Read
+  SESSION_LOG "Handoff before compaction (end of M2)" for the emulator state. Start the emulator
   with `-gpu host` (CLAUDE.md). Code so far: `data/model/` (T1.1),
   `data/StatusSourceStore.kt` (T1.2), `data/StatusFolders.kt` (T1.3, T1.4),
   `StatusSaverApp.kt` + `ui/onboarding/` (T1.5), `ui/KeepsakeNavHost.kt` +
   `ui/StartViewModel.kt` (T1.6), `data/StatusRepository.kt` (T2.1),
   `ui/statuses/StatusesViewModel.kt` (T2.2) and `ui/statuses/StatusesScreen.kt`
-  (grid T2.3, refresh T2.4, empty and lost access T2.5). 43 unit tests (Robolectric
+  (grid T2.3, refresh T2.4, empty and lost access T2.5), `ui/viewer/ViewerScreen.kt`
+  (pager T3.1; zoom T3.2 and player T3.3 go in its `ViewerPage`). 43 unit tests (Robolectric
   where Android types are involved, D-014). Toolchain and settled scope: D-001 to
-  D-022. Only add dependencies a task actually uses.
+  D-023. Only add dependencies a task actually uses.
 
 ## Pending checks
 
@@ -45,7 +46,7 @@ Things verified only partly so far. Close them in the task named.
 | M0 Project scaffold | DONE | 6 / 6 |
 | M1 Folder access | DONE | 6 / 6 |
 | M2 Status list | DONE | 5 / 5 |
-| M3 Viewer | TODO | 0 / 4 |
+| M3 Viewer | WIP | 1 / 4 |
 | M4 Save, indicator, share | TODO | 0 / 6 |
 | M5 Settings and polish | TODO | 0 / 6 |
 | M6 Release | TODO | 1 / 5 |
@@ -91,7 +92,7 @@ summary (world rule → code location). Keep each note to one or two lines.
 
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
-| T3.1 | Pager viewer route | TODO | |
+| T3.1 | Pager viewer route | DONE | `ui/viewer/ViewerScreen.kt` + route `viewer/{tab}/{index}`; tiles clickable ("Open"). Emulator API 35: tapped tile opens that item, swipes go forward and back in order, rotation keeps the page, Back returns with tab kept, videos show first frame + badge, app killed in viewer restores the same item. Device mutation (no load in viewer) → endless spinner, caught. No unit test: navigation glue (as T1.6). Theory: tap → same list, same index (D-023) |
 | T3.2 | Zoomable image | TODO | |
 | T3.3 | Video player page | TODO | Confirm playback works with Media3's network/wake-lock permissions removed (D-011). Never call `setWakeMode`; use keep-screen-on while playing |
 | T3.4 | Vanished file handling | TODO | |

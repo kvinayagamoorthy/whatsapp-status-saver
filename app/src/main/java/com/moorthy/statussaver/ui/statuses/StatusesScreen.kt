@@ -1,6 +1,7 @@
 package com.moorthy.statussaver.ui.statuses
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -13,7 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -54,12 +55,13 @@ import com.moorthy.statussaver.data.model.StatusItem
 /**
  * Status list (FR2): Images and Videos tabs over a grid of thumbnails, newest first.
  * [onNeedsAccess] is called when no granted folder is readable any more, so the user can
- * grant one again (FR8).
+ * grant one again (FR8). [onOpenItem] opens the viewer at an item of a tab's list (FR3).
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatusesScreen(
     onNeedsAccess: () -> Unit,
+    onOpenItem: (tab: MediaType, index: Int) -> Unit,
     viewModel: StatusesViewModel = viewModel(factory = StatusesViewModel.Factory),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -110,7 +112,10 @@ fun StatusesScreen(
                         if (tabItems.isEmpty()) {
                             CenteredMessage(stringResource(selectedTab.noItemsRes))
                         } else {
-                            StatusGrid(items = tabItems)
+                            StatusGrid(
+                                items = tabItems,
+                                onOpenItem = { index -> onOpenItem(selectedTab, index) },
+                            )
                         }
                     }
                     StatusesUiState.Empty -> CenteredMessage(stringResource(R.string.statuses_empty))
@@ -123,29 +128,30 @@ fun StatusesScreen(
 }
 
 @Composable
-private fun StatusGrid(items: List<StatusItem>) {
+private fun StatusGrid(items: List<StatusItem>, onOpenItem: (index: Int) -> Unit) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 110.dp),
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(4.dp),
     ) {
         // The URI, not the name, is the key: both apps' folders could hold the same name.
-        items(items, key = { item -> item.uri.toString() }) { item ->
-            StatusTile(item)
+        itemsIndexed(items, key = { _, item -> item.uri.toString() }) { index, item ->
+            StatusTile(item = item, onOpen = { onOpenItem(index) })
         }
     }
 }
 
 @Composable
-private fun StatusTile(item: StatusItem) {
+private fun StatusTile(item: StatusItem, onOpen: () -> Unit) {
     Box(
         modifier = Modifier
             .padding(2.dp)
             .aspectRatio(1f)
-            .background(MaterialTheme.colorScheme.surfaceVariant),
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .clickable(onClickLabel = stringResource(R.string.statuses_open), onClick = onOpen),
     ) {
         // Coil decodes off the main thread at tile size and caches the result (NFR3).
-        // Tiles get their content descriptions with the tap action in T3.1 and T5.4.
+        // Tiles get their content descriptions in the accessibility pass (T5.4).
         AsyncImage(
             model = item.uri,
             contentDescription = null,

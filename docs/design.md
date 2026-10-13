@@ -69,6 +69,9 @@ Navigation: Navigation Compose with routes `onboarding`, `statuses`,
 `StatusSource` has a valid persisted permission. Onboarding offers "Continue" once one
 app is granted and leaves the back stack when the user continues (D-017). The list
 replaces itself with onboarding when no granted folder is readable any more (D-022).
+The viewer route's `{tab}` is a `MediaType` name and `{index}` a position in that tab's
+list; the viewer shares the list's `StatusesViewModel` (scoped to the `statuses` back
+stack entry), so the index names the item the user tapped (D-023).
 
 ## 3. Reading statuses (SAF)
 
@@ -141,7 +144,8 @@ and `FLAG_GRANT_READ_URI_PERMISSION`. No `FileProvider` and no temp copies neede
 - Grid: `LazyVerticalGrid` adaptive columns (min ~110 dp), square tiles, Coil
   `AsyncImage`; videos via Coil `VideoFrameDecoder` registered in `StatusSaverApp`.
   Tabs are keyed by `MediaType`; grid items by document URI (D-020).
-- Viewer: `HorizontalPager`; images with a small zoomable modifier (pinch,
+- Viewer: `HorizontalPager` over the tapped tab's items, keyed by URI, starting at the
+  tapped index; the saved pager state keeps the page across rotation (D-023); images with a small zoomable modifier (pinch,
   double-tap); videos with Media3 `ExoPlayer` + `PlayerView` in `AndroidView`,
   one player instance released on dispose.
 - Multi-select: long-press enters selection mode; top app bar switches to

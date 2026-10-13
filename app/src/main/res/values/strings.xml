@@ -20,4 +20,5 @@
     <string name="statuses_no_images">No image statuses right now.</string>
     <string name="statuses_no_videos">No video statuses right now.</string>
     <string name="statuses_video_badge">Video</string>
+    <string name="statuses_open">Open</string>
 </resources>

@@ -16,6 +16,24 @@ Template:
 
 ---
 
+## 2026-10-13 — T3.1 pager viewer
+- Done: `ui/viewer/ViewerScreen.kt` (`HorizontalPager` over `itemsOf(tab)`, keyed by
+  URI, fitted `AsyncImage`, video first frame with play badge until T3.3); route
+  `viewer/{tab}/{index}` in `KeepsakeNavHost` with the list's ViewModel shared through
+  the `statuses` back stack entry; tiles clickable with an "Open" label. Not yet
+  committed.
+- Verified: build, lint (only MissingApplicationIcon), 43 unit tests unchanged.
+  Emulator API 35: tap yellow tile → yellow; swipe → green; back twice → cyan; rotation
+  keeps green both ways; Back → list on the same tab; Videos tab opens a video frame
+  with badge and swipes; `am kill` with the viewer open then relaunch → same item, Back
+  → list. Device mutation (viewer never starts the load) → endless spinner after the
+  kill, so that branch is needed; file restored and checked with `cmp`.
+- Decisions: D-023.
+- Next: T3.2 — zoomable image.
+- Notes: grid does not scroll to the last viewed item on return (not asked for). The
+  viewer uses the theme background, not black, so status-bar icons stay readable until
+  T5.1. Image content descriptions are left to T5.4.
+
 ## 2026-10-13 — Handoff before compaction (end of M2)
 - Done: M2 complete and committed: `a6e2a28` T2.1, `ccbec21` T2.2, `000d410` T2.3,
   `c572878` T2.4, `aa73d2c` T2.5 (T1.6 was `77332dc`). Decisions D-018 to D-022.
