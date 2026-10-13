@@ -141,6 +141,12 @@ adb -s emulator-5554 shell 'mkdir -p "/sdcard/Android/media/com.whatsapp/WhatsAp
 # ffmpeg has no libx264 here; for H.264 use libopenh264, e.g. a phone-size 5 s video:
 #   ffmpeg -f lavfi -i testsrc2=s=720x1280:d=5:r=30 -c:v libopenh264 -b:v 1M -pix_fmt yuv420p v.mp4
 # and a phone-size image: ffmpeg -f lavfi -i testsrc2=s=720x1280:d=1 -frames:v 1 w1.jpg
+# A video with sound (for player checks), 30 s with a 440 Hz tone:
+#   ffmpeg -f lavfi -i testsrc2=s=720x1280:d=30:r=30 -f lavfi -i sine=frequency=440:duration=30 \
+#     -c:v libopenh264 -b:v 1M -pix_fmt yuv420p -c:a aac -b:a 96k -shortest a.mp4
+# This ffmpeg has no drawtext filter; use solid colours (color=c=orange:...) to tell
+# videos apart. If ffmpeg fails, a following `touch -d` creates an empty file: check
+# sizes before pushing.
 adb -s emulator-5554 push -a w1.png v.mp4 "/sdcard/Android/media/com.whatsapp/WhatsApp/Media/.Statuses/"
 adb -s emulator-5554 shell pm clear com.moorthy.statussaver            # fresh-install state, drops grants
 adb -s emulator-5554 shell run-as com.moorthy.statussaver cat files/datastore/status_sources.preferences_pb | strings
@@ -172,6 +178,17 @@ too slow (about 20 ms per call). Instead build 24-byte `struct input_event` reco
 the host (`struct.pack("<qqHHi", 0, 0, type, code, value)`; slot 47, x 53, y 54,
 tracking id 57, pressure 58, `BTN_TOUCH` 330, SYN 0), push one file per frame and `cat`
 each to the device with short sleeps between frames.
+
+Whether the app is playing sound: the app's entries under `players:` in
+`adb -s emulator-5554 shell dumpsys audio` (match `u/pid:<uid>/<pid>` with
+`pidof com.moorthy.statussaver`) show `state:started`, `paused`, `stopped`, and
+`mutedState:client` when muted; no entry after leaving the viewer means the player was
+released. `dumpsys window | grep KEEP_SCREEN_ON` shows the keep-screen-on flag.
+
+Library sources and resources can be checked without guessing: the AARs are in
+`~/.gradle/caches/modules-2/files-2.1/<group>/<artifact>/<version>/` (unzip, then
+`javap` on `classes.jar` or grep `res/`), and Media3 sources for a release are at
+`https://raw.githubusercontent.com/androidx/media/<version>/libraries/...`.
 
 If `adb devices` lists only the physical phone, the emulator is not running: start it
 rather than using the phone.

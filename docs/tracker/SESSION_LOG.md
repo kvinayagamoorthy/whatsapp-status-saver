@@ -16,6 +16,31 @@ Template:
 
 ---
 
+## 2026-10-13 — Handoff before compaction (end of M3)
+- Done: M3 complete and committed: `2904702` T3.1, `3486a37` T3.2, `7ad1850` T3.3,
+  `6979ffc` T3.4. Decisions D-023 to D-026. CLAUDE.md gained the raw touch-injection
+  recipe, a test-video-with-sound recipe, `dumpsys audio` / keep-screen-on checks and
+  where to read library AARs and Media3 sources.
+- Next: T4.1 — `SavedMediaRepository.save()` on API 29+ (MediaStore `IS_PENDING`,
+  `Pictures/Keepsake` and `Movies/Keepsake`, design.md §4). Its "done when" asks for an
+  instrumented test, so `androidTest` (AndroidX Test runner, ext-junit) must be added
+  first, with versions looked up live. Saving uses the item name as identity (I3, I4)
+  and must never write into WhatsApp's folders (I1).
+- Notes for M4: the viewer will need Save and Share actions (T4.4, T4.6); today the
+  viewer has no top bar, and the video page has a bottom control bar, so actions need a
+  place that does not collide with it. The viewer reads the list's
+  `StatusesViewModel` (D-023); per-viewer state such as the video player sits in its own
+  ViewModel scoped to the viewer entry (D-025).
+- Open question to the user, unanswered: put the emulator touch-injection script into
+  the repo (for example `tools/emulator_touch.py`) or keep only the CLAUDE.md recipe.
+- Environment: emulator `keepsake_api35` runs headless with `-gpu host`; adbd is back to
+  non-root (`adb unroot` was run after T3.2). `.Statuses` holds 150 entries: w1/w2 PNG,
+  w3.mp4, IMG-001..120, VID-01..20, NEW-1/NEW-2, AUD-1.mp4 and AUD-2.mp4 (30 s with
+  sound, the newest videos), .nomedia, notes.txt, sub/. One WhatsApp grant is held;
+  night mode off; auto-rotate off (`settings put system user_rotation 0|1` rotates).
+  Generated media and backups live only in the session scratchpad. The physical phone
+  `z9lzvojfkf7pknpv` may be attached: never use it without asking.
+
 ## 2026-10-13 — T3.3 committed, T3.4 vanished files; M3 complete
 - Done: Committed T3.3 as `7ad1850`. T3.4: `StatusRepository.stillExists` (document
   query; IllegalArgumentException, null cursor or SecurityException mean gone),

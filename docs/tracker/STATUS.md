@@ -1,17 +1,20 @@
 # Status Board
 
-Last updated: 2026-10-13 (T3.4 done, M3 complete, not yet committed)
+Last updated: 2026-10-13 (M3 complete and committed, handoff before compaction)
 
 ## Resume here
 
-- **Current milestone:** M4 — Save, indicator, share (M3 complete once T3.4 is committed)
-- **In progress:** none (T3.4 done, waiting for the user to commit)
+- **Current milestone:** M4 — Save, indicator, share (M3 complete)
+- **In progress:** none
 - **Next task:** T4.1 — `SavedMediaRepository.save()` on API 29+ (MediaStore, `IS_PENDING`)
 - **Blockers:** none
-- **Last task commit:** `7ad1850` (T3.3). Earlier: `3486a37` (T3.2), `2904702` (T3.1), `aa73d2c` (T2.5), `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
-- **Notes for next session:** T3.4 is done but not committed; commit it as
-  `feat: return to the list when a status has expired (T3.4)` when the user says so.
-  T4.1 needs an instrumented test (`connectedDebugAndroidTest`, not set up yet). Read
+- **Last task commit:** `6979ffc` (T3.4). Earlier: `7ad1850` (T3.3), `3486a37` (T3.2), `2904702` (T3.1), `aa73d2c` (T2.5), `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
+- **Notes for next session:** everything is committed (T3.4 plus a docs-only handoff
+  commit). Start T4.1 when the user says so; read SESSION_LOG "Handoff before
+  compaction (end of M3)" first. T4.1 needs an instrumented test
+  (`connectedDebugAndroidTest`, not set up yet: look up AndroidX Test versions live).
+  Open question to the user: keep the emulator touch-injection script in the repo
+  (e.g. `tools/emulator_touch.py`)? Unanswered; it lives only in CLAUDE.md as a recipe. Read
   SESSION_LOG "Handoff before compaction (end of M2)" for the emulator state. Start the emulator
   with `-gpu host` (CLAUDE.md). Code so far: `data/model/` (T1.1),
   `data/StatusSourceStore.kt` (T1.2), `data/StatusFolders.kt` (T1.3, T1.4),
