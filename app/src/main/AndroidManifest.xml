@@ -32,6 +32,7 @@
         never read when allowBackup is false, so the check is suppressed here.
     -->
     <application
+        android:name=".StatusSaverApp"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:label="@string/app_name"

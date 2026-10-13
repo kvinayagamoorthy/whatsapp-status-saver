@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Keepsake</string>
-    <string name="placeholder_message">Your saved statuses will live here.</string>
+
+    <string name="source_whatsapp">WhatsApp</string>
+    <string name="source_business">WhatsApp Business</string>
+
+    <string name="onboarding_explanation">Keepsake shows the statuses you have already viewed in WhatsApp, so you can keep the ones you like. To find them, it needs to read the folder where WhatsApp stores statuses.</string>
+    <string name="onboarding_picker_hint">Tap Grant access. When the folder picker opens, tap “Use this folder”, then “Allow”.</string>
+    <string name="onboarding_grant_access">Grant access</string>
+    <string name="onboarding_access_granted">Access granted</string>
+    <string name="onboarding_choose_again">Choose again</string>
+    <string name="onboarding_wrong_folder">That is not a statuses folder. Tap Grant access again and use the folder the picker opens at. If you look for it yourself, the .Statuses folder is hidden: turn on “Show hidden files” in the picker’s menu.</string>
+    <string name="onboarding_read_only_note">Keepsake only reads this folder. It never changes or deletes anything in it.</string>
 </resources>

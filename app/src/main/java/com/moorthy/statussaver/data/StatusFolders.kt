@@ -60,6 +60,10 @@ object StatusFolders {
             initialDocumentId(kind, Build.VERSION.SDK_INT),
         )
 
+    /** Folder path shown to the user for [kind], e.g. `WhatsApp/Media/.Statuses`. */
+    fun expectedPath(kind: StatusSourceKind): String =
+        initialDocumentId(kind, Build.VERSION.SDK_INT).substringAfter(':')
+
     /**
      * Document id of the statuses folder [kind] most likely uses on a phone running
      * [sdkInt]. From Android 11, scoped storage moved WhatsApp's media under

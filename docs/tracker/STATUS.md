@@ -1,14 +1,14 @@
 # Status Board
 
-Last updated: 2026-10-13 (T1.4 done)
+Last updated: 2026-10-13 (T1.5 done)
 
 ## Resume here
 
 - **Current milestone:** M1 — Folder access
-- **In progress:** none (T1.4 done, waiting for the user to say commit)
-- **Next task:** T1.5 — onboarding screen (see `docs/plan.md` M1). First task with UI and device checks: also close the two T1.5 rows in Pending checks
+- **In progress:** none (T1.5 done, waiting for the user to say commit)
+- **Next task:** T1.6 — start destination logic (see `docs/plan.md` M1). Brings Navigation Compose; onboarding currently is the only screen
 - **Blockers:** none
-- **Last task commit:** `5defa0e` (T1.3). Earlier: `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
+- **Last task commit:** `b9c966c` (T1.4). Earlier: `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
 - **Notes for next session:** Docs and trackers created. Scope confirmed: WhatsApp
   status saver, Kotlin + Compose, minSdk 26, package `com.moorthy.statussaver`,
   sideload distribution, app name "Keepsake" with bookmark-in-ring icon (D-009).
@@ -28,8 +28,6 @@ Things verified only partly so far. Close them in the task named.
 | Video playback with Media3 network/wake-lock permissions removed | No player yet (D-011) | T3.3 |
 | Status-bar icon colors follow the in-app theme override | `enableEdgeToEdge()` follows the system theme only | T5.1 |
 | Release APK under 10 MB | Debug APK is 16.5 MB unminified | T6.2 |
-| Re-picking a folder whose old grant the system already dropped does not crash | Robolectric does not throw on releasing a missing grant; a device does, and `StatusSourceStore.grant()` guards it (D-014) | T1.5 on emulator |
-| Real picker returns tree document ids in the form `StatusFolders` expects (`primary:Android/media/...`) | Tests use document ids written from the documented format, not captured from a device | T1.5 on emulator |
 
 ## Legend
 
@@ -41,7 +39,7 @@ Things verified only partly so far. Close them in the task named.
 | Milestone | Status | Tasks done |
 |-----------|--------|------------|
 | M0 Project scaffold | DONE | 6 / 6 |
-| M1 Folder access | WIP | 4 / 6 |
+| M1 Folder access | WIP | 5 / 6 |
 | M2 Status list | TODO | 0 / 5 |
 | M3 Viewer | TODO | 0 / 4 |
 | M4 Save, indicator, share | TODO | 0 / 6 |
@@ -72,7 +70,7 @@ summary (world rule → code location). Keep each note to one or two lines.
 | T1.2 | `StatusSourceStore` | DONE | `validSources()` + `grant()`; 7 Robolectric tests on SDK 37 (D-014); mutation checks showed the permission filter and old-grant release are covered. Lint unchanged. Theory: granted folder → `StatusSource` that counts only while the system still holds its read grant |
 | T1.3 | Tree validation + classification | DONE | `data/StatusFolders.kt` `classify(treeDocumentId)`; 10 plain JVM tests (both apps, both path styles, SD card volume, five wrong-folder cases); two mutation checks caught. Lint unchanged (D-015). Theory: picked tree → which app's `.Statuses` folder, or wrong folder |
 | T1.4 | Initial-URI builder | DONE | `StatusFolders.initialUri(kind)` / `initialDocumentId(kind, sdkInt)`, Android/media path from API 30; paths built from the same name constants as `classify`. 5 JVM tests incl. round trip classify(initialDocumentId) = kind; API-boundary mutation caught. Picker actually opening there is checked in T1.5. Theory: app + Android version → where its statuses folder most likely is |
-| T1.5 | Onboarding screen | TODO | |
+| T1.5 | Onboarding screen | DONE | Emulator API 35: picker opens at `.Statuses`; WhatsApp grant survives force-stop; wrong folder (`Media`) shows error, nothing stored or persisted; Business granted by hand via "Show hidden files"; re-pick to legacy path released the old grant (2 persisted grants left); light/dark OK, no crashes. Closed Pending checks: real document id is `primary:Android/media/com.whatsapp/WhatsApp/Media/.Statuses`; device throws SecurityException releasing a missing grant (throwaway probe, reverted). No ViewModel unit test: logic is classify + grant, both tested. Theory: user picks folder → classify decides app → store keeps grant (D-016) |
 | T1.6 | Start destination logic | TODO | |
 
 ### M2 — Status list

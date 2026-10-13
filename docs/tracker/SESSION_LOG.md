@@ -16,6 +16,23 @@ Template:
 
 ---
 
+## 2026-10-13 — T1.5: onboarding screen
+- Done: Committed T1.4 (`b9c966c`). T1.5: `StatusSaverApp` (Application; DataStore
+  `status_sources` + `StatusSourceStore`), `ui/onboarding/OnboardingViewModel` and
+  `OnboardingScreen` (one card per app with path, Grant access / Access granted +
+  Choose again, wrong-folder error, read-only note). `MainActivity` shows onboarding;
+  placeholder screen and string removed. `StatusFolders.expectedPath()` added.
+- Verified on emulator `keepsake_api35` (folders made with `adb shell mkdir`): see the
+  T1.5 row in STATUS.md. Both T1.5 Pending checks closed. 22 unit tests and lint green.
+- Decisions: D-016 (picked folder decides the app, not the button). plan.md R3
+  updated: the picker hides `.Statuses` unless "Show hidden files" is on.
+- Next: T1.6 — start destination (Navigation Compose; onboarding vs statuses).
+- Notes: Driving the picker: `uiautomator dump` + tap by text works (DocumentsUI
+  button text is upper case "USE THIS FOLDER", dialog "ALLOW"); scroll the breadcrumb
+  bar to reach the storage root. Cold emulator boot can show a "System UI isn't
+  responding" dialog: tap Wait. Card shows the expected path even if the user picked
+  another `.Statuses` folder (fine for now; T5.2 shows the granted folder).
+
 ## 2026-10-13 — T1.4: initial-URI builder
 - Done: Committed T1.3 (`5defa0e`). T1.4: `StatusFolders.initialUri(kind)` (uses
   `Build.VERSION.SDK_INT`) over the testable `initialDocumentId(kind, sdkInt)`; folder

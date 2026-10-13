@@ -90,5 +90,5 @@ Goal: grid shows current statuses from all granted sources.
 |----|------|------------|
 | R1 | WhatsApp changes its statuses folder location | Path constants in one place; user can pick any `.Statuses` folder manually |
 | R2 | After reinstall (API 29+), saved indicator misses old saves; MediaStore may create `name (1)` | Accepted for v1; revisit if users complain |
-| R3 | Some OEM file pickers ignore `EXTRA_INITIAL_URI` | Onboarding shows the path text so the user can navigate manually |
+| R3 | Some OEM file pickers ignore `EXTRA_INITIAL_URI`; the picker also hides `.Statuses` (dot folder) unless "Show hidden files" is on | Onboarding shows the path text, and the wrong-folder message tells the user to turn on "Show hidden files" (checked on the API 35 picker in T1.5) |
 | R4 | Play policy on apps related to other apps' content | No "WhatsApp" branding; disclaimer; no network |

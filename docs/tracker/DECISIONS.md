@@ -156,3 +156,15 @@ telling the two apps apart. Whole-name comparison keeps "WhatsApp" from matching
 **Alternatives:** Accept only the four documented full paths (breaks the R1 fallback);
 accept any `.Statuses` folder and ask the user which app it belongs to (an extra step
 for a case not seen in practice).
+
+## D-016 · 2026-10-13 · Accepted
+**Decision:** On onboarding, the folder the user picks decides which app it is granted
+for (`StatusFolders.classify`), not the card whose button opened the picker. A folder
+that classifies as neither app is reported as a wrong folder and nothing is stored or
+persisted.
+**Why:** The folder is the fact; the button is only where the user started. Picking
+the Business folder from the WhatsApp card is still a valid Business grant, and the
+screen needs no memory of which button was pressed.
+**Alternatives:** Reject a folder that does not match the button's app (an extra error
+for a correct folder); remember the requested kind and store under it (could store a
+Business folder as WhatsApp).
