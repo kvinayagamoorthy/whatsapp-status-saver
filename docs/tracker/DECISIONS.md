@@ -246,3 +246,20 @@ and needs no cancellation.
 on each request (the cancelled load's indicator state is easy to get wrong); watching
 the folder for changes (a SAF tree cannot be observed with `FileObserver`, and resume
 covers the real flow).
+
+## D-022 · 2026-10-13 · Accepted
+**Decision:** When the status list finds no readable folder (`NeedsAccess`), it
+navigates to onboarding and removes itself from the back stack; onboarding's Continue
+returns to the list as before (D-017). A readable but empty folder shows one message:
+statuses appear after viewing them in WhatsApp, and they show up on return without any
+action (T2.4). There is no "Open WhatsApp" button. If only one of two granted folders
+is lost, the list keeps showing the other.
+**Why:** FR8 asks to return to the FR1 flow, and onboarding already shows which app
+needs granting again. Popping the list means Back from onboarding leaves the app
+instead of returning to a list that cannot load. A launch button would need a
+`<queries>` manifest entry and the spec does not ask for it. A partly lost source is
+shown in settings (T5.2) rather than interrupting a working list. Note that a granted
+folder deleted by uninstalling WhatsApp keeps its grant and shows as empty, not as lost
+access (seen in T2.1).
+**Alternatives:** A message with a "Grant again" button on the list (one more screen
+for the same action as onboarding); keeping the list under onboarding on the back stack.

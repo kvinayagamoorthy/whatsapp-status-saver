@@ -38,7 +38,15 @@ fun KeepsakeNavHost(
             )
         }
         composable(Routes.STATUSES) {
-            StatusesScreen()
+            StatusesScreen(
+                onNeedsAccess = {
+                    // Back from onboarding then exits instead of returning to a list that
+                    // cannot load (D-022).
+                    navController.navigate(Routes.ONBOARDING) {
+                        popUpTo(Routes.STATUSES) { inclusive = true }
+                    }
+                },
+            )
         }
     }
 }

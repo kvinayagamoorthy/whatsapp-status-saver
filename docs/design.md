@@ -67,7 +67,8 @@ No Hilt/Koin: one module and a handful of classes do not need it.
 Navigation: Navigation Compose with routes `onboarding`, `statuses`,
 `viewer/{tab}/{index}`, `settings`. Start destination chosen from whether any
 `StatusSource` has a valid persisted permission. Onboarding offers "Continue" once one
-app is granted and leaves the back stack when the user continues (D-017).
+app is granted and leaves the back stack when the user continues (D-017). The list
+replaces itself with onboarding when no granted folder is readable any more (D-022).
 
 ## 3. Reading statuses (SAF)
 

@@ -16,6 +16,23 @@ Template:
 
 ---
 
+## 2026-10-13 — T2.4 committed, T2.5 empty and lost access; M2 complete
+- Done: Committed T2.4 as `c572878`. T2.5: Empty shows "No statuses yet..." (centered,
+  scrollable for pull); NeedsAccess navigates to onboarding and pops the list (D-022).
+  Placeholder string removed. Not yet committed.
+- Verified: 43 unit tests (VM states already covered; the navigation glue is checked
+  on the device). Emulator API 35 with a throwaway probe that released every grant in
+  `MainActivity.onStop` (reverted): list → Home → return lands on onboarding with no
+  Continue; Back goes to the launcher; no crashes. Clean build: re-grant → Continue →
+  list. Empty `.Statuses` → message; pull on it works; image added while away shows on
+  return. Lint: only MissingApplicationIcon. Closed the "NeedsAccess seen on a device"
+  pending check.
+- Decisions: D-022.
+- Next: T3.1 — pager viewer route (M3).
+- Notes: There is no shell command to revoke a persisted SAF grant; a probe in the app
+  is the way. Emulator: WhatsApp grant re-made through onboarding; folder restored with
+  all test files.
+
 ## 2026-10-13 — T2.3 committed, T2.4 refresh
 - Done: Committed T2.3 as `000d410`. T2.4: `StatusesViewModel.reload()` (quiet, on every
   `ON_RESUME` via `LifecycleEventEffect`, replaces the `init` load) and `refresh()`

@@ -28,6 +28,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -49,10 +51,15 @@ import com.moorthy.statussaver.R
 import com.moorthy.statussaver.data.model.MediaType
 import com.moorthy.statussaver.data.model.StatusItem
 
-/** Status list (FR2): Images and Videos tabs over a grid of thumbnails, newest first. */
+/**
+ * Status list (FR2): Images and Videos tabs over a grid of thumbnails, newest first.
+ * [onNeedsAccess] is called when no granted folder is readable any more, so the user can
+ * grant one again (FR8).
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatusesScreen(
+    onNeedsAccess: () -> Unit,
     viewModel: StatusesViewModel = viewModel(factory = StatusesViewModel.Factory),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -60,6 +67,11 @@ fun StatusesScreen(
     // Also fires when the screen first appears, so this is the first load too.
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         viewModel.reload()
+    }
+    if (uiState == StatusesUiState.NeedsAccess) {
+        LaunchedEffect(Unit) {
+            onNeedsAccess()
+        }
     }
     // The tab is a MediaType, so it survives rotation and later names the viewer's tab.
     var selectedTab by rememberSaveable { mutableStateOf(MediaType.IMAGE) }
@@ -101,10 +113,9 @@ fun StatusesScreen(
                             StatusGrid(items = tabItems)
                         }
                     }
-                    // Both get their own explanation and actions in T2.5.
-                    StatusesUiState.Empty,
-                    StatusesUiState.NeedsAccess,
-                    -> CenteredMessage(stringResource(R.string.statuses_placeholder))
+                    StatusesUiState.Empty -> CenteredMessage(stringResource(R.string.statuses_empty))
+                    // The screen is about to be replaced by onboarding.
+                    StatusesUiState.NeedsAccess -> Unit
                 }
             }
         }
@@ -162,6 +173,7 @@ private fun CenteredMessage(text: String) {
         Text(
             text = text,
             style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center,
         )
     }
 }

@@ -1,24 +1,24 @@
 # Status Board
 
-Last updated: 2026-10-13 (T2.4 done, uncommitted)
+Last updated: 2026-10-13 (T2.5 done, uncommitted, M2 complete)
 
 ## Resume here
 
-- **Current milestone:** M2 — Status list (M1 complete)
-- **In progress:** none (T2.4 done, waiting for the user to say commit)
-- **Next task:** T2.5 — empty and lost-permission states
+- **Current milestone:** M3 — Viewer (M2 complete once T2.5 is committed)
+- **In progress:** none (T2.5 done, waiting for the user to say commit)
+- **Next task:** T3.1 — pager viewer route (M3)
 - **Blockers:** none
-- **Last task commit:** `000d410` (T2.3). Earlier: `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
-- **Notes for next session:** T2.4 is finished and verified but NOT committed (subject
-  `feat: reload statuses on resume and on pull to refresh (T2.4)`); commit it first
-  when the user says so. Start the emulator with `-gpu host` (CLAUDE.md).
+- **Last task commit:** `c572878` (T2.4). Earlier: `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
+- **Notes for next session:** T2.5 is finished and verified but NOT committed (subject
+  `feat: explain empty statuses and return to onboarding on lost access (T2.5)`);
+  commit it first when the user says so. Start the emulator with `-gpu host` (CLAUDE.md).
   Code so far: `data/model/` (T1.1), `data/StatusSourceStore.kt` (T1.2),
   `data/StatusFolders.kt` (T1.3, T1.4), `StatusSaverApp.kt` + `ui/onboarding/`
   (T1.5), `ui/KeepsakeNavHost.kt` + `ui/StartViewModel.kt` + placeholder
   `ui/statuses/StatusesScreen.kt` (T1.6), `data/StatusRepository.kt` (T2.1),
   `ui/statuses/StatusesViewModel.kt` (T2.2), grid in `ui/statuses/StatusesScreen.kt`
-  (T2.3), refresh (T2.4). 43 unit tests (Robolectric where Android types are involved, D-014). Toolchain and settled
-  scope: D-001 to D-021; see
+  (T2.3), refresh (T2.4), empty and lost access (T2.5). 43 unit tests (Robolectric where Android types are involved, D-014). Toolchain and settled
+  scope: D-001 to D-022; see
   SESSION_LOG "Handoff after M1" for environment and emulator tips. Only add
   dependencies a task actually uses.
 
@@ -33,7 +33,6 @@ Things verified only partly so far. Close them in the task named.
 | Status-bar icon colors follow the in-app theme override | `enableEdgeToEdge()` follows the system theme only | T5.1 |
 | Release APK under 10 MB | Debug APK is 16.5 MB unminified | T6.2 |
 | Grid smoothness on a real phone with real WhatsApp media | Measured only on the emulator with generated files | T5.6 |
-| `NeedsAccess` seen on a device | A fresh install starts on onboarding, so the state was only unit tested in T2.2 | T2.5 |
 
 ## Legend
 
@@ -46,7 +45,7 @@ Things verified only partly so far. Close them in the task named.
 |-----------|--------|------------|
 | M0 Project scaffold | DONE | 6 / 6 |
 | M1 Folder access | DONE | 6 / 6 |
-| M2 Status list | WIP | 4 / 5 |
+| M2 Status list | DONE | 5 / 5 |
 | M3 Viewer | TODO | 0 / 4 |
 | M4 Save, indicator, share | TODO | 0 / 6 |
 | M5 Settings and polish | TODO | 0 / 6 |
@@ -87,7 +86,7 @@ summary (world rule → code location). Keep each note to one or two lines.
 | T2.2 | `StatusesViewModel` + `UiState` | DONE | `ui/statuses/StatusesViewModel.kt`; `load()` returns null when no folder is readable (D-019). 4 VM tests with fake load + 3 repository tests, 4/4 mutations caught. Emulator (probe reverted): Loading → Content newest first; empty folder → Empty; rotation keeps state. Theory: folder readability + contents → Loading / Content / Empty / NeedsAccess |
 | T2.3 | Grid UI with tabs and thumbnails | DONE | Emulator API 35 `-gpu host`, 146 statuses (120 phone-size JPEGs, 21 videos): thumbnails and video frames newest first, badges, light/dark, tab kept in landscape. 24-swipe `gfxinfo`: release 2.1% janky (p50 17 ms), debug 1.9%, Settings 0.2%. Tab-split test + mutation caught (D-020). Theory: newest-first statuses → one grid per media type |
 | T2.4 | Pull-to-refresh + reload on resume | DONE | Emulator API 35: image added while app in background shows first on return; image added while open appears after pull, indicator clears. 11 VM tests, 4/4 mutations caught (D-021). Theory: user returns from WhatsApp or pulls → folders read again, one load at a time |
-| T2.5 | Empty and lost-permission states | TODO | |
+| T2.5 | Empty and lost-permission states | DONE | Emulator API 35: grants released by a throwaway probe → return lands on onboarding, Back exits; re-grant → list; empty folder → message, status added while away shows on return (D-022). Closed the NeedsAccess pending check. Theory: no readable folder → FR1 again; readable but empty → explain where statuses come from |
 
 ### M3 — Viewer
 
