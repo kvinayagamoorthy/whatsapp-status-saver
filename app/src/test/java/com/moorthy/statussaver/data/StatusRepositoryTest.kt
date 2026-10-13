@@ -20,7 +20,9 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -49,6 +51,7 @@ class StatusRepositoryTest {
     @Before
     fun setUp() {
         FakeDocumentsProvider.folders.clear()
+        FakeDocumentsProvider.permissionLost = false
         Robolectric.setupContentProvider(FakeDocumentsProvider::class.java, AUTHORITY)
         val dataStore = PreferenceDataStoreFactory.create(scope = dataStoreScope) {
             temporaryFolder.newFile("sources.preferences_pb")
@@ -215,9 +218,47 @@ class StatusRepositoryTest {
         assertEquals(0L, items.last().sizeBytes)
     }
 
+    @Test
+    fun aListedFileIsStillThereUntilItIsDeleted() = runBlocking {
+        FakeDocumentsProvider.folders[WHATSAPP_TREE_ID] = listOf(
+            image("a.jpg", modified = 2),
+            image("b.jpg", modified = 1),
+        )
+        statusSourceStore.grant(StatusSourceKind.WHATSAPP, WHATSAPP_TREE)
+        val (a, b) = repository.load()!!
+
+        FakeDocumentsProvider.folders[WHATSAPP_TREE_ID] = listOf(image("b.jpg", modified = 1))
+
+        assertFalse(repository.stillExists(a))
+        assertTrue(repository.stillExists(b))
+    }
+
+    @Test
+    fun aFileWhoseWholeFolderWasDeletedIsGone() = runBlocking {
+        FakeDocumentsProvider.folders[WHATSAPP_TREE_ID] = listOf(image("a.jpg", modified = 1))
+        statusSourceStore.grant(StatusSourceKind.WHATSAPP, WHATSAPP_TREE)
+        val item = repository.load()!!.single()
+
+        FakeDocumentsProvider.folders.remove(WHATSAPP_TREE_ID)
+
+        assertFalse(repository.stillExists(item))
+    }
+
+    @Test
+    fun aFileInAFolderWhosePermissionWasLostCountsAsGone() = runBlocking {
+        FakeDocumentsProvider.folders[WHATSAPP_TREE_ID] = listOf(image("a.jpg", modified = 1))
+        statusSourceStore.grant(StatusSourceKind.WHATSAPP, WHATSAPP_TREE)
+        val item = repository.load()!!.single()
+        FakeDocumentsProvider.permissionLost = true
+
+        assertFalse(repository.stillExists(item))
+    }
+
     /**
-     * Stands in for Android's external storage documents provider. It answers only
-     * children queries, with the rows stored for the tree being listed.
+     * Stands in for Android's external storage documents provider. Children queries get
+     * the rows stored for the tree being listed; a query for one document gets its row,
+     * or an IllegalArgumentException when it is missing, as the real provider does
+     * (checked in T3.4).
      */
     class FakeDocumentsProvider : ContentProvider() {
 
@@ -230,7 +271,18 @@ class StatusRepositoryTest {
             selectionArgs: Array<String>?,
             sortOrder: String?,
         ): Cursor? {
-            val rows = folders[DocumentsContract.getTreeDocumentId(uri)] ?: return null
+            if (permissionLost) {
+                throw SecurityException("No permission for $uri")
+            }
+            val treeRows = folders[DocumentsContract.getTreeDocumentId(uri)] ?: return null
+            val rows = if (uri.lastPathSegment == "children") {
+                treeRows
+            } else {
+                val documentId = DocumentsContract.getDocumentId(uri)
+                val row = treeRows.find { row -> row[Document.COLUMN_DOCUMENT_ID] == documentId }
+                    ?: throw IllegalArgumentException("Missing file for $documentId")
+                listOf(row)
+            }
             val columns = requireNotNull(projection)
             val cursor = MatrixCursor(columns)
             for (row in rows) {
@@ -257,6 +309,9 @@ class StatusRepositoryTest {
         companion object {
             /** Rows of each folder, keyed by the tree document id. */
             val folders = mutableMapOf<String, List<Map<String, Any?>>>()
+
+            /** Makes every query fail as it does once the folder grant is gone. */
+            var permissionLost = false
         }
     }
 

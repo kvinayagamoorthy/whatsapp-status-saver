@@ -36,6 +36,26 @@ class StatusRepository(
     }
 
     /**
+     * Whether [item]'s file is still in its folder. WhatsApp deletes a status about a day
+     * after it was posted, so a listed file can be gone by the time the user opens it.
+     */
+    suspend fun stillExists(item: StatusItem): Boolean = withContext(Dispatchers.IO) {
+        try {
+            contentResolver.query(item.uri, existsProjection, null, null, null)
+                ?.use { cursor -> cursor.moveToFirst() }
+                ?: false
+        } catch (e: IllegalArgumentException) {
+            // How Android's external storage provider reports a missing document
+            // (checked on the emulator in T3.4).
+            false
+        } catch (e: SecurityException) {
+            // The folder grant was lost: the file cannot be shown any more either. The
+            // list's next load then sends the user to onboarding.
+            false
+        }
+    }
+
+    /**
      * Lists one folder with a single query. Asking for every column in one go is much
      * faster than `DocumentFile.listFiles()` plus one call per file on large folders.
      */
@@ -93,6 +113,8 @@ class StatusRepository(
         const val MIME_TYPE_COLUMN = 2
         const val LAST_MODIFIED_COLUMN = 3
         const val SIZE_COLUMN = 4
+
+        val existsProjection = arrayOf(Document.COLUMN_DOCUMENT_ID)
 
         // Same-time items keep a fixed order by name, so the grid does not reshuffle
         // between refreshes.

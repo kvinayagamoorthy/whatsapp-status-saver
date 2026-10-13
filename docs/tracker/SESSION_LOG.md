@@ -16,6 +16,26 @@ Template:
 
 ---
 
+## 2026-10-13 — T3.3 committed, T3.4 vanished files; M3 complete
+- Done: Committed T3.3 as `7ad1850`. T3.4: `StatusRepository.stillExists` (document
+  query; IllegalArgumentException, null cursor or SecurityException mean gone),
+  `StatusesViewModel.confirmVanished` + `showVanishedNotice`, viewer pages remember a
+  load failure (Coil `onError`, player `onPlayerError`) and the settled page checks it;
+  gone → close and snackbar on the list, present → "This status can't be shown.". Not
+  yet committed.
+- Verified: 4 new tests (63 in total), 6 of 6 mutations caught. Throwaway probe in
+  `MainActivity` (reverted, `cmp` checked): querying or opening a missing document
+  throws IllegalArgumentException wrapping FileNotFoundException. Emulator API 35:
+  deleted image and video → back to the list with the message, item gone; broken .jpg and
+  .mp4 → message on the page, viewer stays, swipe on works. Lint: only
+  MissingApplicationIcon.
+- Bug found on the device: the snackbar never showed, because clearing the notice
+  ended the effect that showed it; now shown in the screen's coroutine scope.
+- Decisions: D-026.
+- Next: T4.1 — save to MediaStore on API 29+ (M4).
+- Notes: emulator folder restored (NEW-2.jpg and AUD-1.mp4 pushed back with their
+  times; BAD files removed). Backups are only in the session scratchpad.
+
 ## 2026-10-13 — T3.2 committed, T3.3 video player
 - Done: Committed T3.2 as `3486a37`. T3.3: `VideoPlayerViewModel` (one ExoPlayer for the
   viewer: `show(uri)` plays from the start unless already shown, `pause()`, released in

@@ -12,10 +12,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,6 +27,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -45,6 +50,9 @@ import com.moorthy.statussaver.ui.statuses.StatusesViewModel
  * list the user tapped in. That list does not reload while the viewer is open, because
  * the list reloads only when its own screen resumes (D-021, D-023). [onClose] returns to
  * the list, which then shows why there is nothing to view.
+ *
+ * A status that fails to load is checked against its folder: if WhatsApp has deleted it
+ * meanwhile, the viewer closes and the list says it is no longer available (T3.4).
  */
 @Composable
 fun ViewerScreen(
@@ -75,7 +83,13 @@ fun ViewerScreen(
                         onClose()
                     }
                 } else {
-                    ViewerPager(tab = tab, items = items, startIndex = startIndex)
+                    ViewerPager(
+                        tab = tab,
+                        items = items,
+                        startIndex = startIndex,
+                        onCheckVanished = viewModel::confirmVanished,
+                        onClose = onClose,
+                    )
                 }
             }
             StatusesUiState.Empty, StatusesUiState.NeedsAccess -> LaunchedEffect(Unit) {
@@ -86,7 +100,13 @@ fun ViewerScreen(
 }
 
 @Composable
-private fun ViewerPager(tab: MediaType, items: List<StatusItem>, startIndex: Int) {
+private fun ViewerPager(
+    tab: MediaType,
+    items: List<StatusItem>,
+    startIndex: Int,
+    onCheckVanished: suspend (StatusItem) -> Boolean,
+    onClose: () -> Unit,
+) {
     // The pager state is saved, so the current page survives rotation.
     val pagerState = rememberPagerState(initialPage = startIndex.coerceIn(0, items.lastIndex)) {
         items.size
@@ -117,12 +137,42 @@ private fun ViewerPager(tab: MediaType, items: List<StatusItem>, startIndex: Int
         key = { page -> items[page].uri.toString() },
     ) { page ->
         val item = items[page]
+        // Saved, so a page that failed before a rotation is checked again after it.
+        var failed by rememberSaveable(item.uri) { mutableStateOf(false) }
+        val onError = { failed = true }
         when {
-            item.type == MediaType.IMAGE -> ZoomableImage(item)
+            failed -> CannotShowMessage()
+            item.type == MediaType.IMAGE -> ZoomableImage(item = item, onError = onError)
             videoPlayer != null && page == pagerState.settledPage ->
-                VideoPage(item = item, player = videoPlayer.player)
+                VideoPage(item = item, player = videoPlayer.player, onError = onError)
             else -> VideoPreview(item)
         }
+        // Only the page the user is looking at may close the viewer, not a neighbour
+        // that is drawn while swiping.
+        if (failed && page == pagerState.settledPage) {
+            LaunchedEffect(item.uri) {
+                if (onCheckVanished(item)) {
+                    onClose()
+                }
+            }
+        }
+    }
+}
+
+/** A status whose file is still there but cannot be decoded. */
+@Composable
+private fun CannotShowMessage() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = stringResource(R.string.viewer_cannot_show),
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
@@ -154,7 +204,7 @@ private fun VideoPreview(item: StatusItem) {
  * page leaves the pager or the screen rotates, so each visit starts fitted.
  */
 @Composable
-private fun ZoomableImage(item: StatusItem) {
+private fun ZoomableImage(item: StatusItem, onError: () -> Unit) {
     val context = LocalContext.current
     val zoomState = remember(item.uri) { ZoomState() }
     // Decoded at full resolution rather than screen size, so zooming in shows real
@@ -170,6 +220,7 @@ private fun ZoomableImage(item: StatusItem) {
         contentDescription = null,
         contentScale = ContentScale.Fit,
         onSuccess = { success -> zoomState.setContentSize(success.painter.intrinsicSize) },
+        onError = { onError() },
         modifier = Modifier
             .fillMaxSize()
             .zoomable(zoomState),

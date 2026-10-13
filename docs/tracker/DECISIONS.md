@@ -332,3 +332,26 @@ controls that hide after a few seconds.
 **Consequences:** Media3 Compose APIs need `@OptIn(UnstableApi::class)`; re-check them
 when Media3 is upgraded. Debug APK went from 16.5 to 16.8 MB; the release size is checked
 in T6.2.
+
+## D-026 · 2026-10-13 · Accepted
+**Decision:** When the page the user is looking at fails to load, the viewer asks
+`StatusRepository.stillExists(item)` (one SAF query for the document) through
+`StatusesViewModel.confirmVanished`. If the file is gone, the viewer closes and the list
+shows "This status is no longer available..." in a snackbar, once; the list's reload on
+resume drops the item (D-021). If the file is still there, the page says "This status
+can't be shown." and the viewer stays, so the user can swipe on. Pages next to the
+current one never close the viewer. A lost folder grant also counts as gone; the list's
+reload then leads to onboarding (D-022).
+**Why:** The plan asks for a message and a return to a refreshed list when WhatsApp has
+expired a file, but a corrupt or unsupported file is not "no longer available", and
+sending the user back for it would hide the rest of the list. Checking the folder is the
+only reliable way to tell the two apart: Coil and ExoPlayer report both as load errors.
+On the device, querying a deleted document through its tree URI throws
+`IllegalArgumentException` (wrapping `FileNotFoundException`) rather than returning
+null; a deleted folder gives a null cursor (T2.1). The notice lives in the shared list
+ViewModel because the list is where it is shown, after the viewer is gone.
+**Alternatives:** Treat every load error as expired (wrong message for broken files);
+stay in the viewer with a message and no automatic return (the plan asks for the
+return); check existence before opening each page (a query per swipe for a rare case).
+**Known gap:** A rotation while the snackbar is showing dismisses it early; it is not
+shown again.

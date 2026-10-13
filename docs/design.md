@@ -168,7 +168,12 @@ Only where the world can actually fail:
 
 - Lost permission → onboarding.
 - Source file deleted between listing and open/save (WhatsApp expired it) →
-  "This status is no longer available", refresh list.
+  "This status is no longer available", refresh list. In the viewer, a page that fails
+  to load (Coil error for images, player error for videos) asks
+  `StatusRepository.stillExists`; if the file is gone the viewer closes and the list shows
+  the message in a snackbar and drops the item on its resume reload. A file that is still
+  there but cannot be decoded shows "This status can't be shown." on its page, and the
+  viewer stays (D-026).
 - Storage full / IO failure on save → snackbar with failure, MediaStore row cleaned up.
 
 ## 8. Testing strategy

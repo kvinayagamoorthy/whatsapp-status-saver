@@ -10,11 +10,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.compose.ContentFrame
@@ -30,12 +33,25 @@ import com.moorthy.statussaver.data.model.StatusItem
 /**
  * The video on the current page (FR3): the picture, and a bar with play/pause, position,
  * seek bar, duration and mute. The controls stay visible; status videos are short and
- * the viewer is mostly used to decide what to keep.
+ * the viewer is mostly used to decide what to keep. [onError] is called when the video
+ * cannot be played, for example because its file was deleted.
  */
 @androidx.annotation.OptIn(UnstableApi::class)
 @Composable
-fun VideoPage(item: StatusItem, player: Player) {
+fun VideoPage(item: StatusItem, player: Player, onError: () -> Unit) {
     KeepScreenOnWhilePlaying(player)
+    val currentOnError by rememberUpdatedState(onError)
+    DisposableEffect(player) {
+        val listener = object : Player.Listener {
+            override fun onPlayerError(error: PlaybackException) {
+                currentOnError()
+            }
+        }
+        player.addListener(listener)
+        onDispose {
+            player.removeListener(listener)
+        }
+    }
     Box(modifier = Modifier.fillMaxSize()) {
         ContentFrame(
             player = player,

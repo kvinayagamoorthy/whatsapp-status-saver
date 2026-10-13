@@ -38,9 +38,9 @@ sealed interface StatusesUiState {
 }
 
 /**
- * Holds the status list for the statuses screen. [loadStatuses] is
- * `StatusRepository.load`: null means no readable folder, an empty list means empty
- * folders.
+ * Holds the status list for the statuses screen and the viewer opened from it.
+ * [loadStatuses] is `StatusRepository.load`: null means no readable folder, an empty list
+ * means empty folders. [statusStillExists] is `StatusRepository.stillExists`.
  *
  * WhatsApp adds a file whenever the user views a status, so the list is read again each
  * time the screen comes to the front ([reload]) and when the user pulls to refresh
@@ -48,6 +48,7 @@ sealed interface StatusesUiState {
  */
 class StatusesViewModel(
     private val loadStatuses: suspend () -> List<StatusItem>?,
+    private val statusStillExists: suspend (StatusItem) -> Boolean,
 ) : ViewModel() {
 
     private val mutableUiState = MutableStateFlow<StatusesUiState>(StatusesUiState.Loading)
@@ -57,6 +58,14 @@ class StatusesViewModel(
 
     /** True while a load the user asked for by pulling down is running. */
     val isRefreshing: StateFlow<Boolean> = mutableIsRefreshing.asStateFlow()
+
+    private val mutableShowVanishedNotice = MutableStateFlow(false)
+
+    /**
+     * True after the viewer closed because a status had expired; the list says so once
+     * and then calls [vanishedNoticeShown].
+     */
+    val showVanishedNotice: StateFlow<Boolean> = mutableShowVanishedNotice.asStateFlow()
 
     private var loadJob: Job? = null
 
@@ -86,11 +95,32 @@ class StatusesViewModel(
         reload()
     }
 
+    /**
+     * Called by the viewer when [item] could not be shown. Returns true when its file is
+     * gone (WhatsApp expired it): the viewer then closes, the list tells the user, and the
+     * list's reload on return drops the item. Returns false when the file is still there
+     * but cannot be decoded, so the viewer stays and says so on that page.
+     */
+    suspend fun confirmVanished(item: StatusItem): Boolean {
+        val vanished = !statusStillExists(item)
+        if (vanished) {
+            mutableShowVanishedNotice.value = true
+        }
+        return vanished
+    }
+
+    fun vanishedNoticeShown() {
+        mutableShowVanishedNotice.value = false
+    }
+
     companion object {
         val Factory = viewModelFactory {
             initializer {
                 val app = this[APPLICATION_KEY] as StatusSaverApp
-                StatusesViewModel(app.statusRepository::load)
+                StatusesViewModel(
+                    loadStatuses = app.statusRepository::load,
+                    statusStillExists = app.statusRepository::stillExists,
+                )
             }
         }
     }

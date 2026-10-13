@@ -43,7 +43,7 @@ class StatusesViewModelTest {
     @Test
     fun showsLoadingUntilTheFoldersAreRead() = runTest(testDispatcher) {
         val answer = CompletableDeferred<List<StatusItem>?>()
-        val viewModel = StatusesViewModel { answer.await() }
+        val viewModel = statusesViewModel { answer.await() }
 
         viewModel.reload()
         testScheduler.advanceUntilIdle()
@@ -57,7 +57,7 @@ class StatusesViewModelTest {
     @Test
     fun loadedStatusesAreShownInTheOrderGiven() = runTest(testDispatcher) {
         val items = listOf(item("new.jpg"), item("old.mp4", MediaType.VIDEO))
-        val viewModel = StatusesViewModel { items }
+        val viewModel = statusesViewModel { items }
 
         viewModel.reload()
         testScheduler.advanceUntilIdle()
@@ -67,7 +67,7 @@ class StatusesViewModelTest {
 
     @Test
     fun readableButEmptyFoldersShowEmpty() = runTest(testDispatcher) {
-        val viewModel = StatusesViewModel { emptyList() }
+        val viewModel = statusesViewModel { emptyList() }
 
         viewModel.reload()
         testScheduler.advanceUntilIdle()
@@ -77,7 +77,7 @@ class StatusesViewModelTest {
 
     @Test
     fun noReadableFolderNeedsAccess() = runTest(testDispatcher) {
-        val viewModel = StatusesViewModel { null }
+        val viewModel = statusesViewModel { null }
 
         viewModel.reload()
         testScheduler.advanceUntilIdle()
@@ -88,7 +88,7 @@ class StatusesViewModelTest {
     @Test
     fun nothingIsLoadedBeforeTheFirstReload() = runTest(testDispatcher) {
         var loads = 0
-        val viewModel = StatusesViewModel {
+        val viewModel = statusesViewModel {
             loads++
             emptyList()
         }
@@ -102,7 +102,7 @@ class StatusesViewModelTest {
     @Test
     fun reloadShowsStatusesAddedSinceTheLastLoad() = runTest(testDispatcher) {
         var folder = listOf(item("first.jpg"))
-        val viewModel = StatusesViewModel { folder }
+        val viewModel = statusesViewModel { folder }
         viewModel.reload()
         testScheduler.advanceUntilIdle()
 
@@ -117,7 +117,7 @@ class StatusesViewModelTest {
     fun reloadWhileALoadIsRunningDoesNotStartAnother() = runTest(testDispatcher) {
         var loads = 0
         val answer = CompletableDeferred<List<StatusItem>?>()
-        val viewModel = StatusesViewModel {
+        val viewModel = statusesViewModel {
             loads++
             answer.await()
         }
@@ -134,7 +134,7 @@ class StatusesViewModelTest {
     @Test
     fun quietReloadNeverShowsTheRefreshIndicator() = runTest(testDispatcher) {
         val answer = CompletableDeferred<List<StatusItem>?>()
-        val viewModel = StatusesViewModel { answer.await() }
+        val viewModel = statusesViewModel { answer.await() }
 
         viewModel.reload()
         testScheduler.advanceUntilIdle()
@@ -145,7 +145,7 @@ class StatusesViewModelTest {
     @Test
     fun refreshShowsTheIndicatorUntilTheLoadFinishes() = runTest(testDispatcher) {
         val answer = CompletableDeferred<List<StatusItem>?>()
-        val viewModel = StatusesViewModel { answer.await() }
+        val viewModel = statusesViewModel { answer.await() }
 
         viewModel.refresh()
         testScheduler.advanceUntilIdle()
@@ -161,7 +161,7 @@ class StatusesViewModelTest {
     @Test
     fun refreshDuringAQuietReloadEndsWithThatLoad() = runTest(testDispatcher) {
         val answer = CompletableDeferred<List<StatusItem>?>()
-        val viewModel = StatusesViewModel { answer.await() }
+        val viewModel = statusesViewModel { answer.await() }
         viewModel.reload()
         testScheduler.advanceUntilIdle()
 
@@ -191,6 +191,41 @@ class StatusesViewModelTest {
             content.itemsOf(MediaType.VIDEO),
         )
     }
+
+    @Test
+    fun aStatusThatIsGoneIsReportedOnceOnTheList() = runTest(testDispatcher) {
+        val viewModel = StatusesViewModel(
+            loadStatuses = { listOf(item("a.jpg")) },
+            statusStillExists = { false },
+        )
+
+        assertTrue(viewModel.confirmVanished(item("a.jpg")))
+        assertTrue(viewModel.showVanishedNotice.value)
+
+        viewModel.vanishedNoticeShown()
+        assertFalse(viewModel.showVanishedNotice.value)
+    }
+
+    @Test
+    fun aStatusThatIsStillThereIsNotReportedAsGone() = runTest(testDispatcher) {
+        val checked = mutableListOf<StatusItem>()
+        val viewModel = StatusesViewModel(
+            loadStatuses = { listOf(item("a.jpg")) },
+            statusStillExists = { status ->
+                checked += status
+                true
+            },
+        )
+
+        assertFalse(viewModel.confirmVanished(item("a.jpg")))
+
+        assertFalse(viewModel.showVanishedNotice.value)
+        assertEquals(listOf(item("a.jpg")), checked)
+    }
+
+    /** A ViewModel whose statuses all still exist; most tests are about loading. */
+    private fun statusesViewModel(loadStatuses: suspend () -> List<StatusItem>?) =
+        StatusesViewModel(loadStatuses = loadStatuses, statusStillExists = { true })
 
     private fun item(name: String, type: MediaType = MediaType.IMAGE) = StatusItem(
         uri = Uri.parse("content://test/$name"),

@@ -24,15 +24,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -51,6 +54,7 @@ import coil3.compose.AsyncImage
 import com.moorthy.statussaver.R
 import com.moorthy.statussaver.data.model.MediaType
 import com.moorthy.statussaver.data.model.StatusItem
+import kotlinx.coroutines.launch
 
 /**
  * Status list (FR2): Images and Videos tabs over a grid of thumbnails, newest first.
@@ -77,12 +81,27 @@ fun StatusesScreen(
     }
     // The tab is a MediaType, so it survives rotation and later names the viewer's tab.
     var selectedTab by rememberSaveable { mutableStateOf(MediaType.IMAGE) }
+    val showVanishedNotice by viewModel.showVanishedNotice.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarScope = rememberCoroutineScope()
+    val vanishedMessage = stringResource(R.string.statuses_vanished)
+    LaunchedEffect(showVanishedNotice) {
+        if (showVanishedNotice) {
+            // Marked first, so the notice is not shown a second time after a rotation.
+            // That ends this effect, so the snackbar runs in the screen's own scope.
+            viewModel.vanishedNoticeShown()
+            snackbarScope.launch {
+                snackbarHostState.showSnackbar(vanishedMessage)
+            }
+        }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(title = { Text(stringResource(R.string.app_name)) })
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { innerPadding ->
         Column(
             modifier = Modifier
