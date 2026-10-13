@@ -16,6 +16,19 @@ Template:
 
 ---
 
+## 2026-10-13 — T1.3: tree validation and classification
+- Done: Committed T1.2 (`30b0d14`). T1.3: `data/StatusFolders.kt` with
+  `classify(treeDocumentId): StatusSourceKind?` (null = wrong folder). design.md §2
+  and §3 step 2 updated.
+- Verified: 10 new JVM tests (17 total) green; mutations (substring instead of last
+  folder; substring "WhatsApp" match before Business) failed the expected tests.
+  `lintDebug`: only MissingApplicationIcon.
+- Decisions: D-015 (classification rule).
+- Next: T1.4 — initial-URI builder. Put its paths in `StatusFolders` too (one place,
+  R1); `classify` takes a document id string so its tests need no Robolectric.
+- Notes: Picked-tree document id format to be confirmed on the emulator in T1.5
+  (Pending checks).
+
 ## 2026-10-13 — T1.2: StatusSourceStore
 - Done: Committed T1.1 (`857cb99`). T1.2: `data/StatusSourceStore.kt` with
   `StatusSource(kind, treeUri)`, `validSources()` (stored and still granted) and

@@ -142,3 +142,17 @@ checked on a device (T1.5).
 **Alternatives:** A small permissions interface with a hand-written fake plus String
 URIs in the store (keeps tests plain JVM, but adds an abstraction with one production
 caller and a second encoding of the same URI); mocking libraries.
+
+## D-015 · 2026-10-13 · Accepted
+**Decision:** A picked tree is a statuses folder when the last folder of its document
+id is exactly `.Statuses` and its path contains a known app folder name, compared as a
+whole name: `com.whatsapp.w4b` or `WhatsApp Business` means Business, otherwise
+`com.whatsapp` or `WhatsApp` means WhatsApp. Any storage volume is accepted. The
+names live in `data/StatusFolders.kt`, which T1.4's initial-URI paths will share.
+**Why:** Matching folder names instead of the two full documented paths keeps the
+R1 mitigation (the user can pick a `.Statuses` folder in another location) while still
+telling the two apps apart. Whole-name comparison keeps "WhatsApp" from matching
+"WhatsApp Business".
+**Alternatives:** Accept only the four documented full paths (breaks the R1 fallback);
+accept any `.Statuses` folder and ask the user which app it belongs to (an extra step
+for a case not seen in practice).

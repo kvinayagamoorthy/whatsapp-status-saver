@@ -45,6 +45,7 @@ com.moorthy.statussaver
 ├── MainActivity.kt            Single activity, hosts Compose NavHost
 ├── data/
 │   ├── StatusSourceStore.kt   Persisted tree URIs (DataStore) + permission checks
+│   ├── StatusFolders.kt       Known statuses folder names; classify a picked tree
 │   ├── StatusRepository.kt    Lists StatusItems from all granted sources
 │   ├── SavedMediaRepository.kt Save to MediaStore, query saved names
 │   ├── SettingsStore.kt       Theme mode (DataStore)
@@ -80,8 +81,11 @@ Approach (one code path for all API levels 26+):
    with `EXTRA_INITIAL_URI` built by
    `DocumentsContract.buildDocumentUri("com.android.externalstorage.documents", "primary:<path>")`
    for the most likely path on the running API level.
-2. Validate the returned tree: its document id must end with `.Statuses`. Classify as
-   WhatsApp or Business from the path. Otherwise show "wrong folder" and retry.
+2. Validate the returned tree (`StatusFolders.classify`): the last folder of its
+   document id must be `.Statuses`, and the path must contain a WhatsApp Business
+   folder name (`com.whatsapp.w4b`, `WhatsApp Business`) or a WhatsApp one
+   (`com.whatsapp`, `WhatsApp`), compared as whole folder names. Any storage volume is
+   accepted. Otherwise show "wrong folder" and retry (D-015).
 3. `takePersistableUriPermission(uri, FLAG_GRANT_READ_URI_PERMISSION)`; store the URI
    in DataStore keyed by source kind.
 4. List with `DocumentsContract.buildChildDocumentsUriUsingTree` and a single
