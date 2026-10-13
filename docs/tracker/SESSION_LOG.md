@@ -16,6 +16,32 @@ Template:
 
 ---
 
+## 2026-10-13 — Handoff before compaction (end of M2)
+- Done: M2 complete and committed: `a6e2a28` T2.1, `ccbec21` T2.2, `000d410` T2.3,
+  `c572878` T2.4, `aa73d2c` T2.5 (T1.6 was `77332dc`). Decisions D-018 to D-022.
+  CLAUDE.md gained the mutation-run hygiene, the throwaway-probe practice, ffmpeg
+  recipes, grant/reinstall facts, a `tapText` helper and the lint staleness note.
+- Verified: after T2.5, pull-to-refresh on a centered message (the "No video statuses
+  right now" tab) reloaded the list on the emulator, closing the open T2.4 risk. The
+  `tapText` helper in CLAUDE.md was run as written.
+- Next: T3.1 — pager viewer route (`viewer/{tab}/{index}`, design.md §2 and §6).
+- Notes for T3.1: tabs are `MediaType` (D-020), so the route's `{tab}` can be the enum
+  name; grid tiles have no click or content description yet (T3.1 and T5.4). The list
+  reloads on every resume (D-021), so returning from the viewer reloads it quietly; the
+  index the viewer opens at must come from the list the user tapped, and the viewer
+  should tolerate the list changing underneath (T3.4 handles vanished files).
+- Workflow that worked: the user says "commit and start T<n>"; each task follows five
+  questions → code → tests → mutations (clean results each run) → emulator check with
+  screenshots (combined with `magick ... +append`) → design/DECISIONS/trackers → report.
+- Environment: emulator `keepsake_api35` runs headless with `-gpu host` (Intel Iris Xe
+  via Mesa); it must be restarted with that flag after a reboot. Its WhatsApp
+  `.Statuses` holds 148 entries (w1/w2 PNG, w3.mp4, IMG-001..120 JPEG, VID-01..20
+  H.264, NEW-1/NEW-2 JPEG, .nomedia, notes.txt, sub/); the Business folder holds b1.png
+  and is not granted; one WhatsApp grant is held; night mode off, auto-rotate off. The
+  physical phone `z9lzvojfkf7pknpv` is also attached: never use it without asking.
+  Generated media live only in the session scratchpad; recreate with the CLAUDE.md
+  ffmpeg recipes if needed.
+
 ## 2026-10-13 — T2.4 committed, T2.5 empty and lost access; M2 complete
 - Done: Committed T2.4 as `c572878`. T2.5: Empty shows "No statuses yet..." (centered,
   scrollable for pull); NeedsAccess navigates to onboarding and pops the list (D-022).

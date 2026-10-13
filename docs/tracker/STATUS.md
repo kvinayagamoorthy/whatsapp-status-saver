@@ -1,26 +1,25 @@
 # Status Board
 
-Last updated: 2026-10-13 (T2.5 done, uncommitted, M2 complete)
+Last updated: 2026-10-13 (M2 complete and committed, handoff before compaction)
 
 ## Resume here
 
-- **Current milestone:** M3 — Viewer (M2 complete once T2.5 is committed)
-- **In progress:** none (T2.5 done, waiting for the user to say commit)
+- **Current milestone:** M3 — Viewer (M2 complete)
+- **In progress:** none
 - **Next task:** T3.1 — pager viewer route (M3)
 - **Blockers:** none
-- **Last task commit:** `c572878` (T2.4). Earlier: `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
-- **Notes for next session:** T2.5 is finished and verified but NOT committed (subject
-  `feat: explain empty statuses and return to onboarding on lost access (T2.5)`);
-  commit it first when the user says so. Start the emulator with `-gpu host` (CLAUDE.md).
-  Code so far: `data/model/` (T1.1), `data/StatusSourceStore.kt` (T1.2),
-  `data/StatusFolders.kt` (T1.3, T1.4), `StatusSaverApp.kt` + `ui/onboarding/`
-  (T1.5), `ui/KeepsakeNavHost.kt` + `ui/StartViewModel.kt` + placeholder
-  `ui/statuses/StatusesScreen.kt` (T1.6), `data/StatusRepository.kt` (T2.1),
-  `ui/statuses/StatusesViewModel.kt` (T2.2), grid in `ui/statuses/StatusesScreen.kt`
-  (T2.3), refresh (T2.4), empty and lost access (T2.5). 43 unit tests (Robolectric where Android types are involved, D-014). Toolchain and settled
-  scope: D-001 to D-022; see
-  SESSION_LOG "Handoff after M1" for environment and emulator tips. Only add
-  dependencies a task actually uses.
+- **Last task commit:** `aa73d2c` (T2.5). Earlier: `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
+- **Notes for next session:** everything is committed (T2.5 plus a docs-only handoff
+  commit after it). Start T3.1 when the user says so; read SESSION_LOG "Handoff before
+  compaction (end of M2)" for T3.1 notes and the emulator state. Start the emulator
+  with `-gpu host` (CLAUDE.md). Code so far: `data/model/` (T1.1),
+  `data/StatusSourceStore.kt` (T1.2), `data/StatusFolders.kt` (T1.3, T1.4),
+  `StatusSaverApp.kt` + `ui/onboarding/` (T1.5), `ui/KeepsakeNavHost.kt` +
+  `ui/StartViewModel.kt` (T1.6), `data/StatusRepository.kt` (T2.1),
+  `ui/statuses/StatusesViewModel.kt` (T2.2) and `ui/statuses/StatusesScreen.kt`
+  (grid T2.3, refresh T2.4, empty and lost access T2.5). 43 unit tests (Robolectric
+  where Android types are involved, D-014). Toolchain and settled scope: D-001 to
+  D-022. Only add dependencies a task actually uses.
 
 ## Pending checks
 

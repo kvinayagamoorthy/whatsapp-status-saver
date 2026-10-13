@@ -71,7 +71,14 @@ must be updated in the same change, with a `DECISIONS.md` entry.
 Show that new tests can fail: break the code briefly (a mutation such as flipping a
 condition), confirm the expected tests fail, then restore it. Report which mutations
 were caught and which survived; a surviving mutation is a gap to close or to record in
-"Pending checks" in `STATUS.md`. Do not commit placeholder tests.
+"Pending checks" in `STATUS.md`. Do not commit placeholder tests. Before each mutant
+run, delete `app/build/test-results/testDebugUnitTest` and check Gradle's exit code: a
+mutant that fails to compile leaves the old results, which look like a catch.
+
+Platform facts that tests cannot show (what a provider returns, whether a call
+throws) are checked with a throwaway probe in the app (temporary logging in
+`MainActivity` or a screen, or code such as releasing every grant in `onStop`), then
+reverted before the commit. Copy the file aside first and `cmp` it after restoring.
 
 ## Tech stack
 
@@ -129,8 +136,10 @@ Useful for device checks (the emulator has no WhatsApp):
 ```bash
 # Fake statuses folders (mkdir works under Android/media; touch there does not).
 adb -s emulator-5554 shell 'mkdir -p "/sdcard/Android/media/com.whatsapp/WhatsApp/Media/.Statuses"'
-# Fake statuses: adb push works there; -a keeps the local modified time (set it with touch -d).
-# ffmpeg is installed for a tiny test video: ffmpeg -f lavfi -i color=c=red:s=64x64:d=1 -pix_fmt yuv420p v.mp4
+# Fake statuses: adb push works there; -a keeps the local modified time (touch -d "@<epoch>").
+# ffmpeg has no libx264 here; for H.264 use libopenh264, e.g. a phone-size 5 s video:
+#   ffmpeg -f lavfi -i testsrc2=s=720x1280:d=5:r=30 -c:v libopenh264 -b:v 1M -pix_fmt yuv420p v.mp4
+# and a phone-size image: ffmpeg -f lavfi -i testsrc2=s=720x1280:d=1 -frames:v 1 w1.jpg
 adb -s emulator-5554 push -a w1.png v.mp4 "/sdcard/Android/media/com.whatsapp/WhatsApp/Media/.Statuses/"
 adb -s emulator-5554 shell pm clear com.moorthy.statussaver            # fresh-install state, drops grants
 adb -s emulator-5554 shell run-as com.moorthy.statussaver cat files/datastore/status_sources.preferences_pb | strings
@@ -138,6 +147,26 @@ adb -s emulator-5554 shell dumpsys activity permissions | grep -B4 "persisted=0x
 adb -s emulator-5554 shell uiautomator dump /sdcard/ui.xml            # then tap a node's bounds centre
 adb -s emulator-5554 shell input tap <x> <y>
 ```
+
+`install -r` keeps the folder grant; uninstalling (or `pm clear`) drops it, and it
+must then be granted again through onboarding. There is no shell command to revoke a
+persisted SAF grant: use a throwaway probe in the app. To tap by visible text:
+
+```bash
+tapText() {  # usage: tapText "Grant access"
+  adb -s emulator-5554 shell uiautomator dump /sdcard/ui.xml > /dev/null 2>&1
+  bounds=$(adb -s emulator-5554 shell cat /sdcard/ui.xml | grep -o "text=\"$1\"[^>]*bounds=\"[^\"]*\"" | head -1 | grep -o 'bounds="[^"]*"' | grep -o '[0-9]\+' | tr '\n' ' ')
+  set -- $bounds
+  adb -s emulator-5554 shell input tap $(( ($1 + $3) / 2 )) $(( ($2 + $4) / 2 ))
+}
+# Re-grant: tapText "Grant access"; tapText "USE THIS FOLDER"; tapText "ALLOW"; tapText "Continue"
+```
+
+If `adb devices` lists only the physical phone, the emulator is not running: start it
+rather than using the phone.
+
+Lint reports can be stale after a version-catalog-only change: run
+`./gradlew lintDebug --rerun-tasks` (`--rerun` does not rewrite the report).
 
 Use `-gpu host` for anything about smoothness: without it a headless emulator renders
 with SwiftShader on the CPU and even a plain grid janks. Measure with
