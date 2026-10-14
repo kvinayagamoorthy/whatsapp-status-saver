@@ -2,7 +2,9 @@ package com.moorthy.statussaver.ui.viewer
 
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -14,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
@@ -67,7 +70,8 @@ import kotlinx.coroutines.launch
  * meanwhile, the viewer closes and the list says it is no longer available (T3.4).
  *
  * The Save button at the top keeps the current status in the gallery (FR4) and shows a
- * check mark once it is there (FR5).
+ * check mark once it is there (FR5). The Share button beside it hands the status to
+ * another app through the system share sheet (FR6).
  */
 @Composable
 fun ViewerScreen(
@@ -203,24 +207,53 @@ private fun ViewerPager(
                 }
             }
         }
-        // Acts on the page in the middle of the screen, also while swiping.
+        // Both act on the page in the middle of the screen, also while swiping.
         val currentItem = items[pagerState.currentPage]
-        SaveButton(
-            isSaved = currentItem.name in savedNames,
-            isSaving = currentItem.name in savingNames,
-            onClick = { onSave(currentItem) },
+        val context = LocalContext.current
+        val shareTitle = stringResource(R.string.viewer_share)
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .statusBarsPadding()
                 .padding(8.dp),
-        )
+        ) {
+            IconButton(
+                onClick = {
+                    // The share sheet only covers part of the viewer, which keeps running
+                    // behind it, so the video would go on playing while the user picks an app.
+                    videoPlayer?.pause()
+                    context.startActivity(shareIntent(currentItem, shareTitle))
+                },
+                colors = scrimButtonColors(),
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_share),
+                    contentDescription = shareTitle,
+                )
+            }
+            SaveButton(
+                isSaved = currentItem.name in savedNames,
+                isSaving = currentItem.name in savingNames,
+                onClick = { onSave(currentItem) },
+            )
+        }
     }
 }
 
+/** White icons on a dark scrim, since statuses can have any colours behind them. */
+@Composable
+private fun scrimButtonColors(): IconButtonColors =
+    IconButtonDefaults.iconButtonColors(
+        containerColor = Color.Black.copy(alpha = 0.45f),
+        contentColor = Color.White,
+        disabledContainerColor = Color.Black.copy(alpha = 0.45f),
+        disabledContentColor = Color.White,
+    )
+
 /**
  * Saves the current status, or shows a check mark when it is already saved. Tapping the
- * check mark saves again, which only says "Already saved" (I4). On a dark scrim, since
- * statuses can have any colours behind it.
+ * check mark saves again, which only says "Already saved" (I4).
  */
 @Composable
 private fun SaveButton(
@@ -232,12 +265,7 @@ private fun SaveButton(
     IconButton(
         onClick = onClick,
         enabled = !isSaving,
-        colors = IconButtonDefaults.iconButtonColors(
-            containerColor = Color.Black.copy(alpha = 0.45f),
-            contentColor = Color.White,
-            disabledContainerColor = Color.Black.copy(alpha = 0.45f),
-            disabledContentColor = Color.White,
-        ),
+        colors = scrimButtonColors(),
         modifier = modifier,
     ) {
         when {

@@ -1,15 +1,15 @@
 # Status Board
 
-Last updated: 2026-10-14 (T4.5 done, not committed)
+Last updated: 2026-10-14 (T4.6 done, not committed)
 
 ## Resume here
 
-- **Current milestone:** M4 — Save, indicator, share (M3 complete)
-- **In progress:** none (T4.5 done, awaiting commit)
-- **Next task:** T4.6 — share via ACTION_SEND
+- **Current milestone:** M4 — Save, indicator, share (M3 complete; M4 complete once T4.6 is committed)
+- **In progress:** none (T4.6 done, awaiting commit)
+- **Next task:** T5.1 — settings screen with theme mode
 - **Blockers:** none
-- **Last task commit:** `5a832c0` (T4.4). Earlier: `201daee` (T4.3), `04909aa` (T4.2), `39c520a` (T4.1), `c64f0c2` (tools/emulator_touch.py), `c6c87be` (docs handoff), `6979ffc` (T3.4), `7ad1850` (T3.3), `3486a37` (T3.2), `2904702` (T3.1), `aa73d2c` (T2.5), `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
-- **Notes for next session:** T4.5 is done but not committed (commit it as T4.5 first).
+- **Last task commit:** `d41eb39` (T4.5). Earlier: `5a832c0` (T4.4), `201daee` (T4.3), `04909aa` (T4.2), `39c520a` (T4.1), `c64f0c2` (tools/emulator_touch.py), `c6c87be` (docs handoff), `6979ffc` (T3.4), `7ad1850` (T3.3), `3486a37` (T3.2), `2904702` (T3.1), `aa73d2c` (T2.5), `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
+- **Notes for next session:** T4.6 is done but not committed (commit it as T4.6 first).
   Instrumented tests (`app/src/androidTest`) run with `install` + `am instrument`, not
   `connectedDebugAndroidTest` (CLAUDE.md, D-027). Two emulators now: `keepsake_api35`
   (`emulator-5554`) and `keepsake_api28` (`emulator-5556`, Android 9 path, D-028). A third,
@@ -54,7 +54,7 @@ Things verified only partly so far. Close them in the task named.
 | M1 Folder access | DONE | 6 / 6 |
 | M2 Status list | DONE | 5 / 5 |
 | M3 Viewer | DONE | 4 / 4 |
-| M4 Save, indicator, share | TODO | 0 / 6 |
+| M4 Save, indicator, share | DONE | 6 / 6 |
 | M5 Settings and polish | TODO | 0 / 6 |
 | M6 Release | TODO | 1 / 5 |
 
@@ -113,7 +113,7 @@ summary (world rule → code location). Keep each note to one or two lines.
 | T4.3 | Saved-names flow, idempotent save | DONE | `save()` returns `SaveResult` (SAVED / ALREADY_SAVED / FAILED); checks the storage for the name before copying, one save at a time (Mutex); `savedNames` StateFlow + `refreshSavedNames()` (D-029). Instrumented: 12 tests on API 35 and API 29, 9 on API 28, three runs each stable. Saving twice gives one copy and ALREADY_SAVED; two saves at once give one copy; a fresh repository lists earlier copies after refresh; `.part` files and failed saves are not listed; a copy deleted in a gallery app can be saved again. 10 of 10 mutation kinds caught (12 runs) after adding two tests for survivors (no lock on Android 9 with a small file; name filter dropped). Theory: identity = file name in our Keepsake folders; the storage, not a cache, decides |
 | T4.4 | Save action + check marks | DONE | Viewer: round Save button top end (scrim), spinner while copying, check mark when saved; tiles get a check badge; snackbar "Saved to your gallery" / "Already saved" / failure, shown by the screen in front, above the video controls (D-030). `SavedMediaRepository` wired into `StatusSaverApp`; saved names re-read on every list reload. Android 8-9: permission asked at first save (`ui/StoragePermission.kt`). 4 new ViewModel unit tests (67 total), 5 of 5 mutations caught. Emulator API 35: image save → check + snackbar, second tap "Already saved" with one MediaStore row; video save while playing, snackbar above controls; list badge in light and dark; copy deleted outside the app loses its badge on resume. Emulator API 28: dialog → ALLOW → saved at once without restart (closes the T4.2 risk); DENY → settings message, nothing written. Theory: keep = one tap on what you are looking at; saved = name in the gallery folder |
 | T4.5 | Multi-select + Save selected | DONE | Long-press selects, taps toggle, top bar "N selected" with cross and Save, Back leaves the mode; selection by URI in `StatusesViewModel`, kept across rotation, pruned on reload; saves in list order, one summary snackbar with counts (`SaveSummary`, D-031). Permission helper now `rememberStoragePermissionGate`. 73 unit tests (6 new), 9 of 9 mutations caught after rewriting one test that blocked on the wrong item. Emulator API 35: 3 selected → "3 statuses saved to your gallery." (3 MediaStore rows); 1 saved + 1 new → "1 status saved to your gallery. 1 was already saved." (one new row); selection kept through landscape and back; Back clears it; viewer save still works. API 28: Save selected → permission dialog → ALLOW → saved. Theory: pick many, one save action, one honest count |
-| T4.6 | Share | TODO | |
+| T4.6 | Share | DONE | Share button left of Save in the viewer; `ACTION_SEND` of the status's SAF URI with its MIME type, read grant and clip data, through the chooser (`ui/viewer/ShareIntent.kt`, D-032); pauses a playing video first. 76 unit tests (3 new), 5 of 5 mutations caught (no grant flag, no clip data, `*/*` type, no stream, no chooser). Emulator API 35: image → chooser shows preview → Messages attaches it; video → chooser lists AUD-1.mp4; without the pause the video kept playing with sound behind the sheet, with it the player is `paused`. API 28: image → Messaging attaches it. Nothing sent. Theory: share by the grant Keepsake already holds, no copy |
 
 ### M5 — Settings and polish
 

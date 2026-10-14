@@ -16,6 +16,16 @@ Template:
 
 ---
 
+## 2026-10-14 — T4.6 share
+- Done: T4.5 committed (`d41eb39`). T4.6: Share button in the viewer, shares the SAF URI
+  through the system chooser with a read grant; pauses a playing video (D-032). Not
+  committed yet.
+- Verified: 76 unit tests (3 new), 5 of 5 mutations; lint only MissingApplicationIcon;
+  emulator checks on API 35 and 28 as in STATUS T4.6.
+- Next: commit T4.6 (M4 complete), then T5.1 (theme mode setting).
+- Notes: the share checks attached images in Messages (API 35) and Messaging (API 28);
+  nothing was sent and both drafts were discarded.
+
 ## 2026-10-14 — T4.5 multi-select and Save selected
 - Done: T4.4 committed (`5a832c0`). T4.5: selection mode in the grid, "Save selected"
   with one summary snackbar (D-031), not committed yet.

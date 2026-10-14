@@ -474,3 +474,22 @@ One message per action keeps several results from queueing as separate snackbars
 **Alternatives:** Selection per tab (the counts then hide items of the other tab, but
 switching tabs would silently drop a selection); a progress dialog during multi-save
 (blocks the app for what is usually a few seconds); a notice per item.
+
+## D-032 · 2026-10-14 · Accepted
+**Decision:** Share (FR6) is a Share button in the viewer, left of Save, on the same
+dark scrim. It opens the system chooser for an `ACTION_SEND` of the status's own SAF
+document URI with its MIME type, `FLAG_GRANT_READ_URI_PERMISSION`, and the URI as clip
+data (`ui/viewer/ShareIntent.kt`). Tapping it pauses a playing video. Only the viewer
+shares, one status at a time.
+**Why:** design.md §5: the folder grant lets Keepsake hand a read grant for a document
+inside it to another app, so no copy or `FileProvider` is needed; checked on API 35
+(Messages attached the image, the chooser showed its preview) and API 28 (Messaging
+attached the image). The clip data is what carries the grant through the chooser. On
+API 35 the chooser is translucent, so the viewer is only paused, not stopped, and the
+video went on playing with sound behind the sheet until the end; pausing on tap keeps
+the user's attention on picking an app, and the user can resume with the play button.
+The spec asks for sharing "an item", so the list's selection mode has no Share action.
+**Alternatives:** Copying to the app's cache and sharing through a `FileProvider`
+(extra copy, extra manifest entry, and cleanup); sharing the selected items with
+`ACTION_SEND_MULTIPLE` (no current need in the spec); pausing in an `ON_PAUSE` handler
+(would also pause for unrelated dialogs and on multi-window focus changes).

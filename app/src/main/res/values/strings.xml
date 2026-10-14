@@ -26,6 +26,7 @@
     <string name="viewer_save">Save to gallery</string>
     <string name="viewer_saved">Saved</string>
     <string name="viewer_saving">Saving</string>
+    <string name="viewer_share">Share</string>
     <string name="statuses_saved_badge">Saved</string>
 
     <string name="save_done">Saved to your gallery</string>

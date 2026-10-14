@@ -144,6 +144,13 @@ permission). Tracked as risk R2 in `plan.md`.
 
 Share the SAF content URI directly with `Intent.ACTION_SEND`, MIME type from the item,
 and `FLAG_GRANT_READ_URI_PERMISSION`. No `FileProvider` and no temp copies needed.
+The URI is also set as the intent's clip data, which carries the grant through the
+system chooser (`Intent.createChooser`) to the app the user picks. Keepsake may pass the
+grant on because the document lies inside its persisted folder grant (checked on API 35
+and API 28). The intent is built by `ui/viewer/ShareIntent.kt`; the viewer's Share button
+sits beside Save and acts on the current page (FR6). Sharing is single-item only. The
+share sheet covers only part of the viewer, which keeps running behind it, so the Share
+button pauses a playing video first (D-032).
 
 ## 6. UI and theming
 
