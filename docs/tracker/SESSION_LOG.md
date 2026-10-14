@@ -16,6 +16,18 @@ Template:
 
 ---
 
+## 2026-10-14 — T4.3 idempotent save and saved names
+- Done: T4.2 committed (`04909aa`). T4.3: `SaveResult`, storage check before each save,
+  save lock, `savedNames` flow with refresh (D-029), not committed yet.
+- Verified: instrumented suites green on API 35 (12), API 29 (12) and API 28 (9), three
+  runs each on 35 and 28; 10 mutation kinds caught; 63 unit tests; lint only
+  MissingApplicationIcon. Tests now delete their status files from the app cache.
+- Next: commit T4.3, then T4.4 (wiring, snackbar, check marks, permission prompt).
+- Notes: three mutants first gave no result because they did not compile, and the
+  mutation loop's output filter hid "BUILD FAILED"; they were rewritten to compile and
+  the filter now keeps that line. A blank mutant result is never a catch. `keepsake_api29` is shut
+  down again; `keepsake_api35` and `keepsake_api28` are running.
+
 ## 2026-10-14 — T4.2 save on Android 8-9
 - Done: T4.1 committed (`39c520a`). T4.2: `SavedMediaRepository.save()` covers Android
   8-9 (hidden `.part` copy, rename, awaited media scan; D-028), not committed yet.

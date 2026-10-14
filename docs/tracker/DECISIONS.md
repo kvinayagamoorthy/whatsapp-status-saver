@@ -409,3 +409,24 @@ default storage view and `mkdirs` failed, while the permission dialog grants bot
 given to an already running instrumentation process did not reach it; whether a grant
 from the real dialog reaches the running app must be checked in T4.4. The Android 9 media
 scanner only lists files it can parse, so tests use a real one-second MP4 asset.
+
+## D-029 · 2026-10-14 · Accepted
+**Decision:** `SavedMediaRepository.save(item)` returns `SaveResult` (`SAVED`,
+`ALREADY_SAVED`, `FAILED`, in `data/model/`). Before copying it checks the storage for a
+finished copy with the item's name (API 29+: one MediaStore query on `RELATIVE_PATH` and
+`DISPLAY_NAME`; API 26-28: `File.isFile`), and a `Mutex` runs saves one at a time.
+`savedNames: StateFlow<Set<String>>` holds the names of saved statuses: empty until
+`refreshSavedNames()` reads both Keepsake folders, then updated by every `SAVED` or
+`ALREADY_SAVED` result. The repository is still not wired into `StatusSaverApp`; T4.4
+does that, and calls the refresh when the list loads and on resume.
+**Why:** Asking the storage per save keeps saving idempotent even before the names were
+read and after the user deleted a copy in a gallery app (that status can then be saved
+again). Without the lock, two saves started together both found no copy: on Android 10+
+MediaStore then made `name (1).jpg`, and on Android 8-9 both wrote the same `.part`
+file; a test with a 16 MB file catches both. One flow of names serves the grid and the
+viewer (FR5) with no per-tile queries. Pending rows and `.part` files are copies still
+being written, so they do not count.
+**Alternatives:** Decide from the cached names alone (wrong right after a restart, and
+stale after a deletion in a gallery app); a cold `Flow` that queries on every collection
+(a query per collector and no update after a save without another query); keep the
+Boolean and let callers check names (spreads I4 over every caller).

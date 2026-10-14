@@ -125,9 +125,13 @@ See DECISIONS D-003.
   when the save reports success (D-028). Android adds `READ_EXTERNAL_STORAGE` to the
   request; without both granted the shared folders are not writable.
 - **Already-saved check (I3, I4):** API 29+ query MediaStore for our `RELATIVE_PATH`
-  and collect `DISPLAY_NAME`s (own files are visible without read permission);
-  API 26–28 list the public directory. Result is a `Set<String>` exposed as a `Flow`
-  and refreshed after each save.
+  and collect `DISPLAY_NAME`s (own files are visible without read permission; pending
+  rows are left out); API 26–28 list the public directory, skipping hidden `.part`
+  files. Result is `SavedMediaRepository.savedNames`, a `StateFlow<Set<String>>` filled
+  by `refreshSavedNames()` and updated by each save. `save()` itself asks the storage for
+  the one name before copying (not the flow, which may not have been read yet), and
+  saves run one at a time, so a double tap cannot make a second copy. It returns
+  `SaveResult.SAVED`, `ALREADY_SAVED` or `FAILED` (D-029).
 - Copy runs on `Dispatchers.IO`; multi-save processes items sequentially and reports
   counts (saved / already saved / failed).
 
