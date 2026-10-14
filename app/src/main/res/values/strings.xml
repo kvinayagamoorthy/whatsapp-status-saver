@@ -30,6 +30,8 @@
     <string name="viewer_saved">Saved</string>
     <string name="viewer_saving">Saving</string>
     <string name="viewer_share">Share</string>
+    <!-- What TalkBack says for the video seek bar: position, then length. -->
+    <string name="viewer_video_position">%1$s of %2$s</string>
     <string name="statuses_saved_badge">Saved</string>
 
     <string name="save_done">Saved to your gallery</string>

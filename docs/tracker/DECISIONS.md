@@ -647,3 +647,18 @@ Android's own way to pick text by version and need no code.
 **Alternatives:** A neutral hint without button names (less help exactly where users get
 stuck); choosing the text in code by `Build.VERSION.SDK_INT` (code for what resources
 already do).
+
+## D-040 · 2026-10-14 · Accepted
+**Decision:** The video seek bar is Media3's `ProgressSlider`, wrapped in `SeekBar`
+(`ui/viewer/VideoPage.kt`), which reads the position once a second
+(`rememberProgressStateWithTickInterval`) and sets the slider's `stateDescription` to
+"00:07 of 00:30" (`videoPositionDescription`, `DateUtils.formatElapsedTime`, the same
+minutes:seconds form as the position and duration texts); only the position while the
+length is unknown.
+**Why:** TalkBack read the slider as a bare fraction ("0.18. Slider", D-035). Media3's
+`ProgressSlider` passes its modifier to the Material slider, so a `stateDescription` there
+replaces the fraction without forking the control. Checked with TalkBack 15 on API 35:
+"00:08 of 00:30. Slider". A one-second tick is the finest step the description names.
+**Alternatives:** Writing an own slider (more code to keep in step with Media3); merging
+the position and duration texts into the slider node (they would no longer be visible
+to TalkBack as separate items, and the slider would still say the fraction).

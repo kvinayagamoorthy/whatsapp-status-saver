@@ -74,6 +74,7 @@ Goal: grid shows current statuses from all granted sources.
 | T5.5 | Adaptive launcher icon: bookmark ribbon inside a circle, plus monochrome layer for themed icons (D-009) | Icon shows on launcher, including Android 13+ themed icons |
 | T5.6 | Performance check vs NFR2/NFR3 | Measured numbers recorded in STATUS notes |
 | T5.7 | Onboarding picker hint matches the folder picker of each Android version (pending check from T4.2) | Hint text checked against the picker on API 28, 29 and 35 |
+| T5.8 | TalkBack reads the video seek bar as position and duration (pending check from T5.4) | TalkBack says e.g. "00:07 of 00:30" instead of a fraction |
 
 ## M6 — Release
 

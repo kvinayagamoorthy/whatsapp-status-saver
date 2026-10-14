@@ -1,5 +1,7 @@
 package com.moorthy.statussaver.ui.viewer
 
+import android.content.res.Resources
+import android.text.format.DateUtils
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,9 +17,11 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
@@ -29,7 +33,9 @@ import androidx.media3.ui.compose.material3.buttons.PlayPauseButton
 import androidx.media3.ui.compose.material3.indicator.DurationText
 import androidx.media3.ui.compose.material3.indicator.PositionText
 import androidx.media3.ui.compose.material3.indicator.ProgressSlider
+import androidx.media3.ui.compose.state.rememberProgressStateWithTickInterval
 import coil3.compose.AsyncImage
+import com.moorthy.statussaver.R
 import com.moorthy.statussaver.data.model.StatusItem
 
 /**
@@ -96,12 +102,43 @@ fun VideoPage(item: StatusItem, description: String, player: Player, onError: ()
             ) {
                 PlayPauseButton(player)
                 PositionText(player, modifier = Modifier.padding(horizontal = 4.dp))
-                ProgressSlider(player, modifier = Modifier.weight(1f))
+                SeekBar(player, modifier = Modifier.weight(1f))
                 DurationText(player, modifier = Modifier.padding(horizontal = 4.dp))
                 MuteButton(player)
             }
         }
     }
+}
+
+/**
+ * Media3's seek bar, which TalkBack would read as a bare fraction ("0.18"). It is told the
+ * position and the length instead, as the texts beside it show them (D-040).
+ */
+@androidx.annotation.OptIn(UnstableApi::class)
+@Composable
+private fun SeekBar(player: Player, modifier: Modifier = Modifier) {
+    // A second is the finest step the spoken position names.
+    val progress = rememberProgressStateWithTickInterval(player, tickIntervalMs = 1_000)
+    val resources = LocalResources.current
+    val position = videoPositionDescription(resources, progress.currentPositionMs, progress.durationMs)
+    ProgressSlider(
+        player,
+        modifier = modifier.semantics { stateDescription = position },
+    )
+}
+
+/**
+ * "00:07 of 00:30", or only the position while the length is not known yet. Uses the same
+ * minutes:seconds form as the position and duration texts of the control bar.
+ */
+fun videoPositionDescription(resources: Resources, positionMs: Long, durationMs: Long): String {
+    val position = DateUtils.formatElapsedTime(positionMs.coerceAtLeast(0) / 1_000)
+    if (durationMs < 0) {
+        // C.TIME_UNSET until the player has read the file.
+        return position
+    }
+    val duration = DateUtils.formatElapsedTime(durationMs / 1_000)
+    return resources.getString(R.string.viewer_video_position, position, duration)
 }
 
 /**

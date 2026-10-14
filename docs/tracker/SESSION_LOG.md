@@ -16,6 +16,14 @@ Template:
 
 ---
 
+## 2026-10-14 — T5.8 spoken seek bar position
+- Done: T5.7 committed (`c32f0bc`). Added T5.8 from the last pending check: TalkBack reads
+  the video seek bar as position and length (D-040). Not committed yet.
+- Verified: TalkBack 15 on API 35 says "00:08 of 00:30. Slider"; 89 unit tests (2 new),
+  3 of 3 mutations; lint no issues.
+- Next: commit T5.8. Then only T6.4 is left (deferred, D-008); no pending checks.
+- Notes: TalkBack is off and adbd unrooted on `keepsake_api35` again.
+
 ## 2026-10-14 — T5.7 onboarding hint per Android version
 - Done: T6.5 committed (`c80fcbe`). Added T5.7 from the open pending check: the picker
   hint now names the buttons of each Android version's folder picker (D-039); README

@@ -167,7 +167,8 @@ button pauses a playing video first (D-032).
   status, 3 hours ago", `ui/statuses/StatusDescription.kt`), on the grid tile (merged
   with "Saved" and, in selection mode, "Selected" / "Not selected") and on the viewer's
   picture. The video picture is an Android view, so an empty labelled layer lies over
-  it. Every button has a label and a 48 dp target.
+  it. The video seek bar is read as "00:07 of 00:30" (D-040). Every button has a label
+  and a 48 dp target.
 - Settings screen (`ui/settings/`): reached from the gear in the list's top bar; a
   radio group for the theme mode, then "Statuses folders" (FR8) with the same per-app
   cards as onboarding (`ui/onboarding/SourceCard.kt`, `FolderAccessViewModel`, one
