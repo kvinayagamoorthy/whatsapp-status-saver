@@ -16,6 +16,17 @@ Template:
 
 ---
 
+## 2026-10-14 — T5.7 onboarding hint per Android version
+- Done: T6.5 committed (`c80fcbe`). Added T5.7 from the open pending check: the picker
+  hint now names the buttons of each Android version's folder picker (D-039); README
+  updated to match. Not committed yet.
+- Verified: API 29 picker inspected ("ALLOW ACCESS TO ".STATUSES"", then "ALLOW"); hints
+  seen on API 28 and 29 and followed to re-grant; `aapt2` resource dump; lint no issues.
+- Next: commit T5.7. Left: T6.4 (deferred) and the Media3 slider pending check.
+- Notes: `keepsake_api29` now has `/sdcard/WhatsApp/Media/.Statuses/IMG-29.jpg` and the
+  debug build with its grant; it was shut down again. `keepsake_api28` (`emulator-5556`)
+  and `keepsake_api35` are running, both with their grants.
+
 ## 2026-10-14 — T6.5 sideload install notes
 - Done: T6.3 committed (`2d1c34b`). T6.5: `README.md` with install, first start, update,
   uninstall and build steps, using the exact prompts seen on the emulator. Not committed.

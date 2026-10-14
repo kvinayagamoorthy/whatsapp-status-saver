@@ -44,7 +44,9 @@ Keepsake asks for the folder where WhatsApp keeps statuses:
 
 1. Tap **Grant access** next to WhatsApp (or WhatsApp Business).
 2. The folder picker opens at the statuses folder. Tap **Use this folder**, then
-   **Allow**. (On Android 8 and 9 the button is **Select**, and there is no second step.)
+   **Allow**. On Android 10 the button at the bottom reads **Allow access to
+   ".Statuses"**, then **Allow**; on Android 8 and 9 it is **Select**, with no second
+   step. Keepsake's own hint shows the wording for your phone's version.
 3. Tap **Continue**.
 
 You can change or remove this access later under Settings (the gear on the main screen).

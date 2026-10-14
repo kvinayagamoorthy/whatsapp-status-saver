@@ -73,6 +73,7 @@ Goal: grid shows current statuses from all granted sources.
 | T5.4 | Accessibility pass: content descriptions, touch targets, TalkBack, font scale 200% | Manual checklist recorded in STATUS notes |
 | T5.5 | Adaptive launcher icon: bookmark ribbon inside a circle, plus monochrome layer for themed icons (D-009) | Icon shows on launcher, including Android 13+ themed icons |
 | T5.6 | Performance check vs NFR2/NFR3 | Measured numbers recorded in STATUS notes |
+| T5.7 | Onboarding picker hint matches the folder picker of each Android version (pending check from T4.2) | Hint text checked against the picker on API 28, 29 and 35 |
 
 ## M6 — Release
 

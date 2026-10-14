@@ -6,7 +6,9 @@
     <string name="source_business">WhatsApp Business</string>
 
     <string name="onboarding_explanation">Keepsake shows the statuses you have already viewed in WhatsApp, so you can keep the ones you like. To find them, it needs to read the folder where WhatsApp stores statuses.</string>
-    <string name="onboarding_picker_hint">Tap Grant access. When the folder picker opens, tap “Use this folder”, then “Allow”.</string>
+    <!-- The folder picker's buttons differ by Android version: values-v29 and values-v30
+         hold the newer wordings (checked on the API 28, 29 and 35 emulators, T5.7). -->
+    <string name="onboarding_picker_hint">Tap Grant access. When the folder picker opens, tap “Select”.</string>
     <string name="onboarding_grant_access">Grant access</string>
     <string name="onboarding_access_granted">Access granted</string>
     <string name="onboarding_choose_again">Choose again</string>

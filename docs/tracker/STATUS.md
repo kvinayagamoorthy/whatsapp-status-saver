@@ -1,15 +1,15 @@
 # Status Board
 
-Last updated: 2026-10-14 (T6.5 done, not committed)
+Last updated: 2026-10-14 (T5.7 done, not committed)
 
 ## Resume here
 
 - **Current milestone:** M6 — Release (M5 complete)
-- **In progress:** none (T6.5 done, awaiting commit)
+- **In progress:** none (T5.7 done, awaiting commit)
 - **Next task:** none planned after T6.5 (T6.4 deferred until a Play Store move, D-008)
 - **Blockers:** none
-- **Last task commit:** `2d1c34b` (T6.3). Earlier: `8354222` (T6.2), `88f94c1` (T5.6), `a725ae3` (T5.5), `3077f9d` (T5.4), `13c726b` (T5.3), `5a28682` (T5.2), `aeca0c6` (T5.1), `571647c` (T4.6), `d41eb39` (T4.5), `5a832c0` (T4.4), `201daee` (T4.3), `04909aa` (T4.2), `39c520a` (T4.1), `c64f0c2` (tools/emulator_touch.py), `c6c87be` (docs handoff), `6979ffc` (T3.4), `7ad1850` (T3.3), `3486a37` (T3.2), `2904702` (T3.1), `aa73d2c` (T2.5), `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
-- **Notes for next session:** T6.5 is done but not committed (commit it as T6.5 first). All planned tasks are then done except T6.4 (deferred, D-008). The release build stays installed on the user's phone. The user backed up the release keystore and `keystore.properties` (2026-10-14). The user allowed installing on their phone for T6.3 (serial `z9lzvojfkf7pknpv`).
+- **Last task commit:** `c80fcbe` (T6.5). Earlier: `2d1c34b` (T6.3), `8354222` (T6.2), `88f94c1` (T5.6), `a725ae3` (T5.5), `3077f9d` (T5.4), `13c726b` (T5.3), `5a28682` (T5.2), `aeca0c6` (T5.1), `571647c` (T4.6), `d41eb39` (T4.5), `5a832c0` (T4.4), `201daee` (T4.3), `04909aa` (T4.2), `39c520a` (T4.1), `c64f0c2` (tools/emulator_touch.py), `c6c87be` (docs handoff), `6979ffc` (T3.4), `7ad1850` (T3.3), `3486a37` (T3.2), `2904702` (T3.1), `aa73d2c` (T2.5), `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
+- **Notes for next session:** T5.7 is done but not committed (commit it as T5.7 first). All planned tasks are then done except T6.4 (deferred, D-008). The release build stays installed on the user's phone. The user backed up the release keystore and `keystore.properties` (2026-10-14). The user allowed installing on their phone for T6.3 (serial `z9lzvojfkf7pknpv`).
   Instrumented tests (`app/src/androidTest`) run with `install` + `am instrument`, not
   `connectedDebugAndroidTest` (CLAUDE.md, D-027). Two emulators now: `keepsake_api35`
   (`emulator-5554`) and `keepsake_api28` (`emulator-5556`, Android 9 path, D-028). A third,
@@ -35,7 +35,6 @@ Things verified only partly so far. Close them in the task named.
 
 | Check | Why it is open | Close in |
 |-------|----------------|----------|
-| Onboarding text on Android 8-9 | It says tap "Use this folder" then "Allow"; Android 9's picker shows "SELECT" and asks nothing more | T5.x polish (or T4.4 if touched) |
 | Video seek slider spoken as a fraction ("0.18. Slider") | Media3's `ProgressSlider` sets no position text (D-035) | Media3 update or a later polish task |
 
 ## Legend
@@ -52,7 +51,7 @@ Things verified only partly so far. Close them in the task named.
 | M2 Status list | DONE | 5 / 5 |
 | M3 Viewer | DONE | 4 / 4 |
 | M4 Save, indicator, share | DONE | 6 / 6 |
-| M5 Settings and polish | DONE | 6 / 6 |
+| M5 Settings and polish | DONE | 7 / 7 |
 | M6 Release | DONE | 4 / 5 (T6.4 deferred) |
 
 ## Tasks
@@ -122,6 +121,7 @@ summary (world rule → code location). Keep each note to one or two lines.
 | T5.4 | Accessibility pass | DONE | Checklist (API 35 unless noted): (1) content descriptions — every actionable node labelled (audit of uiautomator dumps on list, Videos tab, selection mode, viewer image/video, settings, also API 28); fixed: image tiles had none and video tiles all said "Video", now "Image/Video status, <age>" (`StatusDescription.kt`, D-035); viewer picture now described (image; video via labelled layer). (2) touch targets — all actionable nodes ≥ 48 dp (buttons 48×48, tiles ~131 dp, radio rows 56 dp, tabs 48 dp high). (3) TalkBack 15 — tiles "Image status, 22 hours ago. In list", saved adds "Saved", selection mode "Selected/Not selected …", tabs "Videos. Tab. 2 of 2", gear "Settings. Button", viewer "Image status, 22 hours ago. Image. In horizontal pager" / "Video status, 16 hours ago", Share/Save/Pause/Mute buttons, radios "Selected. System default. Radio button. 1 of 3"; known gap: video slider reads "0.18. Slider" (Media3). (4) font scale 2.0 — list, selection bar, settings ("Remove access" wraps to two lines), viewer controls, snackbar all fit. 87 unit tests (1 new), 3 of 3 mutations caught. Theory: a status is spoken as what it is and how old |
 | T5.5 | Launcher icon (bookmark in ring) | DONE | `mipmap-anydpi/ic_launcher.xml` (icon and round icon): terracotta background, `drawable/ic_launcher_foreground.xml` ring + bookmark ribbon inside the safe circle, same drawable as monochrome layer (D-036). Lint: no issues at all now. Seen on API 35 drawer (circle mask), API 35 home screen with themed icons on (tinted like Gmail/Photos), API 28 drawer (rounded-square mask). Theory: the bookmark says keep, the ring makes it legible in any mask |
 | T5.6 | Performance check | DONE | `ReportDrawnWhen` on the list (D-037). Emulator API 35 `-gpu host`, 202 statuses, release build (temporarily debug-signed, not minified): NFR2 grid drawn median ~470 ms just after install (417-573 ms, 10 runs), ~360 ms after `compile -m speed-profile` (341-659 ms), first frame ~200 ms; debug build ~1.28 s. NFR3 24 fast swipes: 2.8-3.0% janky, p50 17 ms, p90 25 ms, p99 34-38 ms; Settings app 0.6% under the same swipes. Real phone still pending (needs the user's OK). Theory: measure to the visible grid, not the first frame |
+| T5.7 | Onboarding picker hint per Android version | DONE | `onboarding_picker_hint` in `values` (8-9: “Select”), `values-v29` (10: “Allow access to ".Statuses"”, then “Allow”), `values-v30` (11+: “Use this folder”, then “Allow”) (D-039). `aapt2 dump resources` shows the three configs. Seen on screen: API 28 “Select”, API 29 the Android 10 text (quotes kept after escaping); following each hint re-granted the folder on API 28 and 29. Lint no issues. Theory: the hint names the buttons this phone's picker shows |
 
 ### M6 — Release
 

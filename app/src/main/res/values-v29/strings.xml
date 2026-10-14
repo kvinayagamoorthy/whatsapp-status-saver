@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Android 10's folder picker: one button at the bottom, then a confirmation. -->
+    <string name="onboarding_picker_hint">Tap Grant access. When the folder picker opens, tap “Allow access to \".Statuses\"” at the bottom, then “Allow”.</string>
+</resources>

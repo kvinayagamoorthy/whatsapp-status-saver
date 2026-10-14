@@ -143,7 +143,11 @@ Device checks use the local emulator `keepsake_api35` (API 35, config under
 attached; do not install on or change settings of the user's phone without asking.
 For the Android 8-9 code paths there is `keepsake_api28` (API 28, `default` image, so
 `adb root` works); started second, it gets serial `emulator-5556`. `keepsake_api29`
-(API 29) covers Android 10's MediaStore path; a third emulator gets `emulator-5558`. On it WhatsApp's
+(API 29) covers Android 10's MediaStore path; a third emulator gets `emulator-5558` (alone
+with `keepsake_api35` it gets `emulator-5556`). On it WhatsApp's statuses folder is
+`/sdcard/WhatsApp/Media/.Statuses`, and the picker's button reads "ALLOW ACCESS TO
+".STATUSES"" (not in `uiautomator dump`; tap about 540,2209), followed by an "ALLOW"
+dialog. On it WhatsApp's
 statuses folder is `/sdcard/WhatsApp/Media/.Statuses`, the folder picker's button reads
 "SELECT" (not found by `uiautomator dump`; tap about 958,2201) and there is no "ALLOW"
 step. Grant the storage permission with both `pm grant ... READ_EXTERNAL_STORAGE` and

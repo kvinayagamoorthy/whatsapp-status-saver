@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Android 11 and newer: the folder picker's wording. -->
+    <string name="onboarding_picker_hint">Tap Grant access. When the folder picker opens, tap “Use this folder”, then “Allow”.</string>
+</resources>

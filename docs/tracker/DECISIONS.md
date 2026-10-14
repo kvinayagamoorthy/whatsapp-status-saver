@@ -633,3 +633,17 @@ rules were needed.
 **Alternatives:** Keystore made by the user (more steps for the same result); passwords
 in `~/.gradle/gradle.properties` (visible to every build on the machine); a debug-signed
 release (cannot be updated by a properly signed build later).
+
+## D-039 · 2026-10-14 · Accepted
+**Decision:** The onboarding hint (`onboarding_picker_hint`) has one wording per folder
+picker: `values` (Android 8-9) "tap “Select”"; `values-v29` (Android 10) "tap “Allow
+access to ".Statuses"” at the bottom, then “Allow”"; `values-v30` (Android 11+) "tap “Use
+this folder”, then “Allow”".
+**Why:** The hint named Android 11's buttons on every version, but Android 9's picker
+has a single "SELECT" button and Android 10's a single "ALLOW ACCESS TO ".STATUSES"" button
+followed by an "ALLOW" dialog (seen on the API 28 and 29 emulators; API 35 and the user's
+Android 15 phone show "Use this folder" and "Allow"). Version-qualified resources are
+Android's own way to pick text by version and need no code.
+**Alternatives:** A neutral hint without button names (less help exactly where users get
+stuck); choosing the text in code by `Build.VERSION.SDK_INT` (code for what resources
+already do).
