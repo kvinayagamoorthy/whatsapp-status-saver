@@ -1,18 +1,18 @@
 # Status Board
 
-Last updated: 2026-10-13 (M3 complete and committed, handoff before compaction)
+Last updated: 2026-10-14 (T4.1 done, not committed)
 
 ## Resume here
 
 - **Current milestone:** M4 — Save, indicator, share (M3 complete)
-- **In progress:** none
-- **Next task:** T4.1 — `SavedMediaRepository.save()` on API 29+ (MediaStore, `IS_PENDING`)
+- **In progress:** none (T4.1 done, awaiting commit)
+- **Next task:** T4.2 — API 26–28 save path
 - **Blockers:** none
-- **Last task commit:** `6979ffc` (T3.4). Earlier: `7ad1850` (T3.3), `3486a37` (T3.2), `2904702` (T3.1), `aa73d2c` (T2.5), `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
-- **Notes for next session:** everything is committed (T3.4 plus a docs-only handoff
-  commit). Start T4.1 when the user says so; read SESSION_LOG "Handoff before
-  compaction (end of M3)" first. T4.1 needs an instrumented test
-  (`connectedDebugAndroidTest`, not set up yet: look up AndroidX Test versions live).
+- **Last task commit:** `6979ffc` (T3.4); after it `c6c87be` (docs handoff) and `c64f0c2` (tools/emulator_touch.py). Earlier: `7ad1850` (T3.3), `3486a37` (T3.2), `2904702` (T3.1), `aa73d2c` (T2.5), `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
+- **Notes for next session:** T4.1 is done but not committed (commit it as T4.1 first).
+  Instrumented tests exist now (`app/src/androidTest`); run them with `install` +
+  `am instrument`, not `connectedDebugAndroidTest` (CLAUDE.md, D-027). T4.2 needs an
+  API 28 emulator image (none installed yet).
   The emulator touch-injection script is in the repo as `tools/emulator_touch.py`
   (user's call, 2026-10-14). Read
   SESSION_LOG "Handoff before compaction (end of M2)" for the emulator state. Start the emulator
@@ -36,6 +36,7 @@ Things verified only partly so far. Close them in the task named.
 | Brand (terracotta) palette on Android 8-11 | Only an API 35 system image is installed; dynamic color hides the palette there | T5.4 or earlier on an API 26-30 emulator image |
 | Status-bar icon colors follow the in-app theme override | `enableEdgeToEdge()` follows the system theme only | T5.1 |
 | Release APK under 10 MB | Debug APK is 16.5 MB unminified | T6.2 |
+| Save on Android 10 (API 29) | The instrumented test needs API 30 to see pending rows, and no API 29 image is installed | T4.2 (install an API 29 image next to the API 28 one, run the save by probe) |
 | Grid smoothness on a real phone with real WhatsApp media | Measured only on the emulator with generated files | T5.6 |
 
 ## Legend
@@ -105,7 +106,7 @@ summary (world rule → code location). Keep each note to one or two lines.
 
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
-| T4.1 | MediaStore save (API 29+) | TODO | |
+| T4.1 | MediaStore save (API 29+) | DONE | `data/SavedMediaRepository.kt` `save(item)`: pending row in `Pictures/Keepsake/` or `Movies/Keepsake/`, copy from SAF, clear pending; row deleted and false on failure (D-027). AndroidX Test runner 1.7.0 + ext-junit 1.3.0 added. 4 instrumented tests on emulator API 35 (image and video land in the right folder, complete and not pending; source unchanged; vanished source leaves no row); 7 of 7 mutations caught. Probe with real SAF statuses: w1.png and AUD-1.mp4 copied byte-identical (md5), missing document returned false with no row, `.Statuses` still 150 entries; probe and its rows removed. Theory: keeping a status → a complete, never half-visible copy in the gallery under its own name |
 | T4.2 | Legacy save (API 26–28) | TODO | |
 | T4.3 | Saved-names flow, idempotent save | TODO | |
 | T4.4 | Save action + check marks | TODO | |

@@ -116,9 +116,23 @@ Requires JDK 17+ (JDK 21 used) and the Android SDK; set `sdk.dir` in
 ./gradlew assembleDebug          # build debug APK
 ./gradlew installDebug           # install on connected device/emulator
 ./gradlew testDebugUnitTest      # JVM unit tests
-./gradlew connectedDebugAndroidTest  # instrumented tests (device required)
+./gradlew connectedDebugAndroidTest  # instrumented tests; see the note below before using it
 ./gradlew lintDebug              # Android lint
 ```
+
+Instrumented tests (`app/src/androidTest`): prefer this over
+`connectedDebugAndroidTest`, which runs on every attached device (including a phone)
+and uninstalls the app afterwards, dropping the emulator's folder grant (D-027):
+
+```bash
+ANDROID_SERIAL=emulator-5554 ./gradlew installDebug installDebugAndroidTest
+adb -s emulator-5554 shell am instrument -w com.moorthy.statussaver.test/androidx.test.runner.AndroidJUnitRunner
+# prints "OK (n tests)" or "FAILURES!!!"; add -e class <fully.qualified.Test> for one class
+```
+
+Saved copies live in MediaStore; list or remove the app's rows with
+`adb -s emulator-5554 shell content query --uri content://media/external/file --projection _id:_display_name:relative_path:is_pending --where "relative_path\ LIKE\ \'%Keepsake%\'"`
+and `content delete --uri content://media/external/file --where "_id=<id>"`.
 
 Device checks use the local emulator `keepsake_api35` (API 35, config under
 `~/.android/avd/`). Always target it by serial, because a physical phone may also be

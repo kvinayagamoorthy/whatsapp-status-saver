@@ -13,6 +13,8 @@ android {
         targetSdk = 37
         versionCode = 1
         versionName = "0.1.0"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -70,4 +72,9 @@ dependencies {
     testImplementation(libs.robolectric)
     // Replaces the main dispatcher so ViewModel coroutines run under test control.
     testImplementation(libs.kotlinx.coroutines.test)
+
+    // Instrumented tests (src/androidTest) for what only a real device shows, such as
+    // where MediaStore puts a saved file.
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.ext.junit)
 }

@@ -115,6 +115,8 @@ See DECISIONS D-003.
   (`VOLUME_EXTERNAL_PRIMARY`) with `DISPLAY_NAME` = original file name,
   `RELATIVE_PATH` = `Pictures/Keepsake/` or `Movies/Keepsake/`, `IS_PENDING=1`;
   stream-copy from the SAF URI; then set `IS_PENDING=0`. Delete the row on failure.
+  The row is inserted before the source is opened, so a status that vanished before
+  saving takes the same cleanup path as a failed copy (D-027).
 - **API 26–28:** requires `WRITE_EXTERNAL_STORAGE` (manifest `maxSdkVersion="28"`,
   requested at first save). Copy into
   `Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES|MOVIES)/Keepsake/`,

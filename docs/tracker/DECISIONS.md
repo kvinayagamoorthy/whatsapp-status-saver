@@ -355,3 +355,31 @@ stay in the viewer with a message and no automatic return (the plan asks for the
 return); check existence before opening each page (a query per swipe for a rare case).
 **Known gap:** A rotation while the snackbar is showing dismisses it early; it is not
 shown again.
+
+## D-027 · 2026-10-14 · Accepted
+**Decision:** `SavedMediaRepository.save(item)` (API 29+, `@RequiresApi(Q)` until T4.2
+adds the API 26-28 path) inserts a MediaStore row first (`DISPLAY_NAME` = status name,
+`MIME_TYPE`, `RELATIVE_PATH` = `Pictures/Keepsake/` or `Movies/Keepsake/`,
+`IS_PENDING` = 1), then opens the status through its SAF URI and copies the bytes, then
+clears `IS_PENDING`. Any `IOException`, `SecurityException` or `IllegalArgumentException`
+deletes the row again and returns false; success returns true. It takes a plain
+`ContentResolver`, like `StatusRepository`, and is not wired into `StatusSaverApp` until
+a caller exists (T4.3/T4.4).
+Instrumented tests use AndroidX Test runner 1.7.0 and ext-junit 1.3.0
+(`androidTestImplementation`, `AndroidJUnitRunner`). They read status files from the
+app's cache through `file://` URIs and query with `QUERY_ARG_MATCH_PENDING`, so the test
+class needs API 30.
+**Why:** Inserting before opening the source means a status deleted by WhatsApp between
+listing and saving goes through the same cleanup as a failed copy, so the one cleanup
+path is exercised by a test. A Boolean is all the M4 callers need now; T4.3 turns it into
+a result that can also say "already saved". SAF grants cannot be created from a test,
+and the copy only needs a readable URI; the real SAF source was checked with a probe on
+the emulator (byte-identical copies, source folder unchanged). Without including pending
+rows a copy left pending would be invisible to the test and pass.
+**Run instrumented tests with `install` + `am instrument`** (CLAUDE.md), not
+`connectedDebugAndroidTest`: the Gradle task uninstalls the app afterwards, which drops
+the emulator's folder grant, and it runs on every attached device, including a phone.
+**Alternatives:** Open the source before inserting (no row for a vanished file, but the
+cleanup path then needs a stream that fails mid-copy to be tested); a sealed result type
+now (no caller needs more than success or failure yet); Robolectric with a fake MediaStore
+provider (would test the fake, not where Android puts the file).

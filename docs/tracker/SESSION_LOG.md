@@ -16,6 +16,24 @@ Template:
 
 ---
 
+## 2026-10-14 — T4.1 save to MediaStore; touch tool in repo
+- Done: `tools/emulator_touch.py` committed (`c64f0c2`, user's call; CLAUDE.md points to
+  it; checked double-tap, pinch and drag on the viewer). T4.1 `SavedMediaRepository.save()`
+  for API 29+ with instrumented-test setup (AndroidX Test runner 1.7.0, ext-junit 1.3.0),
+  not committed yet.
+- Verified: 4 instrumented tests green on emulator API 35, 7 of 7 mutations caught;
+  probe with real SAF statuses gave byte-identical copies; 63 unit tests green; lint only
+  MissingApplicationIcon (T5.5).
+- Decisions: D-027.
+- Next: commit T4.1, then T4.2 (API 26-28 path; needs an API 28 emulator image, and an
+  API 29 one would close the API 29 pending check).
+- Notes: `connectedDebugAndroidTest` uninstalled the app and so dropped the folder grant;
+  it was granted again through onboarding. Use `install` + `am instrument` (CLAUDE.md).
+  The emulator died once mid-session with no error in its log and was restarted
+  (`-gpu host`, log in the scratchpad). Gallery rows from tests and the probe were
+  deleted; `Pictures/Keepsake` and `Movies/Keepsake` are empty. `SavedMediaRepository` is
+  not wired into `StatusSaverApp` yet (no caller until T4.3/T4.4).
+
 ## 2026-10-13 — Handoff before compaction (end of M3)
 - Done: M3 complete and committed: `2904702` T3.1, `3486a37` T3.2, `7ad1850` T3.3,
   `6979ffc` T3.4. Decisions D-023 to D-026. CLAUDE.md gained the raw touch-injection
@@ -31,8 +49,8 @@ Template:
   place that does not collide with it. The viewer reads the list's
   `StatusesViewModel` (D-023); per-viewer state such as the video player sits in its own
   ViewModel scoped to the viewer entry (D-025).
-- Open question to the user, unanswered: put the emulator touch-injection script into
-  the repo (for example `tools/emulator_touch.py`) or keep only the CLAUDE.md recipe.
+- Open question (answered 2026-10-14: yes, committed as `tools/emulator_touch.py`): put
+  the emulator touch-injection script into the repo or keep only the CLAUDE.md recipe.
 - Environment: emulator `keepsake_api35` runs headless with `-gpu host`; adbd is back to
   non-root (`adb unroot` was run after T3.2). `.Statuses` holds 150 entries: w1/w2 PNG,
   w3.mp4, IMG-001..120, VID-01..20, NEW-1/NEW-2, AUD-1.mp4 and AUD-2.mp4 (30 s with
