@@ -16,6 +16,16 @@ Template:
 
 ---
 
+## 2026-10-14 — T5.3 About section
+- Done: T5.2 committed (`5a28682`). T5.3: About section at the end of settings with
+  version, non-affiliation note and responsibility note. Not committed yet.
+- Verified: 86 unit tests (none new: the section is static text plus the package's
+  version name); lint only MissingApplicationIcon; seen on API 35 (screenshot) and API 28
+  (UI dump), "Version 0.1.0" as in `build.gradle.kts`.
+- Next: commit T5.3, then T5.4 (accessibility pass).
+- Notes: the two notes' wording is new user-facing text (strings `settings_not_affiliated`,
+  `settings_responsibility`); the user may want to adjust it.
+
 ## 2026-10-14 — T5.2 access management
 - Done: T5.1 committed (`aeca0c6`). T5.2: "Statuses folders" section in settings with
   Grant access / Choose again / Remove access (confirmed), `StatusSourceStore.revoke`,

@@ -169,7 +169,10 @@ button pauses a playing video first (D-032).
   instance per screen): Grant access or Choose again opens the folder picker, and
   Remove access (after a confirmation) calls `StatusSourceStore.revoke`, which forgets
   the folder and releases its persisted read permission. Removing the last folder sends
-  the user to onboarding when the list reloads (D-022, D-034). About follows in T5.3.
+  the user to onboarding when the list reloads (D-022, D-034). Last, "About": app name,
+  installed version (read from the package, so it always matches the build), a
+  non-affiliation note and a one-line note that saving and sharing others' statuses is
+  the user's responsibility (spec §7).
 - Grid: `LazyVerticalGrid` adaptive columns (min ~110 dp), square tiles, Coil
   `AsyncImage`; videos via Coil `VideoFrameDecoder` registered in `StatusSaverApp`.
   Tabs are keyed by `MediaType`; grid items by document URI (D-020).
