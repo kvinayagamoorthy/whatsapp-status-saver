@@ -132,7 +132,10 @@ adb -s emulator-5554 shell am instrument -w com.moorthy.statussaver.test/android
 
 Saved copies live in MediaStore; list or remove the app's rows with
 `adb -s emulator-5554 shell content query --uri content://media/external/file --projection _id:_display_name:relative_path:is_pending --where "relative_path\ LIKE\ \'%Keepsake%\'"`
-and `content delete --uri content://media/external/file --where "_id=<id>"`.
+and `content delete --uri content://media/external/file --where "_id=<id>"`. Always delete
+by `_id` (or full path): MediaStore also indexes the fake statuses in `.Statuses`, so a
+delete by `_display_name` removes the status file too (it happened once; restore from
+the scratchpad with `push -a`).
 
 Device checks use the local emulator `keepsake_api35` (API 35, config under
 `~/.android/avd/`). Always target it by serial, because a physical phone may also be

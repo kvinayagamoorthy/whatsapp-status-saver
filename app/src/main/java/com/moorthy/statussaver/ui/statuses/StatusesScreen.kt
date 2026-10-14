@@ -53,6 +53,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.moorthy.statussaver.R
 import com.moorthy.statussaver.data.model.MediaType
+import com.moorthy.statussaver.data.model.SaveResult
 import com.moorthy.statussaver.data.model.StatusItem
 import kotlinx.coroutines.launch
 
@@ -95,6 +96,9 @@ fun StatusesScreen(
             }
         }
     }
+    // A save started in the viewer can end after the user went back to the list.
+    SaveNoticeEffect(viewModel, snackbarHostState)
+    val savedNames by viewModel.savedNames.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -133,6 +137,7 @@ fun StatusesScreen(
                         } else {
                             StatusGrid(
                                 items = tabItems,
+                                savedNames = savedNames,
                                 onOpenItem = { index -> onOpenItem(selectedTab, index) },
                             )
                         }
@@ -146,8 +151,37 @@ fun StatusesScreen(
     }
 }
 
+/**
+ * Tells the user how a save ended (FR4), on whichever screen is in front: the viewer
+ * where the user tapped Save, or the list if they went back before the copy was done.
+ */
 @Composable
-private fun StatusGrid(items: List<StatusItem>, onOpenItem: (index: Int) -> Unit) {
+fun SaveNoticeEffect(viewModel: StatusesViewModel, snackbarHostState: SnackbarHostState) {
+    val saveNotice by viewModel.saveNotice.collectAsStateWithLifecycle()
+    val snackbarScope = rememberCoroutineScope()
+    val messages = mapOf(
+        SaveResult.SAVED to stringResource(R.string.save_done),
+        SaveResult.ALREADY_SAVED to stringResource(R.string.save_already),
+        SaveResult.FAILED to stringResource(R.string.save_failed),
+    )
+    LaunchedEffect(saveNotice) {
+        val result = saveNotice ?: return@LaunchedEffect
+        // As with the vanished notice: marked first, shown in the screen's own scope.
+        viewModel.saveNoticeShown()
+        snackbarScope.launch {
+            // A newer result replaces the one on screen instead of queueing behind it.
+            snackbarHostState.currentSnackbarData?.dismiss()
+            snackbarHostState.showSnackbar(messages.getValue(result))
+        }
+    }
+}
+
+@Composable
+private fun StatusGrid(
+    items: List<StatusItem>,
+    savedNames: Set<String>,
+    onOpenItem: (index: Int) -> Unit,
+) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 110.dp),
         modifier = Modifier.fillMaxSize(),
@@ -155,13 +189,13 @@ private fun StatusGrid(items: List<StatusItem>, onOpenItem: (index: Int) -> Unit
     ) {
         // The URI, not the name, is the key: both apps' folders could hold the same name.
         itemsIndexed(items, key = { _, item -> item.uri.toString() }) { index, item ->
-            StatusTile(item = item, onOpen = { onOpenItem(index) })
+            StatusTile(item = item, isSaved = item.name in savedNames, onOpen = { onOpenItem(index) })
         }
     }
 }
 
 @Composable
-private fun StatusTile(item: StatusItem, onOpen: () -> Unit) {
+private fun StatusTile(item: StatusItem, isSaved: Boolean, onOpen: () -> Unit) {
     Box(
         modifier = Modifier
             .padding(2.dp)
@@ -189,7 +223,28 @@ private fun StatusTile(item: StatusItem, onOpen: () -> Unit) {
                     .padding(6.dp),
             )
         }
+        if (isSaved) {
+            SavedBadge(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(6.dp),
+            )
+        }
     }
+}
+
+/** Check mark on a tile whose status is already in the gallery (FR5). */
+@Composable
+private fun SavedBadge(modifier: Modifier = Modifier) {
+    Icon(
+        painter = painterResource(R.drawable.ic_saved),
+        contentDescription = stringResource(R.string.statuses_saved_badge),
+        tint = MaterialTheme.colorScheme.onPrimary,
+        modifier = modifier
+            .size(22.dp)
+            .background(MaterialTheme.colorScheme.primary, CircleShape)
+            .padding(3.dp),
+    )
 }
 
 @Composable

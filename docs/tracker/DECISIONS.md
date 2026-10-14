@@ -430,3 +430,27 @@ being written, so they do not count.
 stale after a deletion in a gallery app); a cold `Flow` that queries on every collection
 (a query per collector and no update after a save without another query); keep the
 Boolean and let callers check names (spreads I4 over every caller).
+
+## D-030 · 2026-10-14 · Accepted
+**Decision:** The viewer's Save action is one round button at the top end, on a dark
+scrim, over every page; it acts on the pager's current page. It turns into a check mark
+when the status's name is in `savedNames`, and shows a spinner while that name is being
+copied (taps are then ignored). Grid tiles show a small check badge at the top end.
+`StatusesViewModel` (shared by list and viewer, D-023) gets `savedNames`, `savingNames`,
+`save(item)` and a one-shot `saveNotice` (`SaveResult?`), and re-reads saved names in
+every `reload`. The notice is shown as a snackbar by whichever screen is in front
+(`SaveNoticeEffect`); a newer notice replaces the one on screen. On Android 8-9
+`rememberSaveWithPermission` (in `ui/`) asks for `WRITE_EXTERNAL_STORAGE` before the
+first save; if refused, a snackbar points to the app's settings.
+**Why:** The bottom of a video page holds the player's control bar (D-025), and status
+media can be any colour, so a scrimmed button at the top stays visible and out of the
+way. One button for both the action and the state needs no extra space in the viewer,
+and tapping it again gives the "Already saved" message the spec asks for. The notice
+lives in the ViewModel because the user can leave the viewer while a large video is
+still being copied. The permission prompt needs an activity, so it is a UI helper; the
+data layer only reports failure (D-028). Checked on the API 28 emulator: a grant from the
+real dialog reaches the running app, and the save right after it succeeds.
+**Alternatives:** A top app bar in the viewer (takes space from the media and needs a
+back button design); a bottom action row (collides with the video controls); a
+floating action button (covers media and the video slider); asking for the permission
+at onboarding (asks before the user wants to save anything).

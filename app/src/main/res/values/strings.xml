@@ -23,4 +23,13 @@
     <string name="statuses_open">Open</string>
     <string name="statuses_vanished">This status is no longer available. WhatsApp removes statuses about a day after they are posted.</string>
     <string name="viewer_cannot_show">This status can’t be shown.</string>
+    <string name="viewer_save">Save to gallery</string>
+    <string name="viewer_saved">Saved</string>
+    <string name="viewer_saving">Saving</string>
+    <string name="statuses_saved_badge">Saved</string>
+
+    <string name="save_done">Saved to your gallery</string>
+    <string name="save_already">Already saved</string>
+    <string name="save_failed">Couldn’t save this status. It may have expired, or the phone’s storage may be full.</string>
+    <string name="save_needs_permission">To save on this version of Android, Keepsake needs storage access. You can allow it in the app’s settings.</string>
 </resources>

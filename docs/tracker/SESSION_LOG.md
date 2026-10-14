@@ -16,6 +16,20 @@ Template:
 
 ---
 
+## 2026-10-14 — T4.4 save button, check marks, snackbar
+- Done: T4.3 committed (`201daee`). T4.4: viewer Save button with check mark, tile
+  badges, save snackbars, Android 8-9 permission prompt, repository wired into the app
+  (D-030), not committed yet.
+- Verified: 67 unit tests (4 new), 5 of 5 ViewModel mutations caught; lint only
+  MissingApplicationIcon. Emulator API 35 and API 28 checks as in STATUS T4.4. The
+  T4.2 open question is answered: on Android 9 the permission dialog's grant reaches the
+  running app.
+- Next: commit T4.4, then T4.5 (multi-select and "Save selected").
+- Notes: a `content delete` by display name also deleted the fake status `NEW-2.jpg`
+  from `.Statuses` on `keepsake_api35`; it was restored from the scratchpad with its
+  original time (CLAUDE.md now warns). Both emulators' Keepsake folders are empty again.
+  `keepsake_api28` has READ+WRITE storage revoked (last check was the deny path).
+
 ## 2026-10-14 — T4.3 idempotent save and saved names
 - Done: T4.2 committed (`04909aa`). T4.3: `SaveResult`, storage check before each save,
   save lock, `savedNames` flow with refresh (D-029), not committed yet.

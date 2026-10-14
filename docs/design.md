@@ -166,6 +166,13 @@ and `FLAG_GRANT_READ_URI_PERMISSION`. No `FileProvider` and no temp copies neede
   `media3-ui-compose-material3`: play/pause, position, seek slider, duration, mute.
   Leaving the app pauses (not a rotation); the screen stays on only while playing
   (D-025).
+- Saving (FR4, FR5): a round Save button on a dark scrim at the viewer's top end acts on
+  the current page; it shows a spinner while copying and a check mark once the status
+  is in the gallery, and tapping the check says "Already saved". Grid tiles of saved
+  statuses carry a small check badge. Results appear as a snackbar on whichever screen
+  is in front (the viewer's sits above the video controls). Saved names come from
+  `SavedMediaRepository.savedNames`, re-read with every list reload. On Android 8-9
+  the first save asks for the storage permission (D-030).
 - Multi-select: long-press enters selection mode; top app bar switches to
   "N selected" with Save action.
 - Refresh: pull-to-refresh plus reload on `ON_RESUME` (also the first load); one load

@@ -8,6 +8,7 @@ import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import coil3.request.crossfade
 import coil3.video.VideoFrameDecoder
+import com.moorthy.statussaver.data.SavedMediaRepository
 import com.moorthy.statussaver.data.StatusRepository
 import com.moorthy.statussaver.data.StatusSourceStore
 
@@ -22,6 +23,11 @@ class StatusSaverApp : Application(), SingletonImageLoader.Factory {
 
     val statusRepository: StatusRepository by lazy {
         StatusRepository(statusSourceStore, contentResolver)
+    }
+
+    /** One instance, so the list and the viewer see the same saved names. */
+    val savedMediaRepository: SavedMediaRepository by lazy {
+        SavedMediaRepository(this)
     }
 
     /**

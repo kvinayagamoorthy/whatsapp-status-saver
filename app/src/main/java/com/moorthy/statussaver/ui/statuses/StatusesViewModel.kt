@@ -7,11 +7,13 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.moorthy.statussaver.StatusSaverApp
 import com.moorthy.statussaver.data.model.MediaType
+import com.moorthy.statussaver.data.model.SaveResult
 import com.moorthy.statussaver.data.model.StatusItem
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 /** What the status list can show (FR2). */
@@ -41,6 +43,7 @@ sealed interface StatusesUiState {
  * Holds the status list for the statuses screen and the viewer opened from it.
  * [loadStatuses] is `StatusRepository.load`: null means no readable folder, an empty list
  * means empty folders. [statusStillExists] is `StatusRepository.stillExists`.
+ * [savedNames], [refreshSavedNames] and [saveStatus] come from `SavedMediaRepository`.
  *
  * WhatsApp adds a file whenever the user views a status, so the list is read again each
  * time the screen comes to the front ([reload]) and when the user pulls to refresh
@@ -49,6 +52,10 @@ sealed interface StatusesUiState {
 class StatusesViewModel(
     private val loadStatuses: suspend () -> List<StatusItem>?,
     private val statusStillExists: suspend (StatusItem) -> Boolean,
+    /** Names of the statuses already in the gallery, for the check marks (FR5). */
+    val savedNames: StateFlow<Set<String>>,
+    private val refreshSavedNames: suspend () -> Unit,
+    private val saveStatus: suspend (StatusItem) -> SaveResult,
 ) : ViewModel() {
 
     private val mutableUiState = MutableStateFlow<StatusesUiState>(StatusesUiState.Loading)
@@ -67,6 +74,20 @@ class StatusesViewModel(
      */
     val showVanishedNotice: StateFlow<Boolean> = mutableShowVanishedNotice.asStateFlow()
 
+    private val mutableSavingNames = MutableStateFlow<Set<String>>(emptySet())
+
+    /** Names of the statuses being copied right now; their Save buttons wait. */
+    val savingNames: StateFlow<Set<String>> = mutableSavingNames.asStateFlow()
+
+    private val mutableSaveNotice = MutableStateFlow<SaveResult?>(null)
+
+    /**
+     * How the last save ended, until the screen on top has told the user and called
+     * [saveNoticeShown]. Kept here so it is not lost if the user leaves the viewer while
+     * a save is still running.
+     */
+    val saveNotice: StateFlow<SaveResult?> = mutableSaveNotice.asStateFlow()
+
     private var loadJob: Job? = null
 
     /**
@@ -79,6 +100,8 @@ class StatusesViewModel(
             return
         }
         loadJob = viewModelScope.launch {
+            // Alongside the list, so copies deleted in a gallery app lose their check mark.
+            launch { refreshSavedNames() }
             val items = loadStatuses()
             mutableUiState.value = when {
                 items == null -> StatusesUiState.NeedsAccess
@@ -113,6 +136,26 @@ class StatusesViewModel(
         mutableShowVanishedNotice.value = false
     }
 
+    /**
+     * Keeps a copy of [item] in the gallery (FR4). A second tap while the copy is still
+     * being made is ignored; afterwards it gives [SaveResult.ALREADY_SAVED].
+     */
+    fun save(item: StatusItem) {
+        if (item.name in mutableSavingNames.value) {
+            return
+        }
+        mutableSavingNames.update { names -> names + item.name }
+        viewModelScope.launch {
+            val result = saveStatus(item)
+            mutableSavingNames.update { names -> names - item.name }
+            mutableSaveNotice.value = result
+        }
+    }
+
+    fun saveNoticeShown() {
+        mutableSaveNotice.value = null
+    }
+
     companion object {
         val Factory = viewModelFactory {
             initializer {
@@ -120,6 +163,9 @@ class StatusesViewModel(
                 StatusesViewModel(
                     loadStatuses = app.statusRepository::load,
                     statusStillExists = app.statusRepository::stillExists,
+                    savedNames = app.savedMediaRepository.savedNames,
+                    refreshSavedNames = app.savedMediaRepository::refreshSavedNames,
+                    saveStatus = app.savedMediaRepository::save,
                 )
             }
         }

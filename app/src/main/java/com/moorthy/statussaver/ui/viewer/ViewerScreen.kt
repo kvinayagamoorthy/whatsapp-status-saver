@@ -4,20 +4,27 @@ import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -27,6 +34,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -39,8 +48,11 @@ import coil3.size.Size as CoilSize
 import com.moorthy.statussaver.R
 import com.moorthy.statussaver.data.model.MediaType
 import com.moorthy.statussaver.data.model.StatusItem
+import com.moorthy.statussaver.ui.rememberSaveWithPermission
+import com.moorthy.statussaver.ui.statuses.SaveNoticeEffect
 import com.moorthy.statussaver.ui.statuses.StatusesUiState
 import com.moorthy.statussaver.ui.statuses.StatusesViewModel
+import kotlinx.coroutines.launch
 
 /**
  * Full-screen viewer (FR3): swipes through the items of one tab, starting at the one the
@@ -53,6 +65,9 @@ import com.moorthy.statussaver.ui.statuses.StatusesViewModel
  *
  * A status that fails to load is checked against its folder: if WhatsApp has deleted it
  * meanwhile, the viewer closes and the list says it is no longer available (T3.4).
+ *
+ * The Save button at the top keeps the current status in the gallery (FR4) and shows a
+ * check mark once it is there (FR5).
  */
 @Composable
 fun ViewerScreen(
@@ -62,6 +77,20 @@ fun ViewerScreen(
     onClose: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val savedNames by viewModel.savedNames.collectAsStateWithLifecycle()
+    val savingNames by viewModel.savingNames.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarScope = rememberCoroutineScope()
+    SaveNoticeEffect(viewModel, snackbarHostState)
+    val needsPermissionMessage = stringResource(R.string.save_needs_permission)
+    val saveWithPermission = rememberSaveWithPermission(
+        onSave = viewModel::save,
+        onDenied = {
+            snackbarScope.launch {
+                snackbarHostState.showSnackbar(needsPermissionMessage)
+            }
+        },
+    )
 
     Box(
         modifier = Modifier
@@ -87,6 +116,9 @@ fun ViewerScreen(
                         tab = tab,
                         items = items,
                         startIndex = startIndex,
+                        savedNames = savedNames,
+                        savingNames = savingNames,
+                        onSave = saveWithPermission,
                         onCheckVanished = viewModel::confirmVanished,
                         onClose = onClose,
                     )
@@ -96,14 +128,28 @@ fun ViewerScreen(
                 onClose()
             }
         }
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
+                // Above the video controls, which sit at the bottom of video pages.
+                .padding(bottom = if (tab == MediaType.VIDEO) VIDEO_CONTROLS_HEIGHT else 0.dp),
+        )
     }
 }
+
+/** Room left below the snackbar for the video page's control bar. */
+private val VIDEO_CONTROLS_HEIGHT = 64.dp
 
 @Composable
 private fun ViewerPager(
     tab: MediaType,
     items: List<StatusItem>,
     startIndex: Int,
+    savedNames: Set<String>,
+    savingNames: Set<String>,
+    onSave: (StatusItem) -> Unit,
     onCheckVanished: suspend (StatusItem) -> Boolean,
     onClose: () -> Unit,
 ) {
@@ -131,30 +177,89 @@ private fun ViewerPager(
             }
         }
     }
-    HorizontalPager(
-        state = pagerState,
-        modifier = Modifier.fillMaxSize(),
-        key = { page -> items[page].uri.toString() },
-    ) { page ->
-        val item = items[page]
-        // Saved, so a page that failed before a rotation is checked again after it.
-        var failed by rememberSaveable(item.uri) { mutableStateOf(false) }
-        val onError = { failed = true }
-        when {
-            failed -> CannotShowMessage()
-            item.type == MediaType.IMAGE -> ZoomableImage(item = item, onError = onError)
-            videoPlayer != null && page == pagerState.settledPage ->
-                VideoPage(item = item, player = videoPlayer.player, onError = onError)
-            else -> VideoPreview(item)
-        }
-        // Only the page the user is looking at may close the viewer, not a neighbour
-        // that is drawn while swiping.
-        if (failed && page == pagerState.settledPage) {
-            LaunchedEffect(item.uri) {
-                if (onCheckVanished(item)) {
-                    onClose()
+    Box(modifier = Modifier.fillMaxSize()) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize(),
+            key = { page -> items[page].uri.toString() },
+        ) { page ->
+            val item = items[page]
+            // Saved, so a page that failed before a rotation is checked again after it.
+            var failed by rememberSaveable(item.uri) { mutableStateOf(false) }
+            val onError = { failed = true }
+            when {
+                failed -> CannotShowMessage()
+                item.type == MediaType.IMAGE -> ZoomableImage(item = item, onError = onError)
+                videoPlayer != null && page == pagerState.settledPage ->
+                    VideoPage(item = item, player = videoPlayer.player, onError = onError)
+                else -> VideoPreview(item)
+            }
+            // Only the page the user is looking at may close the viewer, not a neighbour
+            // that is drawn while swiping.
+            if (failed && page == pagerState.settledPage) {
+                LaunchedEffect(item.uri) {
+                    if (onCheckVanished(item)) {
+                        onClose()
+                    }
                 }
             }
+        }
+        // Acts on the page in the middle of the screen, also while swiping.
+        val currentItem = items[pagerState.currentPage]
+        SaveButton(
+            isSaved = currentItem.name in savedNames,
+            isSaving = currentItem.name in savingNames,
+            onClick = { onSave(currentItem) },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .statusBarsPadding()
+                .padding(8.dp),
+        )
+    }
+}
+
+/**
+ * Saves the current status, or shows a check mark when it is already saved. Tapping the
+ * check mark saves again, which only says "Already saved" (I4). On a dark scrim, since
+ * statuses can have any colours behind it.
+ */
+@Composable
+private fun SaveButton(
+    isSaved: Boolean,
+    isSaving: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    IconButton(
+        onClick = onClick,
+        enabled = !isSaving,
+        colors = IconButtonDefaults.iconButtonColors(
+            containerColor = Color.Black.copy(alpha = 0.45f),
+            contentColor = Color.White,
+            disabledContainerColor = Color.Black.copy(alpha = 0.45f),
+            disabledContentColor = Color.White,
+        ),
+        modifier = modifier,
+    ) {
+        when {
+            isSaving -> {
+                val savingDescription = stringResource(R.string.viewer_saving)
+                CircularProgressIndicator(
+                    color = Color.White,
+                    strokeWidth = 2.dp,
+                    modifier = Modifier
+                        .size(20.dp)
+                        .semantics { contentDescription = savingDescription },
+                )
+            }
+            isSaved -> Icon(
+                painter = painterResource(R.drawable.ic_saved),
+                contentDescription = stringResource(R.string.viewer_saved),
+            )
+            else -> Icon(
+                painter = painterResource(R.drawable.ic_save),
+                contentDescription = stringResource(R.string.viewer_save),
+            )
         }
     }
 }

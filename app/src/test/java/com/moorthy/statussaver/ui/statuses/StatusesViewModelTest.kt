@@ -2,10 +2,12 @@ package com.moorthy.statussaver.ui.statuses
 
 import android.net.Uri
 import com.moorthy.statussaver.data.model.MediaType
+import com.moorthy.statussaver.data.model.SaveResult
 import com.moorthy.statussaver.data.model.StatusItem
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -13,6 +15,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -194,9 +197,9 @@ class StatusesViewModelTest {
 
     @Test
     fun aStatusThatIsGoneIsReportedOnceOnTheList() = runTest(testDispatcher) {
-        val viewModel = StatusesViewModel(
-            loadStatuses = { listOf(item("a.jpg")) },
+        val viewModel = statusesViewModel(
             statusStillExists = { false },
+            loadStatuses = { listOf(item("a.jpg")) },
         )
 
         assertTrue(viewModel.confirmVanished(item("a.jpg")))
@@ -209,12 +212,12 @@ class StatusesViewModelTest {
     @Test
     fun aStatusThatIsStillThereIsNotReportedAsGone() = runTest(testDispatcher) {
         val checked = mutableListOf<StatusItem>()
-        val viewModel = StatusesViewModel(
-            loadStatuses = { listOf(item("a.jpg")) },
+        val viewModel = statusesViewModel(
             statusStillExists = { status ->
                 checked += status
                 true
             },
+            loadStatuses = { listOf(item("a.jpg")) },
         )
 
         assertFalse(viewModel.confirmVanished(item("a.jpg")))
@@ -224,8 +227,94 @@ class StatusesViewModelTest {
     }
 
     /** A ViewModel whose statuses all still exist; most tests are about loading. */
-    private fun statusesViewModel(loadStatuses: suspend () -> List<StatusItem>?) =
-        StatusesViewModel(loadStatuses = loadStatuses, statusStillExists = { true })
+    @Test
+    fun eachReloadAlsoRereadsTheSavedNames() = runTest(testDispatcher) {
+        var refreshes = 0
+        val viewModel = statusesViewModel(
+            loadStatuses = { listOf(item("a.jpg")) },
+            refreshSavedNames = { refreshes++ },
+        )
+
+        viewModel.reload()
+        testScheduler.advanceUntilIdle()
+        viewModel.reload()
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(2, refreshes)
+    }
+
+    @Test
+    fun saveReportsItsResultUntilShown() = runTest(testDispatcher) {
+        val viewModel = statusesViewModel(saveStatus = { SaveResult.ALREADY_SAVED })
+
+        viewModel.save(item("a.jpg"))
+        testScheduler.advanceUntilIdle()
+        assertEquals(SaveResult.ALREADY_SAVED, viewModel.saveNotice.value)
+
+        viewModel.saveNoticeShown()
+        assertNull(viewModel.saveNotice.value)
+    }
+
+    @Test
+    fun aSecondTapWhileSavingIsIgnored() = runTest(testDispatcher) {
+        val copyDone = CompletableDeferred<SaveResult>()
+        val saved = mutableListOf<String>()
+        val viewModel = statusesViewModel(
+            saveStatus = { item ->
+                saved += item.name
+                copyDone.await()
+            },
+        )
+
+        viewModel.save(item("a.mp4", MediaType.VIDEO))
+        testScheduler.advanceUntilIdle()
+        viewModel.save(item("a.mp4", MediaType.VIDEO))
+        testScheduler.advanceUntilIdle()
+        assertEquals(setOf("a.mp4"), viewModel.savingNames.value)
+        assertNull(viewModel.saveNotice.value)
+
+        copyDone.complete(SaveResult.SAVED)
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(listOf("a.mp4"), saved)
+        assertEquals(emptySet<String>(), viewModel.savingNames.value)
+        assertEquals(SaveResult.SAVED, viewModel.saveNotice.value)
+    }
+
+    @Test
+    fun anotherStatusCanBeSavedWhileOneIsSaving() = runTest(testDispatcher) {
+        val firstDone = CompletableDeferred<SaveResult>()
+        val saved = mutableListOf<String>()
+        val viewModel = statusesViewModel(
+            saveStatus = { item ->
+                saved += item.name
+                if (item.name == "a.jpg") firstDone.await() else SaveResult.SAVED
+            },
+        )
+
+        viewModel.save(item("a.jpg"))
+        viewModel.save(item("b.jpg"))
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(listOf("a.jpg", "b.jpg"), saved)
+        firstDone.complete(SaveResult.FAILED)
+        testScheduler.advanceUntilIdle()
+        assertEquals(SaveResult.FAILED, viewModel.saveNotice.value)
+    }
+
+    /** [loadStatuses] comes last, so most tests pass it as a trailing lambda. */
+    private fun statusesViewModel(
+        statusStillExists: suspend (StatusItem) -> Boolean = { true },
+        refreshSavedNames: suspend () -> Unit = {},
+        saveStatus: suspend (StatusItem) -> SaveResult = { SaveResult.SAVED },
+        loadStatuses: suspend () -> List<StatusItem>? = { emptyList() },
+    ) = StatusesViewModel(
+        loadStatuses = loadStatuses,
+        statusStillExists = statusStillExists,
+        savedNames = MutableStateFlow(emptySet()),
+        refreshSavedNames = refreshSavedNames,
+        saveStatus = saveStatus,
+    )
 
     private fun item(name: String, type: MediaType = MediaType.IMAGE) = StatusItem(
         uri = Uri.parse("content://test/$name"),
