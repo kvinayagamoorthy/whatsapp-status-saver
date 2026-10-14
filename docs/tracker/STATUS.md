@@ -13,8 +13,8 @@ Last updated: 2026-10-13 (M3 complete and committed, handoff before compaction)
   commit). Start T4.1 when the user says so; read SESSION_LOG "Handoff before
   compaction (end of M3)" first. T4.1 needs an instrumented test
   (`connectedDebugAndroidTest`, not set up yet: look up AndroidX Test versions live).
-  Open question to the user: keep the emulator touch-injection script in the repo
-  (e.g. `tools/emulator_touch.py`)? Unanswered; it lives only in CLAUDE.md as a recipe. Read
+  The emulator touch-injection script is in the repo as `tools/emulator_touch.py`
+  (user's call, 2026-10-14). Read
   SESSION_LOG "Handoff before compaction (end of M2)" for the emulator state. Start the emulator
   with `-gpu host` (CLAUDE.md). Code so far: `data/model/` (T1.1),
   `data/StatusSourceStore.kt` (T1.2), `data/StatusFolders.kt` (T1.3, T1.4),

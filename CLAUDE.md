@@ -170,14 +170,20 @@ tapText() {  # usage: tapText "Grant access"
 ```
 
 `adb shell input` cannot pinch, and two `input tap` calls are too slow for a
-double-tap. For those, write raw multi-touch events to the emulator's touch device
-`/dev/input/event2` (`virtio_input_multi_touch_1`, axes 0..32767): this needs
-`adb -s emulator-5554 root` (SELinux blocks the shell user; `adb unroot` afterwards),
-each touch-down needs `ABS_MT_PRESSURE` > 0 or Android ignores it, and `sendevent` is
-too slow (about 20 ms per call). Instead build 24-byte `struct input_event` records on
-the host (`struct.pack("<qqHHi", 0, 0, type, code, value)`; slot 47, x 53, y 54,
-tracking id 57, pressure 58, `BTN_TOUCH` 330, SYN 0), push one file per frame and `cat`
-each to the device with short sleeps between frames.
+double-tap. For those, use `tools/emulator_touch.py`, which writes raw multi-touch
+events to the emulator's touch device `/dev/input/event2` and needs adbd as root
+(SELinux blocks the shell user):
+
+```bash
+adb -s emulator-5554 root
+tools/emulator_touch.py dtap 540 1200              # double-tap at x y (screen pixels)
+tools/emulator_touch.py pinch 540 1200 100 350     # two fingers 100 -> 350 px from centre (zoom in)
+tools/emulator_touch.py drag 300 1200 900 1200     # one-finger drag
+adb -s emulator-5554 unroot
+```
+
+The script's docstring explains the event format (each touch-down needs
+`ABS_MT_PRESSURE` > 0, and `sendevent` is too slow, so frames are pushed and `cat`-ed).
 
 Whether the app is playing sound: the app's entries under `players:` in
 `adb -s emulator-5554 shell dumpsys audio` (match `u/pid:<uid>/<pid>` with
