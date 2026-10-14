@@ -16,6 +16,17 @@ Template:
 
 ---
 
+## 2026-10-14 — T5.5 launcher icon
+- Done: T5.4 committed (`3077f9d`). T5.5: adaptive launcher icon, bookmark ribbon in a
+  ring on terracotta, monochrome layer for themed icons (D-036). Not committed yet.
+- Verified: lint reports no issues (MissingApplicationIcon gone); icon seen in the API 35
+  drawer, as a themed icon on the API 35 home screen, and in the API 28 drawer.
+- Next: commit T5.5, then T5.6 (performance check).
+- Notes: themed icons were turned on through
+  `content://com.google.android.apps.nexuslauncher.grid_control/icon_themed` (Pixel
+  launcher themes only home-screen icons, not the drawer) and off again; the home-screen
+  shortcut added for the check was removed.
+
 ## 2026-10-14 — T5.4 accessibility pass
 - Done: T5.3 committed (`13c726b`). T5.4: statuses get spoken descriptions (kind + age) on
   tiles and viewer pictures; checklist recorded in STATUS (D-035). Not committed yet.

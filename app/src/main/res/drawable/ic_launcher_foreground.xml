@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Launcher icon foreground (D-009): a bookmark ribbon inside a ring. The canvas is the
+    adaptive icon's 108 x 108; launchers may crop everything outside the central circle
+    of diameter 66, so the ring (outer radius about 28) stays inside it. Also used as the
+    monochrome layer for themed icons, which only reads the shape.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Ring: centre 54,54, radius 26, drawn as a stroke. -->
+    <path
+        android:strokeColor="#FFFFDBCF"
+        android:strokeWidth="3.5"
+        android:pathData="M54,28 A26,26 0 1,1 53.99,28 Z" />
+    <!-- Bookmark ribbon with a notch at the bottom. -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M45,39 L63,39 Q64,39 64,40 L64,68 L54,61 L44,68 L44,40 Q44,39 45,39 Z" />
+</vector>

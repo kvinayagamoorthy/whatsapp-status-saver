@@ -572,3 +572,17 @@ visible but not read with it. Left for a Media3 update or a later polish task.
 **Alternatives:** Reading the file name; numbering tiles ("Image 3 of 150", which
 changes whenever statuses arrive); a label on a wrapper around each viewer page (not
 focusable, so TalkBack skipped it).
+
+## D-036 · 2026-10-14 · Accepted
+**Decision:** The launcher icon is a single adaptive icon in `mipmap-anydpi`
+(`ic_launcher`, also the round icon): brand terracotta `#8C4A2F` background, and a
+vector foreground with a light ring (radius 26, inside the 66-unit safe circle) around
+a white bookmark ribbon. The same foreground drawable is the monochrome layer.
+**Why:** minSdk 26 supports adaptive icons everywhere, so no bitmap fallbacks are
+needed. Themed icons use only the monochrome layer's shape, and ring plus ribbon is
+already a single-colour shape, so a second drawable would only repeat it. Checked on
+API 35 (circle mask in the app drawer; with themed icons on, the home-screen icon is
+tinted like Gmail and Photos) and API 28 (Launcher3's rounded-square mask). Lint now
+reports no issues.
+**Alternatives:** A separate monochrome drawable (same shape twice); PNG fallbacks per
+density (only needed below API 26).
