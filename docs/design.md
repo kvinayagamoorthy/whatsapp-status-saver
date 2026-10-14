@@ -174,7 +174,12 @@ and `FLAG_GRANT_READ_URI_PERMISSION`. No `FileProvider` and no temp copies neede
   `SavedMediaRepository.savedNames`, re-read with every list reload. On Android 8-9
   the first save asks for the storage permission (D-030).
 - Multi-select: long-press enters selection mode; top app bar switches to
-  "N selected" with Save action.
+  "N selected" with Save action. Taps then select or unselect (a ring or a filled check
+  at the tile's top start, plus a border); Back or the cross leaves the mode. The
+  selection is held by URI in `StatusesViewModel` (survives rotation, drops statuses
+  that vanished on reload). "Save selected" leaves the mode at once, saves in list order
+  and reports one `SaveSummary` snackbar, e.g. "3 statuses saved to your gallery. 1 was
+  already saved." (D-031).
 - Refresh: pull-to-refresh plus reload on `ON_RESUME` (also the first load); one load
   at a time, quiet reloads keep the current list on screen (D-021).
 

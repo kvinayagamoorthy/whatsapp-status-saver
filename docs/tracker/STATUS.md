@@ -1,15 +1,15 @@
 # Status Board
 
-Last updated: 2026-10-14 (T4.4 done, not committed)
+Last updated: 2026-10-14 (T4.5 done, not committed)
 
 ## Resume here
 
 - **Current milestone:** M4 — Save, indicator, share (M3 complete)
-- **In progress:** none (T4.4 done, awaiting commit)
-- **Next task:** T4.5 — multi-select in grid with "Save selected"
+- **In progress:** none (T4.5 done, awaiting commit)
+- **Next task:** T4.6 — share via ACTION_SEND
 - **Blockers:** none
-- **Last task commit:** `201daee` (T4.3). Earlier: `04909aa` (T4.2), `39c520a` (T4.1), `c64f0c2` (tools/emulator_touch.py), `c6c87be` (docs handoff), `6979ffc` (T3.4), `7ad1850` (T3.3), `3486a37` (T3.2), `2904702` (T3.1), `aa73d2c` (T2.5), `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
-- **Notes for next session:** T4.4 is done but not committed (commit it as T4.4 first). T4.5 can reuse `rememberSaveWithPermission` (`ui/StoragePermission.kt`) and `SaveNoticeEffect`, but needs a summary with counts instead of one result.
+- **Last task commit:** `5a832c0` (T4.4). Earlier: `201daee` (T4.3), `04909aa` (T4.2), `39c520a` (T4.1), `c64f0c2` (tools/emulator_touch.py), `c6c87be` (docs handoff), `6979ffc` (T3.4), `7ad1850` (T3.3), `3486a37` (T3.2), `2904702` (T3.1), `aa73d2c` (T2.5), `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
+- **Notes for next session:** T4.5 is done but not committed (commit it as T4.5 first).
   Instrumented tests (`app/src/androidTest`) run with `install` + `am instrument`, not
   `connectedDebugAndroidTest` (CLAUDE.md, D-027). Two emulators now: `keepsake_api35`
   (`emulator-5554`) and `keepsake_api28` (`emulator-5556`, Android 9 path, D-028). A third,
@@ -35,7 +35,7 @@ Things verified only partly so far. Close them in the task named.
 
 | Check | Why it is open | Close in |
 |-------|----------------|----------|
-| Brand (terracotta) palette on Android 8-11 | Only an API 35 system image is installed; dynamic color hides the palette there | T5.4 or earlier on an API 26-30 emulator image |
+| Brand (terracotta) palette on Android 8-11 | Seen in light mode on `keepsake_api28` (T4.4/T4.5 screenshots); dark mode not looked at yet | T5.4 (dark mode on `keepsake_api28`) |
 | Status-bar icon colors follow the in-app theme override | `enableEdgeToEdge()` follows the system theme only | T5.1 |
 | Release APK under 10 MB | Debug APK is 16.5 MB unminified | T6.2 |
 | Onboarding text on Android 8-9 | It says tap "Use this folder" then "Allow"; Android 9's picker shows "SELECT" and asks nothing more | T5.x polish (or T4.4 if touched) |
@@ -112,7 +112,7 @@ summary (world rule → code location). Keep each note to one or two lines.
 | T4.2 | Legacy save (API 26–28) | DONE | `save()` now covers Android 8-9: hidden `.part` copy in public `Pictures`/`Movies` `/Keepsake`, rename, awaited media scan; failure deletes the `.part` and returns false (D-028). Repository takes a `Context`. 4 instrumented tests on new emulator `keepsake_api28` (image and video complete in the right folder and in MediaStore; source unchanged; vanished source leaves nothing); 8 of 8 mutations caught after fixing a test that took the expected folder from the code under test. API 35 suite still green. Closed the API 29 pending check: new emulator `keepsake_api29` runs `SavedMediaRepositoryTest` green, and the two pending-row mutations (pending never cleared, no row cleanup) are caught there too. Probe with real SAF statuses on API 28 (`/sdcard/WhatsApp/Media/.Statuses`): without storage permission both saves false and nothing written; with READ+WRITE granted both true, md5-identical, rows in images/video MediaStore (video with duration). Permission request UI is T4.4. Theory: on Android 8-9 the gallery is files in the public folders plus the media scanner |
 | T4.3 | Saved-names flow, idempotent save | DONE | `save()` returns `SaveResult` (SAVED / ALREADY_SAVED / FAILED); checks the storage for the name before copying, one save at a time (Mutex); `savedNames` StateFlow + `refreshSavedNames()` (D-029). Instrumented: 12 tests on API 35 and API 29, 9 on API 28, three runs each stable. Saving twice gives one copy and ALREADY_SAVED; two saves at once give one copy; a fresh repository lists earlier copies after refresh; `.part` files and failed saves are not listed; a copy deleted in a gallery app can be saved again. 10 of 10 mutation kinds caught (12 runs) after adding two tests for survivors (no lock on Android 9 with a small file; name filter dropped). Theory: identity = file name in our Keepsake folders; the storage, not a cache, decides |
 | T4.4 | Save action + check marks | DONE | Viewer: round Save button top end (scrim), spinner while copying, check mark when saved; tiles get a check badge; snackbar "Saved to your gallery" / "Already saved" / failure, shown by the screen in front, above the video controls (D-030). `SavedMediaRepository` wired into `StatusSaverApp`; saved names re-read on every list reload. Android 8-9: permission asked at first save (`ui/StoragePermission.kt`). 4 new ViewModel unit tests (67 total), 5 of 5 mutations caught. Emulator API 35: image save → check + snackbar, second tap "Already saved" with one MediaStore row; video save while playing, snackbar above controls; list badge in light and dark; copy deleted outside the app loses its badge on resume. Emulator API 28: dialog → ALLOW → saved at once without restart (closes the T4.2 risk); DENY → settings message, nothing written. Theory: keep = one tap on what you are looking at; saved = name in the gallery folder |
-| T4.5 | Multi-select save | TODO | |
+| T4.5 | Multi-select + Save selected | DONE | Long-press selects, taps toggle, top bar "N selected" with cross and Save, Back leaves the mode; selection by URI in `StatusesViewModel`, kept across rotation, pruned on reload; saves in list order, one summary snackbar with counts (`SaveSummary`, D-031). Permission helper now `rememberStoragePermissionGate`. 73 unit tests (6 new), 9 of 9 mutations caught after rewriting one test that blocked on the wrong item. Emulator API 35: 3 selected → "3 statuses saved to your gallery." (3 MediaStore rows); 1 saved + 1 new → "1 status saved to your gallery. 1 was already saved." (one new row); selection kept through landscape and back; Back clears it; viewer save still works. API 28: Save selected → permission dialog → ALLOW → saved. Theory: pick many, one save action, one honest count |
 | T4.6 | Share | TODO | |
 
 ### M5 — Settings and polish

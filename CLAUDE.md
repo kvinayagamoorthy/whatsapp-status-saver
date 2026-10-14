@@ -199,6 +199,11 @@ tapText() {  # usage: tapText "Grant access"
 # Re-grant: tapText "Grant access"; tapText "USE THIS FOLDER"; tapText "ALLOW"; tapText "Continue"
 ```
 
+To rotate, auto-rotate must be off (`settings put system accelerometer_rotation 0`; an
+emulator restart can turn it back on), then `settings put system user_rotation 1` (0 for
+portrait); `dumpsys window displays | grep mCurrentRotation` confirms it. A long press is
+`input swipe x y x y 800`.
+
 `adb shell input` cannot pinch, and two `input tap` calls are too slow for a
 double-tap. For those, use `tools/emulator_touch.py`, which writes raw multi-touch
 events to the emulator's touch device `/dev/input/event2` and needs adbd as root

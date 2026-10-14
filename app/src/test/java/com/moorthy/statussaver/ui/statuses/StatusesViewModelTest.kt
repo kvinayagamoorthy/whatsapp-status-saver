@@ -249,7 +249,7 @@ class StatusesViewModelTest {
 
         viewModel.save(item("a.jpg"))
         testScheduler.advanceUntilIdle()
-        assertEquals(SaveResult.ALREADY_SAVED, viewModel.saveNotice.value)
+        assertEquals(SaveSummary(alreadySaved = 1), viewModel.saveNotice.value)
 
         viewModel.saveNoticeShown()
         assertNull(viewModel.saveNotice.value)
@@ -278,7 +278,7 @@ class StatusesViewModelTest {
 
         assertEquals(listOf("a.mp4"), saved)
         assertEquals(emptySet<String>(), viewModel.savingNames.value)
-        assertEquals(SaveResult.SAVED, viewModel.saveNotice.value)
+        assertEquals(SaveSummary(saved = 1), viewModel.saveNotice.value)
     }
 
     @Test
@@ -299,7 +299,95 @@ class StatusesViewModelTest {
         assertEquals(listOf("a.jpg", "b.jpg"), saved)
         firstDone.complete(SaveResult.FAILED)
         testScheduler.advanceUntilIdle()
-        assertEquals(SaveResult.FAILED, viewModel.saveNotice.value)
+        assertEquals(SaveSummary(failed = 1), viewModel.saveNotice.value)
+    }
+
+    @Test
+    fun longPressedItemsAreSelectedAndATapUnselects() = runTest(testDispatcher) {
+        val viewModel = statusesViewModel { listOf(item("a.jpg"), item("b.jpg")) }
+
+        viewModel.toggleSelection(item("a.jpg"))
+        viewModel.toggleSelection(item("b.jpg"))
+        assertEquals(setOf(item("a.jpg").uri, item("b.jpg").uri), viewModel.selectedUris.value)
+
+        viewModel.toggleSelection(item("a.jpg"))
+        assertEquals(setOf(item("b.jpg").uri), viewModel.selectedUris.value)
+
+        viewModel.clearSelection()
+        assertEquals(emptySet<Uri>(), viewModel.selectedUris.value)
+    }
+
+    @Test
+    fun saveSelectedSavesTheSelectedItemsInListOrderAndCountsTheResults() = runTest(testDispatcher) {
+        val list = listOf(item("a.jpg"), item("b.jpg"), item("c.mp4", MediaType.VIDEO), item("d.jpg"))
+        val results = mapOf(
+            "a.jpg" to SaveResult.SAVED,
+            "c.mp4" to SaveResult.ALREADY_SAVED,
+            "d.jpg" to SaveResult.FAILED,
+        )
+        val saved = mutableListOf<String>()
+        val viewModel = statusesViewModel(
+            saveStatus = { item ->
+                saved += item.name
+                results.getValue(item.name)
+            },
+            loadStatuses = { list },
+        )
+        viewModel.reload()
+        testScheduler.advanceUntilIdle()
+        // Selected out of order; b.jpg is not selected.
+        viewModel.toggleSelection(item("d.jpg"))
+        viewModel.toggleSelection(item("a.jpg"))
+        viewModel.toggleSelection(item("c.mp4", MediaType.VIDEO))
+
+        viewModel.saveSelected()
+        assertEquals(emptySet<Uri>(), viewModel.selectedUris.value)
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(listOf("a.jpg", "c.mp4", "d.jpg"), saved)
+        assertEquals(SaveSummary(saved = 1, alreadySaved = 1, failed = 1), viewModel.saveNotice.value)
+        assertEquals(emptySet<String>(), viewModel.savingNames.value)
+    }
+
+    @Test
+    fun itemsGoneAfterAReloadLeaveTheSelection() = runTest(testDispatcher) {
+        var list = listOf(item("a.jpg"), item("b.jpg"))
+        val viewModel = statusesViewModel { list }
+        viewModel.reload()
+        testScheduler.advanceUntilIdle()
+        viewModel.toggleSelection(item("a.jpg"))
+        viewModel.toggleSelection(item("b.jpg"))
+
+        // WhatsApp deleted a.jpg.
+        list = listOf(item("b.jpg"))
+        viewModel.reload()
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(setOf(item("b.jpg").uri), viewModel.selectedUris.value)
+    }
+
+    @Test
+    fun eachSelectedItemShowsAsSavingUntilItsOwnCopyIsDone() = runTest(testDispatcher) {
+        val secondDone = CompletableDeferred<SaveResult>()
+        val viewModel = statusesViewModel(
+            saveStatus = { item -> if (item.name == "b.jpg") secondDone.await() else SaveResult.SAVED },
+            loadStatuses = { listOf(item("a.jpg"), item("b.jpg")) },
+        )
+        viewModel.reload()
+        testScheduler.advanceUntilIdle()
+        viewModel.toggleSelection(item("a.jpg"))
+        viewModel.toggleSelection(item("b.jpg"))
+
+        viewModel.saveSelected()
+        assertEquals(setOf("a.jpg", "b.jpg"), viewModel.savingNames.value)
+        testScheduler.advanceUntilIdle()
+        // a.jpg is done, b.jpg is still being copied: one notice comes only at the end.
+        assertEquals(setOf("b.jpg"), viewModel.savingNames.value)
+        assertNull(viewModel.saveNotice.value)
+
+        secondDone.complete(SaveResult.SAVED)
+        testScheduler.advanceUntilIdle()
+        assertEquals(SaveSummary(saved = 2), viewModel.saveNotice.value)
     }
 
     /** [loadStatuses] comes last, so most tests pass it as a trailing lambda. */

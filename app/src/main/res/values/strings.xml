@@ -32,4 +32,26 @@
     <string name="save_already">Already saved</string>
     <string name="save_failed">Couldn’t save this status. It may have expired, or the phone’s storage may be full.</string>
     <string name="save_needs_permission">To save on this version of Android, Keepsake needs storage access. You can allow it in the app’s settings.</string>
+    <plurals name="save_summary_saved">
+        <item quantity="one">%d status saved to your gallery.</item>
+        <item quantity="other">%d statuses saved to your gallery.</item>
+    </plurals>
+    <plurals name="save_summary_already">
+        <item quantity="one">%d was already saved.</item>
+        <item quantity="other">%d were already saved.</item>
+    </plurals>
+    <plurals name="save_summary_failed">
+        <item quantity="one">%d couldn’t be saved.</item>
+        <item quantity="other">%d couldn’t be saved.</item>
+    </plurals>
+
+    <plurals name="statuses_selected_count">
+        <item quantity="one">%d selected</item>
+        <item quantity="other">%d selected</item>
+    </plurals>
+    <string name="statuses_save_selected">Save selected</string>
+    <string name="statuses_clear_selection">Cancel selection</string>
+    <string name="statuses_select">Select</string>
+    <string name="statuses_selected">Selected</string>
+    <string name="statuses_not_selected">Not selected</string>
 </resources>

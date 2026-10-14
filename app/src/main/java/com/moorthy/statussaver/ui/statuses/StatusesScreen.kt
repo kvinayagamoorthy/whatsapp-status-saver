@@ -1,7 +1,11 @@
 package com.moorthy.statussaver.ui.statuses
 
+import android.content.res.Resources
+import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -21,6 +25,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
@@ -29,6 +34,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,8 +48,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -53,14 +64,17 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.moorthy.statussaver.R
 import com.moorthy.statussaver.data.model.MediaType
-import com.moorthy.statussaver.data.model.SaveResult
 import com.moorthy.statussaver.data.model.StatusItem
+import com.moorthy.statussaver.ui.rememberStoragePermissionGate
 import kotlinx.coroutines.launch
 
 /**
  * Status list (FR2): Images and Videos tabs over a grid of thumbnails, newest first.
  * [onNeedsAccess] is called when no granted folder is readable any more, so the user can
  * grant one again (FR8). [onOpenItem] opens the viewer at an item of a tab's list (FR3).
+ *
+ * A long press starts selection mode (FR4): taps then select or unselect tiles, the top
+ * bar counts them and offers "Save selected", and Back leaves the mode.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -99,11 +113,32 @@ fun StatusesScreen(
     // A save started in the viewer can end after the user went back to the list.
     SaveNoticeEffect(viewModel, snackbarHostState)
     val savedNames by viewModel.savedNames.collectAsStateWithLifecycle()
+    val selectedUris by viewModel.selectedUris.collectAsStateWithLifecycle()
+    val isSelecting = selectedUris.isNotEmpty()
+    BackHandler(enabled = isSelecting) {
+        viewModel.clearSelection()
+    }
+    val needsPermissionMessage = stringResource(R.string.save_needs_permission)
+    val withStoragePermission = rememberStoragePermissionGate(
+        onDenied = {
+            snackbarScope.launch {
+                snackbarHostState.showSnackbar(needsPermissionMessage)
+            }
+        },
+    )
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(title = { Text(stringResource(R.string.app_name)) })
+            if (isSelecting) {
+                SelectionTopBar(
+                    count = selectedUris.size,
+                    onClear = viewModel::clearSelection,
+                    onSave = { withStoragePermission { viewModel.saveSelected() } },
+                )
+            } else {
+                TopAppBar(title = { Text(stringResource(R.string.app_name)) })
+            }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { innerPadding ->
@@ -138,7 +173,15 @@ fun StatusesScreen(
                             StatusGrid(
                                 items = tabItems,
                                 savedNames = savedNames,
-                                onOpenItem = { index -> onOpenItem(selectedTab, index) },
+                                selectedUris = selectedUris,
+                                onTap = { index, item ->
+                                    if (isSelecting) {
+                                        viewModel.toggleSelection(item)
+                                    } else {
+                                        onOpenItem(selectedTab, index)
+                                    }
+                                },
+                                onLongPress = viewModel::toggleSelection,
                             )
                         }
                     }
@@ -159,28 +202,82 @@ fun StatusesScreen(
 fun SaveNoticeEffect(viewModel: StatusesViewModel, snackbarHostState: SnackbarHostState) {
     val saveNotice by viewModel.saveNotice.collectAsStateWithLifecycle()
     val snackbarScope = rememberCoroutineScope()
-    val messages = mapOf(
-        SaveResult.SAVED to stringResource(R.string.save_done),
-        SaveResult.ALREADY_SAVED to stringResource(R.string.save_already),
-        SaveResult.FAILED to stringResource(R.string.save_failed),
-    )
+    val resources = LocalResources.current
     LaunchedEffect(saveNotice) {
-        val result = saveNotice ?: return@LaunchedEffect
+        val summary = saveNotice ?: return@LaunchedEffect
         // As with the vanished notice: marked first, shown in the screen's own scope.
         viewModel.saveNoticeShown()
         snackbarScope.launch {
             // A newer result replaces the one on screen instead of queueing behind it.
             snackbarHostState.currentSnackbarData?.dismiss()
-            snackbarHostState.showSnackbar(messages.getValue(result))
+            snackbarHostState.showSnackbar(saveMessage(resources, summary))
         }
     }
+}
+
+/**
+ * The message for a save action: for one status, what happened to it; for several, one
+ * sentence per outcome that occurred, e.g. "3 statuses saved to your gallery. 1 was
+ * already saved."
+ */
+private fun saveMessage(resources: Resources, summary: SaveSummary): String {
+    if (summary.total == 1) {
+        return resources.getString(
+            when {
+                summary.saved == 1 -> R.string.save_done
+                summary.alreadySaved == 1 -> R.string.save_already
+                else -> R.string.save_failed
+            },
+        )
+    }
+    val parts = listOf(
+        R.plurals.save_summary_saved to summary.saved,
+        R.plurals.save_summary_already to summary.alreadySaved,
+        R.plurals.save_summary_failed to summary.failed,
+    )
+    return parts
+        .filter { (_, count) -> count > 0 }
+        .joinToString(" ") { (pluralsRes, count) -> resources.getQuantityString(pluralsRes, count, count) }
+}
+
+/** Top bar in selection mode: leave the mode, how many are selected, save them. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SelectionTopBar(count: Int, onClear: () -> Unit, onSave: () -> Unit) {
+    TopAppBar(
+        navigationIcon = {
+            IconButton(onClick = onClear) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_close),
+                    contentDescription = stringResource(R.string.statuses_clear_selection),
+                )
+            }
+        },
+        title = { Text(pluralStringResource(R.plurals.statuses_selected_count, count, count)) },
+        actions = {
+            IconButton(onClick = onSave) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_save),
+                    contentDescription = stringResource(R.string.statuses_save_selected),
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            titleContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            navigationIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            actionIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ),
+    )
 }
 
 @Composable
 private fun StatusGrid(
     items: List<StatusItem>,
     savedNames: Set<String>,
-    onOpenItem: (index: Int) -> Unit,
+    selectedUris: Set<Uri>,
+    onTap: (index: Int, item: StatusItem) -> Unit,
+    onLongPress: (StatusItem) -> Unit,
 ) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 110.dp),
@@ -189,19 +286,64 @@ private fun StatusGrid(
     ) {
         // The URI, not the name, is the key: both apps' folders could hold the same name.
         itemsIndexed(items, key = { _, item -> item.uri.toString() }) { index, item ->
-            StatusTile(item = item, isSaved = item.name in savedNames, onOpen = { onOpenItem(index) })
+            StatusTile(
+                item = item,
+                isSaved = item.name in savedNames,
+                isSelecting = selectedUris.isNotEmpty(),
+                isSelected = item.uri in selectedUris,
+                onTap = { onTap(index, item) },
+                onLongPress = { onLongPress(item) },
+            )
         }
     }
 }
 
 @Composable
-private fun StatusTile(item: StatusItem, isSaved: Boolean, onOpen: () -> Unit) {
+private fun StatusTile(
+    item: StatusItem,
+    isSaved: Boolean,
+    isSelecting: Boolean,
+    isSelected: Boolean,
+    onTap: () -> Unit,
+    onLongPress: () -> Unit,
+) {
+    val selectionState = if (isSelected) {
+        stringResource(R.string.statuses_selected)
+    } else {
+        stringResource(R.string.statuses_not_selected)
+    }
     Box(
         modifier = Modifier
             .padding(2.dp)
             .aspectRatio(1f)
             .background(MaterialTheme.colorScheme.surfaceVariant)
-            .clickable(onClickLabel = stringResource(R.string.statuses_open), onClick = onOpen),
+            .then(
+                if (isSelected) {
+                    Modifier.border(3.dp, MaterialTheme.colorScheme.primary)
+                } else {
+                    Modifier
+                },
+            )
+            .combinedClickable(
+                onClickLabel = if (isSelecting) {
+                    stringResource(R.string.statuses_select)
+                } else {
+                    stringResource(R.string.statuses_open)
+                },
+                onClick = onTap,
+                onLongClickLabel = stringResource(R.string.statuses_select),
+                onLongClick = onLongPress,
+            )
+            .then(
+                if (isSelecting) {
+                    Modifier.semantics {
+                        selected = isSelected
+                        stateDescription = selectionState
+                    }
+                } else {
+                    Modifier
+                },
+            ),
     ) {
         // Coil decodes off the main thread at tile size and caches the result (NFR3).
         // Tiles get their content descriptions in the accessibility pass (T5.4).
@@ -230,6 +372,38 @@ private fun StatusTile(item: StatusItem, isSaved: Boolean, onOpen: () -> Unit) {
                     .padding(6.dp),
             )
         }
+        if (isSelecting) {
+            SelectionMark(
+                isSelected = isSelected,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(6.dp),
+            )
+        }
+    }
+}
+
+/** In selection mode: an empty ring on unselected tiles, a filled check on selected ones. */
+@Composable
+private fun SelectionMark(isSelected: Boolean, modifier: Modifier = Modifier) {
+    if (isSelected) {
+        Icon(
+            painter = painterResource(R.drawable.ic_saved),
+            // The tile's own state description says it is selected.
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onPrimary,
+            modifier = modifier
+                .size(24.dp)
+                .background(MaterialTheme.colorScheme.primary, CircleShape)
+                .padding(3.dp),
+        )
+    } else {
+        Box(
+            modifier = modifier
+                .size(24.dp)
+                .background(Color.Black.copy(alpha = 0.25f), CircleShape)
+                .border(2.dp, Color.White, CircleShape),
+        )
     }
 }
 

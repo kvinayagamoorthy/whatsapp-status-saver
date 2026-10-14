@@ -1,5 +1,6 @@
 package com.moorthy.statussaver.ui.statuses
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
@@ -79,14 +80,22 @@ class StatusesViewModel(
     /** Names of the statuses being copied right now; their Save buttons wait. */
     val savingNames: StateFlow<Set<String>> = mutableSavingNames.asStateFlow()
 
-    private val mutableSaveNotice = MutableStateFlow<SaveResult?>(null)
+    private val mutableSaveNotice = MutableStateFlow<SaveSummary?>(null)
 
     /**
-     * How the last save ended, until the screen on top has told the user and called
-     * [saveNoticeShown]. Kept here so it is not lost if the user leaves the viewer while
-     * a save is still running.
+     * How the last save action ended, until the screen on top has told the user and
+     * called [saveNoticeShown]. Kept here so it is not lost if the user leaves the viewer
+     * while a save is still running.
      */
-    val saveNotice: StateFlow<SaveResult?> = mutableSaveNotice.asStateFlow()
+    val saveNotice: StateFlow<SaveSummary?> = mutableSaveNotice.asStateFlow()
+
+    private val mutableSelectedUris = MutableStateFlow<Set<Uri>>(emptySet())
+
+    /**
+     * Items picked in the grid for "Save selected" (FR4), by document URI like the grid's
+     * keys. The grid is in selection mode while this is not empty.
+     */
+    val selectedUris: StateFlow<Set<Uri>> = mutableSelectedUris.asStateFlow()
 
     private var loadJob: Job? = null
 
@@ -108,6 +117,9 @@ class StatusesViewModel(
                 items.isEmpty() -> StatusesUiState.Empty
                 else -> StatusesUiState.Content(items)
             }
+            // Statuses WhatsApp has deleted in the meantime cannot be saved any more.
+            val listedUris = items.orEmpty().mapTo(mutableSetOf()) { item -> item.uri }
+            mutableSelectedUris.update { selected -> selected intersect listedUris }
             mutableIsRefreshing.value = false
         }
     }
@@ -141,14 +153,49 @@ class StatusesViewModel(
      * being made is ignored; afterwards it gives [SaveResult.ALREADY_SAVED].
      */
     fun save(item: StatusItem) {
-        if (item.name in mutableSavingNames.value) {
+        saveAll(listOf(item))
+    }
+
+    /** Adds [item] to the selection, or takes it out if it is already selected. */
+    fun toggleSelection(item: StatusItem) {
+        mutableSelectedUris.update { selected ->
+            if (item.uri in selected) selected - item.uri else selected + item.uri
+        }
+    }
+
+    fun clearSelection() {
+        mutableSelectedUris.value = emptySet()
+    }
+
+    /**
+     * Saves every selected item, in list order, and leaves selection mode at once. One
+     * notice with the counts follows when all are done.
+     */
+    fun saveSelected() {
+        val selected = mutableSelectedUris.value
+        val items = (uiState.value as? StatusesUiState.Content)?.items.orEmpty()
+        clearSelection()
+        saveAll(items.filter { item -> item.uri in selected })
+    }
+
+    /**
+     * Copies [items] one after another (design.md §4). Items already being copied are
+     * skipped, so a second tap while a copy runs does nothing; afterwards a tap gives
+     * [SaveResult.ALREADY_SAVED].
+     */
+    private fun saveAll(items: List<StatusItem>) {
+        val toSave = items.filter { item -> item.name !in mutableSavingNames.value }
+        if (toSave.isEmpty()) {
             return
         }
-        mutableSavingNames.update { names -> names + item.name }
+        mutableSavingNames.update { names -> names + toSave.map { item -> item.name } }
         viewModelScope.launch {
-            val result = saveStatus(item)
-            mutableSavingNames.update { names -> names - item.name }
-            mutableSaveNotice.value = result
+            var summary = SaveSummary()
+            for (item in toSave) {
+                summary += saveStatus(item)
+                mutableSavingNames.update { names -> names - item.name }
+            }
+            mutableSaveNotice.value = summary
         }
     }
 

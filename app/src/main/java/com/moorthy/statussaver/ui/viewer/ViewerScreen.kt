@@ -48,7 +48,7 @@ import coil3.size.Size as CoilSize
 import com.moorthy.statussaver.R
 import com.moorthy.statussaver.data.model.MediaType
 import com.moorthy.statussaver.data.model.StatusItem
-import com.moorthy.statussaver.ui.rememberSaveWithPermission
+import com.moorthy.statussaver.ui.rememberStoragePermissionGate
 import com.moorthy.statussaver.ui.statuses.SaveNoticeEffect
 import com.moorthy.statussaver.ui.statuses.StatusesUiState
 import com.moorthy.statussaver.ui.statuses.StatusesViewModel
@@ -83,8 +83,7 @@ fun ViewerScreen(
     val snackbarScope = rememberCoroutineScope()
     SaveNoticeEffect(viewModel, snackbarHostState)
     val needsPermissionMessage = stringResource(R.string.save_needs_permission)
-    val saveWithPermission = rememberSaveWithPermission(
-        onSave = viewModel::save,
+    val withStoragePermission = rememberStoragePermissionGate(
         onDenied = {
             snackbarScope.launch {
                 snackbarHostState.showSnackbar(needsPermissionMessage)
@@ -118,7 +117,7 @@ fun ViewerScreen(
                         startIndex = startIndex,
                         savedNames = savedNames,
                         savingNames = savingNames,
-                        onSave = saveWithPermission,
+                        onSave = { item -> withStoragePermission { viewModel.save(item) } },
                         onCheckVanished = viewModel::confirmVanished,
                         onClose = onClose,
                     )

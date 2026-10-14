@@ -454,3 +454,23 @@ real dialog reaches the running app, and the save right after it succeeds.
 back button design); a bottom action row (collides with the video controls); a
 floating action button (covers media and the video slider); asking for the permission
 at onboarding (asks before the user wants to save anything).
+
+## D-031 · 2026-10-14 · Accepted
+**Decision:** Multi-select lives in `StatusesViewModel`: `selectedUris` (document URIs,
+the grid's keys), `toggleSelection`, `clearSelection` and `saveSelected`. Selection mode
+is "the set is not empty"; a long press toggles a tile, and in the mode a tap toggles
+instead of opening the viewer. The selection spans both tabs. A reload keeps only URIs
+still listed. `saveSelected` takes the selected items in list order, clears the
+selection at once, and saves them one after another through the same path as the
+viewer's single save; each item's spinner state ends with its own copy, and one
+`SaveSummary` (saved / already saved / failed counts) is the notice for the whole
+action. A single save is a summary of one and keeps its own messages. The storage
+permission helper became `rememberStoragePermissionGate`, which wraps any save action.
+**Why:** The ViewModel already owns the list and the save path, survives rotation, and
+can be tested without a device; a `rememberSaveable` set would need its own saver and
+would not see reloads. URIs, not names, because both apps' folders can hold the same
+name. Leaving the mode right away lets the user carry on while a large selection copies.
+One message per action keeps several results from queueing as separate snackbars.
+**Alternatives:** Selection per tab (the counts then hide items of the other tab, but
+switching tabs would silently drop a selection); a progress dialog during multi-save
+(blocks the app for what is usually a few seconds); a notice per item.

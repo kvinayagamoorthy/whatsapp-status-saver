@@ -16,6 +16,16 @@ Template:
 
 ---
 
+## 2026-10-14 — T4.5 multi-select and Save selected
+- Done: T4.4 committed (`5a832c0`). T4.5: selection mode in the grid, "Save selected"
+  with one summary snackbar (D-031), not committed yet.
+- Verified: 73 unit tests, 9 of 9 mutations; lint only MissingApplicationIcon; emulator
+  checks on API 35 and 28 as in STATUS T4.5.
+- Next: commit T4.5, then T4.6 (share via ACTION_SEND).
+- Notes: auto-rotate was on on `keepsake_api35` after its restart, so `user_rotation`
+  did nothing at first; it is off again (CLAUDE.md now says how to check). Saved copies
+  were deleted on both emulators. `keepsake_api28` now has READ+WRITE storage granted.
+
 ## 2026-10-14 — T4.4 save button, check marks, snackbar
 - Done: T4.3 committed (`201daee`). T4.4: viewer Save button with check mark, tile
   badges, save snackbars, Android 8-9 permission prompt, repository wired into the app
