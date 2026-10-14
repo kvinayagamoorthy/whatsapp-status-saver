@@ -1,15 +1,15 @@
 # Status Board
 
-Last updated: 2026-10-14 (T6.3 done, not committed)
+Last updated: 2026-10-14 (T6.5 done, not committed)
 
 ## Resume here
 
 - **Current milestone:** M6 — Release (M5 complete)
-- **In progress:** none (T6.3 done, awaiting commit)
-- **Next task:** T6.5 — sideload install notes
+- **In progress:** none (T6.5 done, awaiting commit)
+- **Next task:** none planned after T6.5 (T6.4 deferred until a Play Store move, D-008)
 - **Blockers:** none
-- **Last task commit:** `8354222` (T6.2). Earlier: `88f94c1` (T5.6), `a725ae3` (T5.5), `3077f9d` (T5.4), `13c726b` (T5.3), `5a28682` (T5.2), `aeca0c6` (T5.1), `571647c` (T4.6), `d41eb39` (T4.5), `5a832c0` (T4.4), `201daee` (T4.3), `04909aa` (T4.2), `39c520a` (T4.1), `c64f0c2` (tools/emulator_touch.py), `c6c87be` (docs handoff), `6979ffc` (T3.4), `7ad1850` (T3.3), `3486a37` (T3.2), `2904702` (T3.1), `aa73d2c` (T2.5), `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
-- **Notes for next session:** T6.3 is done but not committed (commit it as T6.3 first). The release build stays installed on the user's phone. The user backed up the release keystore and `keystore.properties` (2026-10-14). The user allowed installing on their phone for T6.3 (serial `z9lzvojfkf7pknpv`).
+- **Last task commit:** `2d1c34b` (T6.3). Earlier: `8354222` (T6.2), `88f94c1` (T5.6), `a725ae3` (T5.5), `3077f9d` (T5.4), `13c726b` (T5.3), `5a28682` (T5.2), `aeca0c6` (T5.1), `571647c` (T4.6), `d41eb39` (T4.5), `5a832c0` (T4.4), `201daee` (T4.3), `04909aa` (T4.2), `39c520a` (T4.1), `c64f0c2` (tools/emulator_touch.py), `c6c87be` (docs handoff), `6979ffc` (T3.4), `7ad1850` (T3.3), `3486a37` (T3.2), `2904702` (T3.1), `aa73d2c` (T2.5), `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
+- **Notes for next session:** T6.5 is done but not committed (commit it as T6.5 first). All planned tasks are then done except T6.4 (deferred, D-008). The release build stays installed on the user's phone. The user backed up the release keystore and `keystore.properties` (2026-10-14). The user allowed installing on their phone for T6.3 (serial `z9lzvojfkf7pknpv`).
   Instrumented tests (`app/src/androidTest`) run with `install` + `am instrument`, not
   `connectedDebugAndroidTest` (CLAUDE.md, D-027). Two emulators now: `keepsake_api35`
   (`emulator-5554`) and `keepsake_api28` (`emulator-5556`, Android 9 path, D-028). A third,
@@ -53,7 +53,7 @@ Things verified only partly so far. Close them in the task named.
 | M3 Viewer | DONE | 4 / 4 |
 | M4 Save, indicator, share | DONE | 6 / 6 |
 | M5 Settings and polish | DONE | 6 / 6 |
-| M6 Release | WIP | 3 / 5 |
+| M6 Release | DONE | 4 / 5 (T6.4 deferred) |
 
 ## Tasks
 
@@ -131,7 +131,7 @@ summary (world rule → code location). Keep each note to one or two lines.
 | T6.2 | Release build + signing | DONE | R8 + resource shrinking, no app keep rules; signing from git-ignored `keystore.properties` → `~/keystores/keepsake-release.jks` (made by Claude at the user's request; unsigned build without the file) (D-038). `assembleRelease`: signed APK 2.16 MB (debug 16.8, unminified release 12.4), `apksigner` v2, `CN=Keepsake`. Minified build smoke-tested on API 35 (list, video frames, playback with sound, save, share preview, dark theme, folder cards, About, no crash in logcat); fresh install of the signed APK through onboarding works. Theory: one key for every update, kept outside the repo |
 | T6.3 | Release manual test | DONE | Signed release APK on the user's phone: Xiaomi 2312DRAABI (Redmi Note 13 5G), Android 15, HyperOS 3, 120 Hz, 37 real statuses (25 JPEG, 12 MP4). Checklist: install (needs Developer options "Install via USB" + "USB debugging (Security settings)"); onboarding grants the real `.Statuses` folder (persisted); grid of real statuses in system dark mode with wallpaper colours; NFR2 grid drawn median ~930 ms right after install (730-1612 ms), ~680 ms after a profile compile (540-1359 ms), with 37 statuses (no test files may be added to WhatsApp's folder, so ~200 was not tried on the phone); NFR3 24 swipes 0.65% janky, p50 5 ms, p99 19 ms; viewer image and video (sound playing); save image and video → rows in `Pictures/Keepsake`/`Movies/Keepsake`, sizes equal to the statuses, tap again → "Already saved"; share sheet opens; multi-select 1 saved + 1 new → one new row, 2 already saved → "2 were already saved." (wording kept by the user's choice); in-app Light over the dark phone; landscape; font scale 2.0; installed app requests no INTERNET (only androidx's internal receiver permission); test copies deleted by `_id`, phone settings restored (auto-rotate on, font 1.0, theme System). Fixed: at font 2.0 "Remove access" broke mid-word beside "Choose again" → the card's buttons now wrap (`FlowRow`). TalkBack not run on the phone (checked on the emulator, T5.4). Theory: the release build, on a real phone, with real statuses |
 | T6.4 | Store listing + privacy policy | TODO | Deferred until a Play Store move (D-008) |
-| T6.5 | Sideload install notes | TODO | |
+| T6.5 | Sideload install notes | DONE | New `README.md`: what Keepsake is, privacy, disclaimer, requirements, install, first start, update, uninstall, build from source. Walked through on `keepsake_api35` with the signed APK in Downloads via the Files app: "isn't allowed to install unknown apps from this source" → Settings → Allow from this source → "Do you want to install this app?" → Install → Open → onboarding; reopening the APK → "Do you want to update this app?" → Update keeps the folder grant; a differently signed APK → "App not installed as package conflicts with an existing package." README quotes these. Real-device install was done over adb in T6.3 (the user keeps that build, so it was not reinstalled through Files). Emulator restored afterwards. Theory: write down exactly what the phone says |
 
 ## Open questions
 

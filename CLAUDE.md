@@ -56,6 +56,7 @@ trackers are. Before doing any work:
 | `docs/tracker/STATUS.md` | Live task status board and "Resume here" pointer |
 | `docs/tracker/DECISIONS.md` | Decision log (ADR-style, append only) |
 | `docs/tracker/SESSION_LOG.md` | Dated per-session log of what was done |
+| `README.md` | For users: install (sideload), first start, update, build from source |
 
 ## How to approach code work
 

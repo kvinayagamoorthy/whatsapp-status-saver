@@ -16,6 +16,17 @@ Template:
 
 ---
 
+## 2026-10-14 — T6.5 sideload install notes
+- Done: T6.3 committed (`2d1c34b`). T6.5: `README.md` with install, first start, update,
+  uninstall and build steps, using the exact prompts seen on the emulator. Not committed.
+- Verified: sideload flow through Files → Downloads on `keepsake_api35`: unknown-sources
+  prompt, install, open, onboarding, update keeping the grant, and the conflict message
+  for a differently signed APK.
+- Next: commit T6.5. Only T6.4 is left, deferred until a Play Store move (D-008).
+- Notes: the emulator has the debug build again with its grant; Download Manager's
+  install permission was reset with `appops set ... REQUEST_INSTALL_PACKAGES default`; the
+  APK copies in Download were removed. The user's phone was not touched in T6.5.
+
 ## 2026-10-14 — T6.3 release test on the user's phone
 - Done: the user turned on "Install via USB" and "USB debugging (Security settings)";
   the signed release APK was installed and the design.md §8 checklist run on the phone
