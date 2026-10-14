@@ -248,6 +248,16 @@ rather than using the phone.
 Lint reports can be stale after a version-catalog-only change: run
 `./gradlew lintDebug --rerun-tasks` (`--rerun` does not rewrite the report).
 
+Run only one `-gpu host` emulator at a time for long checks: with `keepsake_api28` also
+running, `keepsake_api35` crashed three times ("context was preempted by others"), and
+a crash can lose the last install and the compile state (`pm path` empty: reinstall).
+
+Start time (NFR2): the list reports "Fully drawn" once the grid shows (D-037). Measure a
+release build (debug is ~3x slower): force-stop, `logcat -c`, `am start -W -n
+com.moorthy.statussaver/.MainActivity` (TotalTime = first frame), then
+`logcat -d -s ActivityTaskManager:I | grep "Fully drawn"`. Signing the release build
+with the debug key for this is a temporary edit to `app/build.gradle.kts` until T6.2.
+
 Use `-gpu host` for anything about smoothness: without it a headless emulator renders
 with SwiftShader on the CPU and even a plain grid janks. Measure with
 `adb -s emulator-5554 shell dumpsys gfxinfo com.moorthy.statussaver` (`reset` first,

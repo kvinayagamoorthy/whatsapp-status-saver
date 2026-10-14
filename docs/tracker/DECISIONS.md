@@ -586,3 +586,28 @@ tinted like Gmail and Photos) and API 28 (Launcher3's rounded-square mask). Lint
 reports no issues.
 **Alternatives:** A separate monochrome drawable (same shape twice); PNG fallbacks per
 density (only needed below API 26).
+
+## D-037 · 2026-10-14 · Accepted
+**Decision:** The status list calls `ReportDrawnWhen { uiState != Loading }`, so Android
+logs "Fully drawn" (and counts the start as finished) once the grid shows statuses or
+the reason it has none. Performance (NFR2, NFR3) is measured on a release build: the
+start time with `am start -W` (first frame) and the "Fully drawn" logcat line, the
+scrolling with `dumpsys gfxinfo` over 24 fast swipes, each on `keepsake_api35` with 202
+statuses and `-gpu host`, and again after `cmd package compile -m speed-profile`, the
+state a phone reaches once its background compile job has run.
+**Why:** The first frame alone is not "visible grid": the folders are read after it.
+Results (release build, temporarily signed with the debug key, not minified): grid
+drawn in 417-573 ms just after install (median about 470 ms) and 341-659 ms after the
+profile compile (median about 360 ms), first frame about 200 ms; the debug build takes
+about 1.28 s, which is why debug numbers are not used. Scrolling: 2.8-3.0% janky frames
+(p50 17 ms, p90 25 ms, p99 34-38 ms) against 0.6% for the system Settings app under the
+same swipes; T2.3 measured 2.1% with 146 statuses. NFR2 is met on the emulator with
+room to spare; a mid-range phone is slower, so the real-phone check stays pending
+(T6.3).
+**Notes:** Running two `-gpu host` emulators at once made the API 35 emulator crash
+three times ("context was preempted by others", EGL fence errors); with one emulator
+it ran stable. A crash can also lose the last install and the compile state.
+**Alternatives:** Macrobenchmark with a baseline profile module (a second Gradle module
+and a device-side test harness for one measurement; worth it only if a real phone
+misses NFR2); timing with log lines in the app (removed again, and less exact than the
+system's own report).

@@ -16,6 +16,20 @@ Template:
 
 ---
 
+## 2026-10-14 — T5.6 performance check
+- Done: T5.5 committed (`a725ae3`). T5.6: `ReportDrawnWhen` on the status list; cold
+  start and scrolling measured on the API 35 emulator with 202 statuses (D-037). Not
+  committed yet.
+- Verified: release build (temporarily debug-signed; `app/build.gradle.kts` restored and
+  `cmp`-checked) grid drawn median ~470 ms after install, ~360 ms after a profile
+  compile; scrolling 2.8-3.0% janky vs Settings 0.6%. 87 unit tests, lint no issues.
+- Next: commit T5.6 (M5 complete), then T6.2 (release build and signing).
+- Notes: the API 35 emulator crashed three times while `keepsake_api28` also ran with
+  `-gpu host`; stable with one emulator (CLAUDE.md updated). After a crash the app had to
+  be reinstalled (`install -r`, grant kept). The 55 extra `PERF-*.jpg` statuses were
+  removed again; the debug build is installed; `keepsake_api28` was restarted. The real
+  phone check is still pending: it needs the user's OK to install on their phone.
+
 ## 2026-10-14 — T5.5 launcher icon
 - Done: T5.4 committed (`3077f9d`). T5.5: adaptive launcher icon, bookmark ribbon in a
   ring on terracotta, monochrome layer for themed icons (D-036). Not committed yet.

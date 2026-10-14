@@ -3,6 +3,7 @@ package com.moorthy.statussaver.ui.statuses
 import android.content.res.Resources
 import android.net.Uri
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.ReportDrawnWhen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
@@ -91,6 +92,9 @@ fun StatusesScreen(
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         viewModel.reload()
     }
+    // Tells Android the app has started once the list shows its statuses (or says why it
+    // has none), so the start time it reports covers reading the folders (NFR2).
+    ReportDrawnWhen { uiState != StatusesUiState.Loading }
     if (uiState == StatusesUiState.NeedsAccess) {
         LaunchedEffect(Unit) {
             onNeedsAccess()
