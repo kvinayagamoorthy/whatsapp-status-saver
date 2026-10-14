@@ -81,6 +81,7 @@ import kotlinx.coroutines.launch
 fun StatusesScreen(
     onNeedsAccess: () -> Unit,
     onOpenItem: (tab: MediaType, index: Int) -> Unit,
+    onOpenSettings: () -> Unit,
     viewModel: StatusesViewModel = viewModel(factory = StatusesViewModel.Factory),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -137,7 +138,17 @@ fun StatusesScreen(
                     onSave = { withStoragePermission { viewModel.saveSelected() } },
                 )
             } else {
-                TopAppBar(title = { Text(stringResource(R.string.app_name)) })
+                TopAppBar(
+                    title = { Text(stringResource(R.string.app_name)) },
+                    actions = {
+                        IconButton(onClick = onOpenSettings) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_settings),
+                                contentDescription = stringResource(R.string.settings_title),
+                            )
+                        }
+                    },
+                )
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },

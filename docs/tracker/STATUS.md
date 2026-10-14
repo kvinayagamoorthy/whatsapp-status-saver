@@ -1,15 +1,15 @@
 # Status Board
 
-Last updated: 2026-10-14 (T4.6 done, not committed)
+Last updated: 2026-10-14 (T5.1 done, not committed)
 
 ## Resume here
 
-- **Current milestone:** M4 — Save, indicator, share (M3 complete; M4 complete once T4.6 is committed)
-- **In progress:** none (T4.6 done, awaiting commit)
-- **Next task:** T5.1 — settings screen with theme mode
+- **Current milestone:** M5 — Settings and polish (M4 complete)
+- **In progress:** none (T5.1 done, awaiting commit)
+- **Next task:** T5.2 — access management in settings
 - **Blockers:** none
-- **Last task commit:** `d41eb39` (T4.5). Earlier: `5a832c0` (T4.4), `201daee` (T4.3), `04909aa` (T4.2), `39c520a` (T4.1), `c64f0c2` (tools/emulator_touch.py), `c6c87be` (docs handoff), `6979ffc` (T3.4), `7ad1850` (T3.3), `3486a37` (T3.2), `2904702` (T3.1), `aa73d2c` (T2.5), `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
-- **Notes for next session:** T4.6 is done but not committed (commit it as T4.6 first).
+- **Last task commit:** `571647c` (T4.6). Earlier: `d41eb39` (T4.5), `5a832c0` (T4.4), `201daee` (T4.3), `04909aa` (T4.2), `39c520a` (T4.1), `c64f0c2` (tools/emulator_touch.py), `c6c87be` (docs handoff), `6979ffc` (T3.4), `7ad1850` (T3.3), `3486a37` (T3.2), `2904702` (T3.1), `aa73d2c` (T2.5), `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
+- **Notes for next session:** T5.1 is done but not committed (commit it as T5.1 first).
   Instrumented tests (`app/src/androidTest`) run with `install` + `am instrument`, not
   `connectedDebugAndroidTest` (CLAUDE.md, D-027). Two emulators now: `keepsake_api35`
   (`emulator-5554`) and `keepsake_api28` (`emulator-5556`, Android 9 path, D-028). A third,
@@ -35,8 +35,6 @@ Things verified only partly so far. Close them in the task named.
 
 | Check | Why it is open | Close in |
 |-------|----------------|----------|
-| Brand (terracotta) palette on Android 8-11 | Seen in light mode on `keepsake_api28` (T4.4/T4.5 screenshots); dark mode not looked at yet | T5.4 (dark mode on `keepsake_api28`) |
-| Status-bar icon colors follow the in-app theme override | `enableEdgeToEdge()` follows the system theme only | T5.1 |
 | Release APK under 10 MB | Debug APK is 16.5 MB unminified | T6.2 |
 | Onboarding text on Android 8-9 | It says tap "Use this folder" then "Allow"; Android 9's picker shows "SELECT" and asks nothing more | T5.x polish (or T4.4 if touched) |
 | Grid smoothness on a real phone with real WhatsApp media | Measured only on the emulator with generated files | T5.6 |
@@ -55,7 +53,7 @@ Things verified only partly so far. Close them in the task named.
 | M2 Status list | DONE | 5 / 5 |
 | M3 Viewer | DONE | 4 / 4 |
 | M4 Save, indicator, share | DONE | 6 / 6 |
-| M5 Settings and polish | TODO | 0 / 6 |
+| M5 Settings and polish | WIP | 1 / 6 |
 | M6 Release | TODO | 1 / 5 |
 
 ## Tasks
@@ -119,7 +117,7 @@ summary (world rule → code location). Keep each note to one or two lines.
 
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
-| T5.1 | Theme mode setting | TODO | `enableEdgeToEdge()` picks bar icon colors from the system theme; pass explicit `SystemBarStyle` once the in-app override exists |
+| T5.1 | Theme mode setting | DONE | `SettingsStore` (DataStore `settings`, `ThemeMode` by name, unknown → System); settings screen from the list's gear, radio group System default / Light / Dark; `MainActivity` waits for the stored choice, themes the app and the system bar icons, and on Android 12+ calls `setApplicationNightMode` so the launch screen matches (D-033). 82 unit tests (6 new), 6 of 6 mutations caught (default, write, read, and three `isDarkTheme` branches). Emulator API 35: Dark on a light phone applies at once with white status icons; Back/forward crossfade stays dark; cold start keeps Dark and the launch screen is dark (was white for ~2 s before `setApplicationNightMode`); System follows `cmd uimode night yes/no` both ways; Light on a dark phone is light with dark icons; choice kept through landscape. API 28: Dark applies, brand palette in dark mode looks right (closes that pending check); cold start still shows the light launch window ~1.8 s (accepted, D-033). Theory: one stored choice, the activity follows it |
 | T5.2 | Access management | TODO | |
 | T5.3 | About section | TODO | |
 | T5.4 | Accessibility pass | TODO | |

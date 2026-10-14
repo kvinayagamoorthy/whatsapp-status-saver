@@ -12,17 +12,19 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.moorthy.statussaver.data.model.MediaType
 import com.moorthy.statussaver.ui.onboarding.OnboardingScreen
+import com.moorthy.statussaver.ui.settings.SettingsScreen
 import com.moorthy.statussaver.ui.statuses.StatusesScreen
 import com.moorthy.statussaver.ui.statuses.StatusesViewModel
 import com.moorthy.statussaver.ui.viewer.ViewerScreen
 
-/** Navigation routes (design.md §2). The settings route arrives with M5. */
+/** Navigation routes (design.md §2). */
 object Routes {
     const val ONBOARDING = "onboarding"
     const val STATUSES = "statuses"
     const val VIEWER_TAB = "tab"
     const val VIEWER_INDEX = "index"
     const val VIEWER = "viewer/{$VIEWER_TAB}/{$VIEWER_INDEX}"
+    const val SETTINGS = "settings"
 
     /** The viewer opened at item [index] of the [tab] list. */
     fun viewer(tab: MediaType, index: Int): String = "viewer/${tab.name}/$index"
@@ -60,6 +62,17 @@ fun KeepsakeNavHost(
                 },
                 onOpenItem = { tab, index ->
                     navController.navigate(Routes.viewer(tab, index))
+                },
+                onOpenSettings = {
+                    navController.navigate(Routes.SETTINGS)
+                },
+            )
+        }
+        composable(Routes.SETTINGS) {
+            SettingsScreen(
+                onBack = {
+                    // Pops only the settings screen, even if asked twice.
+                    navController.popBackStack(Routes.SETTINGS, inclusive = true)
                 },
             )
         }

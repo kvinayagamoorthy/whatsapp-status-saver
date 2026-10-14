@@ -493,3 +493,35 @@ The spec asks for sharing "an item", so the list's selection mode has no Share a
 (extra copy, extra manifest entry, and cleanup); sharing the selected items with
 `ACTION_SEND_MULTIPLE` (no current need in the spec); pausing in an `ON_PAUSE` handler
 (would also pause for unrelated dialogs and on multi-window focus changes).
+
+## D-033 · 2026-10-14 · Accepted
+**Decision:** The theme mode is a `ThemeMode` enum (`SYSTEM`, `LIGHT`, `DARK`) stored by
+name in its own DataStore file `settings` by `SettingsStore`; an unknown stored name
+reads as `SYSTEM`. `MainActivity` collects the store, draws nothing until the first
+value arrives, and passes `isDarkTheme(mode, isSystemInDarkTheme())` to `KeepsakeTheme`
+and to the system bar styles. The settings screen (gear in the list's top bar, route
+`settings`) only writes the store. On Android 12+ the activity also calls
+`UiModeManager.setApplicationNightMode` (`SYSTEM` → `MODE_NIGHT_AUTO`, `LIGHT` → `NO`,
+`DARK` → `YES`).
+**Why:** One source of truth: the screen writes, the activity follows, so the app
+changes at once and after a restart in the same way. Waiting for the first value
+costs a few milliseconds and avoids drawing the wrong theme first (as the start route
+already does, D-017). Without telling the system, the API 35 emulator showed the light
+launch screen for about 2 s on a cold start before a dark app; with
+`setApplicationNightMode` it is dark from the first frame, and with `SYSTEM` the app
+still followed `cmd uimode night yes/no` both ways. The system keeps that value per
+app, and the app's configuration then reports the chosen mode, which `isDarkTheme`
+reads unchanged. Status bar icons now follow the app's theme, not only the phone's
+(closes that pending check). A separate file keeps settings apart from the folder
+grants.
+**Limits:** Below Android 12 there is no such call, and the system draws the launch
+window from the manifest theme before any app code runs; on the API 28 emulator a
+cold start with Dark chosen on a light phone showed the light window for about 1.8 s
+(less on a real phone, which starts faster). Accepted: it happens only when the choice
+differs from the phone's setting.
+**Alternatives:** AppCompat's `setDefaultNightMode` (adds AppCompat for one call);
+reading the choice synchronously from `SharedPreferences` in `onCreate` to pick a dark
+or light window theme (a second store, and the pre-process launch window would still
+flash); `windowDisablePreview` (no flash, but the launcher stays on screen until the
+first frame, which feels like a slow start); `distinctUntilChanged` on the flow
+(Compose state already ignores equal values).

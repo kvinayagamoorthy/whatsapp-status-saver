@@ -16,6 +16,18 @@ Template:
 
 ---
 
+## 2026-10-14 — T5.1 theme mode setting
+- Done: T4.6 committed (`571647c`), M4 complete. T5.1: `SettingsStore` + settings screen
+  with System / Light / Dark, applied at once and kept across restarts; system bar icons
+  and (Android 12+) the launch screen follow the choice (D-033). Not committed yet.
+- Verified: 82 unit tests (6 new), 6 of 6 mutations; lint only MissingApplicationIcon;
+  emulator checks on API 35 and 28 as in STATUS T5.1.
+- Next: commit T5.1, then T5.2 (access management in settings).
+- Notes: a mutant that dropped the write made the watcher test hang; it now has a
+  timeout. `pkill -f GradleWorkerMain` killed its own shell (exit 144), like
+  `sdkmanager` before: CLAUDE.md now warns about any `pkill -f` pattern. Both emulators
+  are back on System theme, `keepsake_api35` on light system mode.
+
 ## 2026-10-14 — T4.6 share
 - Done: T4.5 committed (`d41eb39`). T4.6: Share button in the viewer, shares the SAF URI
   through the system chooser with a read grant; pauses a playing video (D-032). Not

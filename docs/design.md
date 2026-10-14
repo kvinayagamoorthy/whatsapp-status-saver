@@ -155,8 +155,16 @@ button pauses a playing video first (D-032).
 ## 6. UI and theming
 
 - Material 3, `dynamicColorScheme` on API 31+, static brand scheme below.
-- `ThemeMode` (System/Light/Dark) from `SettingsStore`; `System` uses
-  `isSystemInDarkTheme()`. Applied in `MainActivity` before first frame; edge-to-edge.
+- `ThemeMode` (System/Light/Dark) from `SettingsStore` (DataStore file `settings`);
+  `System` uses `isSystemInDarkTheme()`. `MainActivity` draws nothing until the stored
+  choice is read, then passes `darkTheme` to `KeepsakeTheme` and sets the system bar
+  icon colours to match (`enableEdgeToEdge` with `SystemBarStyle.auto { darkTheme }`).
+  A change on the settings screen is only stored; the activity follows the store, so
+  it applies at once without a restart. On Android 12+ the choice is also handed to
+  `UiModeManager.setApplicationNightMode`, so the system's launch screen is drawn in it.
+  Below Android 12 the launch window follows the phone's setting (D-033).
+- Settings screen (`ui/settings/`): reached from the gear in the list's top bar; one
+  radio group for the theme mode for now (FR8 and About follow in T5.2, T5.3).
 - Grid: `LazyVerticalGrid` adaptive columns (min ~110 dp), square tiles, Coil
   `AsyncImage`; videos via Coil `VideoFrameDecoder` registered in `StatusSaverApp`.
   Tabs are keyed by `MediaType`; grid items by document URI (D-020).

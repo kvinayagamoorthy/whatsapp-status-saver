@@ -151,8 +151,9 @@ step. Grant the storage permission with both `pm grant ... READ_EXTERNAL_STORAGE
 look: move the `.avd` folder and `.ini` to `~/.android/avd/` and fix `path=` in the
 `.ini`. `sdkmanager` downloads can hang forever on a dropped connection: if
 `~/Android/Sdk/.sdk/arch/*.part` stops growing, kill the installer by PID and rerun (the
-finished archives are kept). Never `pkill -f sdkmanager` from a shell whose own command
-line contains that word.
+finished archives are kept). Never `pkill -f <pattern>` from a shell whose own command
+line contains the pattern (it kills that shell, exit 144; it happened with `sdkmanager`
+and `GradleWorkerMain`): kill by PID, or stop Gradle with `./gradlew --stop`.
 
 ```bash
 ~/Android/Sdk/emulator/emulator -avd keepsake_api35 -no-window -no-audio -no-snapshot -gpu host &

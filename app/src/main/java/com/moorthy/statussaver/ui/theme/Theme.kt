@@ -10,6 +10,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import com.moorthy.statussaver.data.model.ThemeMode
 
 private val KeepsakeLightColorScheme = lightColorScheme(
     primary = TerracottaLightPrimary,
@@ -45,16 +46,25 @@ private val KeepsakeDarkColorScheme = darkColorScheme(
     onSurface = TerracottaDarkOnSurface,
 )
 
+/** Whether [mode] makes the app dark, given whether the phone is in dark mode now. */
+fun isDarkTheme(mode: ThemeMode, systemIsDark: Boolean): Boolean = when (mode) {
+    ThemeMode.SYSTEM -> systemIsDark
+    ThemeMode.LIGHT -> false
+    ThemeMode.DARK -> true
+}
+
 /**
- * App-wide Material 3 theme.
+ * App-wide Material 3 theme, dark when [darkTheme] is true.
  *
- * Light or dark follows the system setting. On Android 12+ colors come from the
- * user's wallpaper (dynamic color); older versions use the Keepsake brand palette.
- * The in-app System/Light/Dark override arrives with the settings screen (T5.1).
+ * Light or dark follows the system setting unless the user chose otherwise in settings
+ * (FR7, `MainActivity`). On Android 12+ colors come from the user's wallpaper (dynamic
+ * color); older versions use the Keepsake brand palette.
  */
 @Composable
-fun KeepsakeTheme(content: @Composable () -> Unit) {
-    val darkTheme = isSystemInDarkTheme()
+fun KeepsakeTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit,
+) {
     val colorScheme: ColorScheme = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         val context = LocalContext.current
         if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
