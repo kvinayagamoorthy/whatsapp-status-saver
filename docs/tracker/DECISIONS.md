@@ -383,3 +383,29 @@ the emulator's folder grant, and it runs on every attached device, including a p
 cleanup path then needs a stream that fails mid-copy to be tested); a sealed result type
 now (no caller needs more than success or failure yet); Robolectric with a fake MediaStore
 provider (would test the fake, not where Android puts the file).
+
+## D-028 · 2026-10-14 · Accepted
+**Decision:** On Android 8-9, `SavedMediaRepository.save(item)` copies the status into
+`<public Pictures or Movies>/Keepsake/` as a hidden `.<name>.part` file, renames it to
+the status's name once complete, then calls `MediaScannerConnection.scanFile` and waits
+for its callback before returning true. A failed copy deletes the `.part` file and
+returns false; a missing storage permission shows up as a failed copy (`mkdirs` or the
+file write fails). The repository now takes a `Context` (for the scanner) instead of a
+`ContentResolver`. Asking the user for `WRITE_EXTERNAL_STORAGE` belongs to the first
+save action in the UI (T4.4), not to the repository.
+**Why:** The `.part` file plays the role `IS_PENDING` plays on Android 10+ (D-027): the
+scanner never sees a hidden file, and a broken copy never sits under the status's name,
+where T4.3 would count it as already saved. Waiting for the scan means a saved file is
+in the gallery (and in MediaStore queries) when `save` returns, so the check mark and the
+"Saved" message are true. A permission prompt needs an activity, which only the UI has.
+**Alternatives:** MediaStore insert with `DATA` on Android 8-9 (works, but the design
+chose the documented file path, and it needs the same permission anyway); writing the
+target file directly (a failed copy could leave a truncated file under the status's
+name); fire-and-forget scan (the file could be missing from the gallery right after
+"Saved").
+**Checked on the API 28 emulator:** Android adds `READ_EXTERNAL_STORAGE` to any app that
+declares `WRITE_EXTERNAL_STORAGE`; `pm grant` of WRITE alone left the process with the
+default storage view and `mkdirs` failed, while the permission dialog grants both. A grant
+given to an already running instrumentation process did not reach it; whether a grant
+from the real dialog reaches the running app must be checked in T4.4. The Android 9 media
+scanner only lists files it can parse, so tests use a real one-second MP4 asset.

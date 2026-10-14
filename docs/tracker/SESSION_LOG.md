@@ -16,6 +16,24 @@ Template:
 
 ---
 
+## 2026-10-14 — T4.2 save on Android 8-9
+- Done: T4.1 committed (`39c520a`). T4.2: `SavedMediaRepository.save()` covers Android
+  8-9 (hidden `.part` copy, rename, awaited media scan; D-028), not committed yet.
+- Verified: 4 instrumented tests on a new emulator `keepsake_api28` (`emulator-5556`),
+  8 of 8 mutations caught (one test fixed so it no longer takes the expected folder from
+  the code under test); API 35 suite still green (4); probe with real SAF statuses on
+  API 28: no permission → false and nothing written, READ+WRITE granted → md5-identical
+  copies in MediaStore. 63 unit tests green; lint only MissingApplicationIcon.
+- Decisions: D-028 (with the API 28 permission findings).
+- Next: commit T4.2, then T4.3.
+- Notes: network dropped several times. sdkmanager hung on dead connections twice; one
+  `pkill -f sdkmanager` killed its own shell. The API 28 and API 29 images are installed;
+  `keepsake_api29` ran `SavedMediaRepositoryTest` green (pending-row mutations caught
+  there too), closing the API 29 pending check; it was shut down afterwards. The
+  emulators' AVDs had to be moved from `~/.config/.android/avd/` (CLAUDE.md). Android 9's
+  onboarding text mismatch is a new pending check. `keepsake_api28` has a WhatsApp grant,
+  READ+WRITE storage granted, and `.Statuses` with IMG-28.jpg and AUD-1.mp4.
+
 ## 2026-10-14 — T4.1 save to MediaStore; touch tool in repo
 - Done: `tools/emulator_touch.py` committed (`c64f0c2`, user's call; CLAUDE.md points to
   it; checked double-tap, pinch and drag on the viewer). T4.1 `SavedMediaRepository.save()`

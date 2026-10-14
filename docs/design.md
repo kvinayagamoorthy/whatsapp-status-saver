@@ -118,9 +118,12 @@ See DECISIONS D-003.
   The row is inserted before the source is opened, so a status that vanished before
   saving takes the same cleanup path as a failed copy (D-027).
 - **API 26–28:** requires `WRITE_EXTERNAL_STORAGE` (manifest `maxSdkVersion="28"`,
-  requested at first save). Copy into
-  `Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES|MOVIES)/Keepsake/`,
-  then `MediaScannerConnection.scanFile`.
+  requested at first save, T4.4). Copy into
+  `Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES|MOVIES)/Keepsake/`
+  as a hidden `.<name>.part` file, rename it once complete, then
+  `MediaScannerConnection.scanFile` and wait for the scan, so the copy is in the gallery
+  when the save reports success (D-028). Android adds `READ_EXTERNAL_STORAGE` to the
+  request; without both granted the shared folders are not writable.
 - **Already-saved check (I3, I4):** API 29+ query MediaStore for our `RELATIVE_PATH`
   and collect `DISPLAY_NAME`s (own files are visible without read permission);
   API 26–28 list the public directory. Result is a `Set<String>` exposed as a `Flow`

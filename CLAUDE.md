@@ -137,6 +137,19 @@ and `content delete --uri content://media/external/file --where "_id=<id>"`.
 Device checks use the local emulator `keepsake_api35` (API 35, config under
 `~/.android/avd/`). Always target it by serial, because a physical phone may also be
 attached; do not install on or change settings of the user's phone without asking.
+For the Android 8-9 code paths there is `keepsake_api28` (API 28, `default` image, so
+`adb root` works); started second, it gets serial `emulator-5556`. `keepsake_api29`
+(API 29) covers Android 10's MediaStore path; a third emulator gets `emulator-5558`. On it WhatsApp's
+statuses folder is `/sdcard/WhatsApp/Media/.Statuses`, the folder picker's button reads
+"SELECT" (not found by `uiautomator dump`; tap about 958,2201) and there is no "ALLOW"
+step. Grant the storage permission with both `pm grant ... READ_EXTERNAL_STORAGE` and
+`WRITE_EXTERNAL_STORAGE` (WRITE alone gives no access), then restart the app.
+`avdmanager create avd` writes to `~/.config/.android/avd/`, where the emulator does not
+look: move the `.avd` folder and `.ini` to `~/.android/avd/` and fix `path=` in the
+`.ini`. `sdkmanager` downloads can hang forever on a dropped connection: if
+`~/Android/Sdk/.sdk/arch/*.part` stops growing, kill the installer by PID and rerun (the
+finished archives are kept). Never `pkill -f sdkmanager` from a shell whose own command
+line contains that word.
 
 ```bash
 ~/Android/Sdk/emulator/emulator -avd keepsake_api35 -no-window -no-audio -no-snapshot -gpu host &

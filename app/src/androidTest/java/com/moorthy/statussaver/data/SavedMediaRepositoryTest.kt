@@ -3,8 +3,6 @@ package com.moorthy.statussaver.data
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -14,9 +12,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
 import com.moorthy.statussaver.data.model.MediaType
 import com.moorthy.statussaver.data.model.StatusItem
-import java.io.ByteArrayOutputStream
 import java.io.File
-import kotlin.random.Random
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertArrayEquals
@@ -30,19 +26,19 @@ import org.junit.runner.RunWith
 
 /**
  * Saves into the device's real MediaStore. The status files are plain files in the
- * app's cache, read through `file://` URIs: the repository only needs a readable URI,
- * and SAF folder grants cannot be set up from a test.
+ * app's cache ([statusFile]).
  *
- * Needs Android 11 to see pending rows in queries, so a file left pending is noticed.
- * Every gallery row a test creates is deleted again afterwards.
+ * Covers the MediaStore path of Android 10+; [LegacySavedMediaRepositoryTest] covers
+ * Android 8-9. Queries include pending rows, so a file left pending is noticed. Every
+ * gallery row a test creates is deleted again afterwards.
  */
 @RunWith(AndroidJUnit4::class)
-@SdkSuppress(minSdkVersion = Build.VERSION_CODES.R)
+@SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
 class SavedMediaRepositoryTest {
 
     private val context: Context = ApplicationProvider.getApplicationContext()
     private val contentResolver: ContentResolver = context.contentResolver
-    private val repository = SavedMediaRepository(contentResolver)
+    private val repository = SavedMediaRepository(context)
 
     // Unique per run, so a row left behind by an aborted run cannot satisfy a test.
     private val runId = System.currentTimeMillis()
@@ -74,7 +70,7 @@ class SavedMediaRepositoryTest {
 
     @Test
     fun videoIsSavedUnderMoviesKeepsake() = runBlocking {
-        val bytes = Random(runId).nextBytes(64 * 1024)
+        val bytes = videoBytes()
         val item = statusFile("VID-$runId.mp4", MediaType.VIDEO, "video/mp4", bytes)
 
         val saved = repository.save(item)
@@ -109,25 +105,8 @@ class SavedMediaRepositoryTest {
     }
 
     private fun statusFile(name: String, type: MediaType, mimeType: String, bytes: ByteArray): StatusItem {
-        val file = File(context.cacheDir, name)
-        file.writeBytes(bytes)
         createdNames += name
-        return StatusItem(
-            uri = Uri.fromFile(file),
-            name = name,
-            type = type,
-            mimeType = mimeType,
-            lastModifiedMillis = file.lastModified(),
-            sizeBytes = file.length(),
-        )
-    }
-
-    private fun jpegBytes(): ByteArray {
-        val bitmap = Bitmap.createBitmap(64, 128, Bitmap.Config.ARGB_8888)
-        bitmap.eraseColor(Color.rgb(200, 90, 60))
-        val output = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, output)
-        return output.toByteArray()
+        return statusFile(context, name, type, mimeType, bytes)
     }
 
     private fun read(uri: Uri): ByteArray =
@@ -141,14 +120,16 @@ class SavedMediaRepositoryTest {
         val query = Bundle().apply {
             putString(ContentResolver.QUERY_ARG_SQL_SELECTION, "${MediaStore.MediaColumns.DISPLAY_NAME} = ?")
             putStringArray(ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, arrayOf(name))
-            putInt(MediaStore.QUERY_ARG_MATCH_PENDING, MediaStore.MATCH_INCLUDE)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                putInt(MediaStore.QUERY_ARG_MATCH_PENDING, MediaStore.MATCH_INCLUDE)
+            }
         }
         val projection = arrayOf(
             MediaStore.MediaColumns._ID,
             MediaStore.MediaColumns.RELATIVE_PATH,
             MediaStore.MediaColumns.IS_PENDING,
         )
-        return contentResolver.query(collection, projection, query, null)?.use { cursor ->
+        return contentResolver.query(includingPending(collection), projection, query, null)?.use { cursor ->
             if (!cursor.moveToFirst()) {
                 return@use null
             }
@@ -159,4 +140,13 @@ class SavedMediaRepositoryTest {
             )
         }
     }
+
+    /** Android 10 has no query argument for pending rows; it marks the URI instead. */
+    @Suppress("DEPRECATION")
+    private fun includingPending(collection: Uri): Uri =
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+            MediaStore.setIncludePending(collection)
+        } else {
+            collection
+        }
 }
