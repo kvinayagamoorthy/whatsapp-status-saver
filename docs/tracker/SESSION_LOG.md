@@ -16,6 +16,16 @@ Template:
 
 ---
 
+## 2026-10-14 — Handoff before compaction (end of planned work)
+- Done: M0-M6 complete except T6.4 (deferred, D-008). This session: T4.5-T4.6, T5.1-T5.8,
+  T6.2, T6.3, T6.5; the release build is on the user's phone; version kept at 0.1.0
+  (D-041). STATUS "Resume here" rewritten for a fresh start.
+- Verified: trackers, DECISIONS (D-027 to D-041), design.md, plan.md, README and CLAUDE.md
+  match the code at `048e7ee`.
+- Next: wait for the user's new ideas; plan them as new tasks first.
+- Notes: emulators `keepsake_api35` and `keepsake_api28` were left running; the user may
+  stop them (`adb -s <serial> emu kill`).
+
 ## 2026-10-14 — Phone updated to the latest build
 - Done: T5.8 committed (`048e7ee`). At the user's request the signed release APK of that
   commit was installed over the existing app on their phone (`install -r`).
@@ -23,8 +33,7 @@ Template:
   folder grant; the app started and reported "Fully drawn" (+1197 ms, first start after
   the update) with no crash in logcat.
 - Next: nothing planned; T6.4 waits for a Play Store move (D-008).
-- Notes: versionName is still 0.1.0 / versionCode 1; bump it before handing out a new APK
-  to other phones so About shows which build they have.
+- Notes: versionName stays 0.1.0 / versionCode 1 by the user's choice (D-041).
 
 ## 2026-10-14 — T5.8 spoken seek bar position
 - Done: T5.7 committed (`c32f0bc`). Added T5.8 from the last pending check: TalkBack reads

@@ -662,3 +662,12 @@ replaces the fraction without forking the control. Checked with TalkBack 15 on A
 **Alternatives:** Writing an own slider (more code to keep in step with Media3); merging
 the position and duration texts into the slider node (they would no longer be visible
 to TalkBack as separate items, and the slider would still say the fraction).
+
+## D-041 · 2026-10-14 · Accepted
+**Decision:** The version stays 0.1.0 (versionCode 1) for now.
+**Why:** User's choice after the phone update. The build on the user's phone already
+carries all work up to T5.8, and no APK is being handed to other phones yet.
+**Consequences:** About shows 0.1.0 for every build until the version is raised.
+`adb install -r` and the Files app's "Update" both accept a build with the same
+versionCode; raise versionCode before handing out an APK that should replace one already
+on other phones, so the builds can be told apart.
