@@ -611,3 +611,25 @@ it ran stable. A crash can also lose the last install and the compile state.
 and a device-side test harness for one measurement; worth it only if a real phone
 misses NFR2); timing with log lines in the app (removed again, and less exact than the
 system's own report).
+
+## D-038 · 2026-10-14 · Accepted
+**Decision:** Release builds use R8 (`isMinifyEnabled`, `isShrinkResources`, the default
+`proguard-android-optimize.txt`, no app rules) and are signed with a release key: a
+PKCS12 keystore at `~/keystores/keepsake-release.jks` (RSA 4096, alias `keepsake`,
+`CN=Keepsake`, valid until 2059, certificate SHA-256
+`a58d635f66f4e8104e3d5722846b8130ced71c2c427e8d6e009a350f5c12fd8c`), created by Claude
+with a random password at the user's request. Gradle reads its path and passwords from
+`keystore.properties` in the repo root (git-ignored, mode 600); without that file the
+release APK is built unsigned.
+**Why:** User's choice (keystore made for them; secrets in the project's own git-ignored
+file, not in the user-wide Gradle properties). Every sideloaded update must carry the
+same signature (D-008), so the keystore and `keystore.properties` must be backed up off
+this machine. R8 brought the APK from 12.4 MB to 2.16 MB (NFR5 asks for under 10 MB).
+The minified build was checked on `keepsake_api35`: list, video frames, video playback
+with sound, save with snackbar, share sheet preview, dark theme, folder cards and About
+all work and logcat shows no crash; a fresh install of the signed APK went through
+onboarding and listed the statuses. Libraries ship their own keep rules, so no app
+rules were needed.
+**Alternatives:** Keystore made by the user (more steps for the same result); passwords
+in `~/.gradle/gradle.properties` (visible to every build on the machine); a debug-signed
+release (cannot be updated by a properly signed build later).

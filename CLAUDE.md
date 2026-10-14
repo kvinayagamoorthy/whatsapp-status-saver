@@ -255,8 +255,15 @@ a crash can lose the last install and the compile state (`pm path` empty: reinst
 Start time (NFR2): the list reports "Fully drawn" once the grid shows (D-037). Measure a
 release build (debug is ~3x slower): force-stop, `logcat -c`, `am start -W -n
 com.moorthy.statussaver/.MainActivity` (TotalTime = first frame), then
-`logcat -d -s ActivityTaskManager:I | grep "Fully drawn"`. Signing the release build
-with the debug key for this is a temporary edit to `app/build.gradle.kts` until T6.2.
+`logcat -d -s ActivityTaskManager:I | grep "Fully drawn"`.
+
+Release builds (D-038): `./gradlew assembleRelease` signs with the release key when
+`keystore.properties` (git-ignored, repo root) exists, else it builds
+`app-release-unsigned.apk`. A release-signed APK cannot replace the debug build with
+`install -r` (signature mismatch; uninstalling drops the folder grant). To try a release
+build on an emulator without that, sign the unsigned APK with the debug key:
+`apksigner sign --ks ~/.config/.android/debug.keystore --ks-pass pass:android --ks-key-alias androiddebugkey --key-pass pass:android --out <out.apk> app-release-unsigned.apk`.
+Never print or commit the release passwords.
 
 Use `-gpu host` for anything about smoothness: without it a headless emulator renders
 with SwiftShader on the CPU and even a plain grid janks. Measure with

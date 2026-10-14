@@ -16,6 +16,19 @@ Template:
 
 ---
 
+## 2026-10-14 — T6.2 release build and signing
+- Done: T5.6 committed (`88f94c1`), M5 complete. T6.2: R8 and resource shrinking for
+  release; release keystore created at `~/keystores/keepsake-release.jks` with its
+  secrets in git-ignored `keystore.properties` (user's choices, D-038). Not committed yet.
+- Verified: signed release APK 2.16 MB (`apksigner verify`: v2, `CN=Keepsake`); minified
+  build smoke-tested on API 35; fresh install of the signed APK through onboarding works;
+  without `keystore.properties` the build is unsigned. 87 unit tests, lint no issues.
+- Next: commit T6.2, then T6.3 (release manual test on a real device, needs the user).
+- Notes: the user must back up `~/keystores/keepsake-release.jks` and
+  `keystore.properties` off this machine. The debug build is reinstalled on
+  `keepsake_api35` and its folder grant re-made through onboarding. The debug keystore
+  on this machine is at `~/.config/.android/debug.keystore`.
+
 ## 2026-10-14 — T5.6 performance check
 - Done: T5.5 committed (`a725ae3`). T5.6: `ReportDrawnWhen` on the status list; cold
   start and scrolling measured on the API 35 emulator with 202 statuses (D-037). Not

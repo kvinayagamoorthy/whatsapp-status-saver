@@ -1,15 +1,15 @@
 # Status Board
 
-Last updated: 2026-10-14 (T5.6 done, not committed)
+Last updated: 2026-10-14 (T6.2 done, not committed)
 
 ## Resume here
 
-- **Current milestone:** M5 — Settings and polish (M4 complete)
-- **In progress:** none (T5.6 done, awaiting commit)
-- **Next task:** T6.2 — release build (M6)
+- **Current milestone:** M6 — Release (M5 complete)
+- **In progress:** none (T6.2 done, awaiting commit)
+- **Next task:** T6.3 — release manual test on a real device
 - **Blockers:** none
-- **Last task commit:** `a725ae3` (T5.5). Earlier: `3077f9d` (T5.4), `13c726b` (T5.3), `5a28682` (T5.2), `aeca0c6` (T5.1), `571647c` (T4.6), `d41eb39` (T4.5), `5a832c0` (T4.4), `201daee` (T4.3), `04909aa` (T4.2), `39c520a` (T4.1), `c64f0c2` (tools/emulator_touch.py), `c6c87be` (docs handoff), `6979ffc` (T3.4), `7ad1850` (T3.3), `3486a37` (T3.2), `2904702` (T3.1), `aa73d2c` (T2.5), `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
-- **Notes for next session:** T5.6 is done but not committed (commit it as T5.6 first).
+- **Last task commit:** `88f94c1` (T5.6). Earlier: `a725ae3` (T5.5), `3077f9d` (T5.4), `13c726b` (T5.3), `5a28682` (T5.2), `aeca0c6` (T5.1), `571647c` (T4.6), `d41eb39` (T4.5), `5a832c0` (T4.4), `201daee` (T4.3), `04909aa` (T4.2), `39c520a` (T4.1), `c64f0c2` (tools/emulator_touch.py), `c6c87be` (docs handoff), `6979ffc` (T3.4), `7ad1850` (T3.3), `3486a37` (T3.2), `2904702` (T3.1), `aa73d2c` (T2.5), `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
+- **Notes for next session:** T6.2 is done but not committed (commit it as T6.2 first). The release keystore and `keystore.properties` must be backed up by the user (D-038).
   Instrumented tests (`app/src/androidTest`) run with `install` + `am instrument`, not
   `connectedDebugAndroidTest` (CLAUDE.md, D-027). Two emulators now: `keepsake_api35`
   (`emulator-5554`) and `keepsake_api28` (`emulator-5556`, Android 9 path, D-028). A third,
@@ -35,7 +35,6 @@ Things verified only partly so far. Close them in the task named.
 
 | Check | Why it is open | Close in |
 |-------|----------------|----------|
-| Release APK under 10 MB | Debug APK is 16.5 MB unminified | T6.2 |
 | Onboarding text on Android 8-9 | It says tap "Use this folder" then "Allow"; Android 9's picker shows "SELECT" and asks nothing more | T5.x polish (or T4.4 if touched) |
 | Video seek slider spoken as a fraction ("0.18. Slider") | Media3's `ProgressSlider` sets no position text (D-035) | Media3 update or a later polish task |
 | Start time and grid smoothness on a real phone with real WhatsApp media | Measured only on the emulator with generated files (T5.6, D-037); installing on the phone needs the user's OK | T6.3 |
@@ -55,7 +54,7 @@ Things verified only partly so far. Close them in the task named.
 | M3 Viewer | DONE | 4 / 4 |
 | M4 Save, indicator, share | DONE | 6 / 6 |
 | M5 Settings and polish | DONE | 6 / 6 |
-| M6 Release | TODO | 1 / 5 |
+| M6 Release | WIP | 1 / 5 |
 
 ## Tasks
 
@@ -130,7 +129,7 @@ summary (world rule → code location). Keep each note to one or two lines.
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
 | T6.1 | Distribution decision | DONE | Sideloaded APK for now; Play Store maybe later (D-008) |
-| T6.2 | Release build + signing | TODO | |
+| T6.2 | Release build + signing | DONE | R8 + resource shrinking, no app keep rules; signing from git-ignored `keystore.properties` → `~/keystores/keepsake-release.jks` (made by Claude at the user's request; unsigned build without the file) (D-038). `assembleRelease`: signed APK 2.16 MB (debug 16.8, unminified release 12.4), `apksigner` v2, `CN=Keepsake`. Minified build smoke-tested on API 35 (list, video frames, playback with sound, save, share preview, dark theme, folder cards, About, no crash in logcat); fresh install of the signed APK through onboarding works. Theory: one key for every update, kept outside the repo |
 | T6.3 | Release manual test | TODO | |
 | T6.4 | Store listing + privacy policy | TODO | Deferred until a Play Store move (D-008) |
 | T6.5 | Sideload install notes | TODO | |
