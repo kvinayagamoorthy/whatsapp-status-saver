@@ -16,6 +16,31 @@ Template:
 
 ---
 
+## 2026-10-14 — T6.3 release test on the user's phone
+- Done: the user turned on "Install via USB" and "USB debugging (Security settings)";
+  the signed release APK was installed and the design.md §8 checklist run on the phone
+  (STATUS T6.3). One fix: the source card's buttons wrap (`FlowRow`) instead of
+  breaking "Remove access" mid-word at font scale 2.0. Not committed yet.
+- Verified: phone numbers in STATUS T6.3 (NFR2 ~930 ms after install, ~680 ms compiled,
+  37 statuses; NFR3 0.65% janky). 87 unit tests, lint no issues.
+- Next: commit T6.3, then T6.5 (sideload install notes).
+- Notes: the release build stays installed on the phone with the WhatsApp grant. Test
+  copies were deleted by `_id`; the statuses folder was only read (37 files before and
+  after). Phone settings changed for the check were restored (auto-rotate on, font 1.0),
+  and Keepsake's theme set back to System. Phone screenshots were deleted. The user
+  keeps the release build on the phone and keeps the "2 were already saved." wording.
+
+## 2026-10-14 — T6.3 started, blocked on phone settings
+- Done: T6.2 committed (`8354222`). The user backed up the release keystore and
+  `keystore.properties`, attached their phone and allowed installing on it for T6.3.
+- Verified: phone is a Xiaomi 2312DRAABI (Redmi Note 13 5G), Android 15 (API 35),
+  HyperOS 3, 1080x2400 at 440 dpi, WhatsApp installed, 37 statuses in `.Statuses`.
+- Blocked: `adb install` → `INSTALL_FAILED_USER_RESTRICTED`. Needs Developer options →
+  "Install via USB" and "USB debugging (Security settings)" turned on by the user.
+- Next: retry the install, then the checklist (design.md §8) on the phone.
+- Notes: do not take screenshots of the phone while another app is in front (one was
+  taken while checking for an install prompt; it showed private content and was deleted).
+
 ## 2026-10-14 — T6.2 release build and signing
 - Done: T5.6 committed (`88f94c1`), M5 complete. T6.2: R8 and resource shrinking for
   release; release keystore created at `~/keystores/keepsake-release.jks` with its

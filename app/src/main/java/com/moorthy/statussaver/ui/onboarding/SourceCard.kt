@@ -2,7 +2,7 @@ package com.moorthy.statussaver.ui.onboarding
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -53,7 +53,12 @@ fun SourceCard(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
                 )
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Wraps the second button onto its own line when there is no room, for
+                // example at large font sizes, instead of breaking its words apart.
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
                     OutlinedButton(onClick = onGrantClick) {
                         Text(stringResource(R.string.onboarding_choose_again))
                     }

@@ -242,6 +242,12 @@ Library sources and resources can be checked without guessing: the AARs are in
 `javap` on `classes.jar` or grep `res/`), and Media3 sources for a release are at
 `https://raw.githubusercontent.com/androidx/media/<version>/libraries/...`.
 
+The user's phone (serial `z9lzvojfkf7pknpv`, Xiaomi, HyperOS 3) was used with permission
+for T6.3 only; ask again before the next use. HyperOS refuses `adb install` until
+Developer options → "Install via USB" is on, and `adb shell input` needs "USB debugging
+(Security settings)". Never screenshot it while another app is in front, and never add
+or remove files in its WhatsApp folders: delete test copies by MediaStore `_id`.
+
 If `adb devices` lists only the physical phone, the emulator is not running: start it
 rather than using the phone.
 
