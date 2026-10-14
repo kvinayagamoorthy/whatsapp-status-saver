@@ -62,4 +62,10 @@
     <string name="settings_theme_system">System default</string>
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
+    <string name="settings_access">Statuses folders</string>
+    <string name="settings_remove_access">Remove access</string>
+    <string name="settings_remove_access_title">Remove access to %1$s statuses?</string>
+    <string name="settings_remove_access_text">Keepsake will stop showing these statuses. Copies you saved stay in your gallery, and you can grant access again at any time.</string>
+    <string name="settings_remove_access_confirm">Remove</string>
+    <string name="settings_remove_access_cancel">Cancel</string>
 </resources>

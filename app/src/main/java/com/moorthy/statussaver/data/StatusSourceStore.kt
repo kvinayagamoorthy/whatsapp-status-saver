@@ -69,6 +69,25 @@ class StatusSourceStore(
         }
     }
 
+    /**
+     * Stops reading the folder granted for [kind] (FR8): forgets it and gives the read
+     * permission back to the system, so Keepsake can no longer open it. Nothing happens
+     * when no folder is stored for [kind].
+     */
+    suspend fun revoke(kind: StatusSourceKind) {
+        val storedUri = dataStore.data.first()[treeUriKey(kind)]?.toUri() ?: return
+        dataStore.edit { preferences ->
+            preferences.remove(treeUriKey(kind))
+        }
+        // Releasing a grant the system no longer holds throws, so check it first.
+        if (storedUri in grantedTreeUris()) {
+            contentResolver.releasePersistableUriPermission(
+                storedUri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION,
+            )
+        }
+    }
+
     private fun grantedTreeUris(): Set<Uri> =
         contentResolver.persistedUriPermissions
             .filter { permission -> permission.isReadPermission }

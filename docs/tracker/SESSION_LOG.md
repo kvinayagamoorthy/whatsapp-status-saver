@@ -16,6 +16,17 @@ Template:
 
 ---
 
+## 2026-10-14 — T5.2 access management
+- Done: T5.1 committed (`aeca0c6`). T5.2: "Statuses folders" section in settings with
+  Grant access / Choose again / Remove access (confirmed), `StatusSourceStore.revoke`,
+  onboarding ViewModel renamed `FolderAccessViewModel` and shared (D-034). Not committed.
+- Verified: 86 unit tests (4 new), 4 of 5 mutations (the release guard survives, as in
+  T1.5: only a device throws); lint only MissingApplicationIcon; emulator checks on API
+  35 and 28 as in STATUS T5.2.
+- Next: commit T5.2, then T5.3 (About section).
+- Notes: both emulators were re-granted their WhatsApp folder after the revoke checks
+  (API 35 through onboarding, API 28 through settings) and show the list again.
+
 ## 2026-10-14 — T5.1 theme mode setting
 - Done: T4.6 committed (`571647c`), M4 complete. T5.1: `SettingsStore` + settings screen
   with System / Light / Dark, applied at once and kept across restarts; system bar icons

@@ -135,6 +135,45 @@ class StatusSourceStoreTest {
         assertEquals(listOf(WHATSAPP_TREE), persistedTreeUris())
     }
 
+    @Test
+    fun revokingGivesThePermissionBackAndForgetsTheFolder() = runBlocking {
+        store.grant(StatusSourceKind.WHATSAPP, WHATSAPP_TREE)
+        store.grant(StatusSourceKind.BUSINESS, BUSINESS_TREE)
+
+        store.revoke(StatusSourceKind.WHATSAPP)
+
+        assertEquals(
+            listOf(StatusSource(StatusSourceKind.BUSINESS, BUSINESS_TREE)),
+            store.validSources(),
+        )
+        assertEquals(listOf(BUSINESS_TREE), persistedTreeUris())
+    }
+
+    @Test
+    fun revokingAFolderWhosePermissionWasLostForgetsIt() = runBlocking {
+        store.grant(StatusSourceKind.WHATSAPP, WHATSAPP_TREE)
+        loseGrant(WHATSAPP_TREE)
+
+        store.revoke(StatusSourceKind.WHATSAPP)
+        // Granted again later, the folder must not come back from the old entry.
+        contentResolver.takePersistableUriPermission(WHATSAPP_TREE, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+        assertEquals(emptyList<StatusSource>(), store.validSources())
+    }
+
+    @Test
+    fun revokingAnAppThatWasNeverGrantedChangesNothing() = runBlocking {
+        store.grant(StatusSourceKind.WHATSAPP, WHATSAPP_TREE)
+
+        store.revoke(StatusSourceKind.BUSINESS)
+
+        assertEquals(
+            listOf(StatusSource(StatusSourceKind.WHATSAPP, WHATSAPP_TREE)),
+            store.validSources(),
+        )
+        assertEquals(listOf(WHATSAPP_TREE), persistedTreeUris())
+    }
+
     /** What the system does when it drops a grant behind the app's back. */
     private fun loseGrant(treeUri: Uri) {
         contentResolver.releasePersistableUriPermission(

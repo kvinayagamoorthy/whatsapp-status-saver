@@ -1,15 +1,15 @@
 # Status Board
 
-Last updated: 2026-10-14 (T5.1 done, not committed)
+Last updated: 2026-10-14 (T5.2 done, not committed)
 
 ## Resume here
 
 - **Current milestone:** M5 — Settings and polish (M4 complete)
-- **In progress:** none (T5.1 done, awaiting commit)
-- **Next task:** T5.2 — access management in settings
+- **In progress:** none (T5.2 done, awaiting commit)
+- **Next task:** T5.3 — About section in settings
 - **Blockers:** none
-- **Last task commit:** `571647c` (T4.6). Earlier: `d41eb39` (T4.5), `5a832c0` (T4.4), `201daee` (T4.3), `04909aa` (T4.2), `39c520a` (T4.1), `c64f0c2` (tools/emulator_touch.py), `c6c87be` (docs handoff), `6979ffc` (T3.4), `7ad1850` (T3.3), `3486a37` (T3.2), `2904702` (T3.1), `aa73d2c` (T2.5), `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
-- **Notes for next session:** T5.1 is done but not committed (commit it as T5.1 first).
+- **Last task commit:** `aeca0c6` (T5.1). Earlier: `571647c` (T4.6), `d41eb39` (T4.5), `5a832c0` (T4.4), `201daee` (T4.3), `04909aa` (T4.2), `39c520a` (T4.1), `c64f0c2` (tools/emulator_touch.py), `c6c87be` (docs handoff), `6979ffc` (T3.4), `7ad1850` (T3.3), `3486a37` (T3.2), `2904702` (T3.1), `aa73d2c` (T2.5), `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
+- **Notes for next session:** T5.2 is done but not committed (commit it as T5.2 first).
   Instrumented tests (`app/src/androidTest`) run with `install` + `am instrument`, not
   `connectedDebugAndroidTest` (CLAUDE.md, D-027). Two emulators now: `keepsake_api35`
   (`emulator-5554`) and `keepsake_api28` (`emulator-5556`, Android 9 path, D-028). A third,
@@ -53,7 +53,7 @@ Things verified only partly so far. Close them in the task named.
 | M2 Status list | DONE | 5 / 5 |
 | M3 Viewer | DONE | 4 / 4 |
 | M4 Save, indicator, share | DONE | 6 / 6 |
-| M5 Settings and polish | WIP | 1 / 6 |
+| M5 Settings and polish | WIP | 2 / 6 |
 | M6 Release | TODO | 1 / 5 |
 
 ## Tasks
@@ -118,7 +118,7 @@ summary (world rule → code location). Keep each note to one or two lines.
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
 | T5.1 | Theme mode setting | DONE | `SettingsStore` (DataStore `settings`, `ThemeMode` by name, unknown → System); settings screen from the list's gear, radio group System default / Light / Dark; `MainActivity` waits for the stored choice, themes the app and the system bar icons, and on Android 12+ calls `setApplicationNightMode` so the launch screen matches (D-033). 82 unit tests (6 new), 6 of 6 mutations caught (default, write, read, and three `isDarkTheme` branches). Emulator API 35: Dark on a light phone applies at once with white status icons; Back/forward crossfade stays dark; cold start keeps Dark and the launch screen is dark (was white for ~2 s before `setApplicationNightMode`); System follows `cmd uimode night yes/no` both ways; Light on a dark phone is light with dark icons; choice kept through landscape. API 28: Dark applies, brand palette in dark mode looks right (closes that pending check); cold start still shows the light launch window ~1.8 s (accepted, D-033). Theory: one stored choice, the activity follows it |
-| T5.2 | Access management | TODO | |
+| T5.2 | Access management | DONE | Settings "Statuses folders": onboarding's cards (`SourceCard.kt`) and ViewModel (renamed `FolderAccessViewModel`) with Grant access / Choose again / Remove access; Remove asks first (dialog kept through rotation) and calls `StatusSourceStore.revoke`, which forgets the URI and releases the persisted grant (D-034). 86 unit tests (4 new), 4 of 5 mutations caught; the dropped release guard survives because Robolectric does not throw there (device does, T1.5). Emulator API 35: Remove → 0 persisted grants, DataStore empty, Back → onboarding; re-grant through onboarding; Choose again keeps one grant and the list returns. API 28: Remove → `persisted=0x0` (the picker's temporary grant stays with the running activity, unused); re-grant from settings → list. Theory: one access concept, two screens |
 | T5.3 | About section | TODO | |
 | T5.4 | Accessibility pass | TODO | |
 | T5.5 | Launcher icon (bookmark in ring) | TODO | Name already decided: Keepsake (D-009). Setting `android:icon` clears the last lint warning (MissingApplicationIcon) |

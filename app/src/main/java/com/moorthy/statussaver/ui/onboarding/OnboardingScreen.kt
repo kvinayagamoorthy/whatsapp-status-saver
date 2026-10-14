@@ -11,8 +11,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,7 +31,7 @@ import com.moorthy.statussaver.data.model.StatusSourceKind
 @Composable
 fun OnboardingScreen(
     onContinue: () -> Unit,
-    viewModel: OnboardingViewModel = viewModel(factory = OnboardingViewModel.Factory),
+    viewModel: FolderAccessViewModel = viewModel(factory = FolderAccessViewModel.Factory),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val folderPicker = rememberLauncherForActivityResult(
@@ -93,49 +91,3 @@ fun OnboardingScreen(
         }
     }
 }
-
-@Composable
-private fun SourceCard(
-    kind: StatusSourceKind,
-    isGranted: Boolean,
-    onGrantClick: () -> Unit,
-) {
-    OutlinedCard(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Text(
-                text = stringResource(kind.displayName()),
-                style = MaterialTheme.typography.titleMedium,
-            )
-            // Shown so the user can find the folder by hand if the picker ignores the
-            // start folder (risk R3).
-            Text(
-                text = StatusFolders.expectedPath(kind),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            if (isGranted) {
-                Text(
-                    text = stringResource(R.string.onboarding_access_granted),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-                OutlinedButton(onClick = onGrantClick) {
-                    Text(stringResource(R.string.onboarding_choose_again))
-                }
-            } else {
-                Button(onClick = onGrantClick) {
-                    Text(stringResource(R.string.onboarding_grant_access))
-                }
-            }
-        }
-    }
-}
-
-private fun StatusSourceKind.displayName(): Int =
-    when (this) {
-        StatusSourceKind.WHATSAPP -> R.string.source_whatsapp
-        StatusSourceKind.BUSINESS -> R.string.source_business
-    }

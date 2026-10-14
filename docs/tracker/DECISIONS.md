@@ -525,3 +525,26 @@ or light window theme (a second store, and the pre-process launch window would s
 flash); `windowDisablePreview` (no flash, but the launcher stays on screen until the
 first frame, which feels like a slow start); `distinctUntilChanged` on the flow
 (Compose state already ignores equal values).
+
+## D-034 · 2026-10-14 · Accepted
+**Decision:** Access management (FR8) lives in settings as a "Statuses folders" section
+that reuses onboarding's per-app cards and ViewModel. `OnboardingViewModel` became
+`FolderAccessViewModel` (same package, one instance per screen) and gained `revoke`;
+the card moved to `ui/onboarding/SourceCard.kt` and shows Remove access only when
+given an `onRevoke` (settings). `StatusSourceStore.revoke(kind)` removes the stored URI
+and releases the persisted read permission if the system still holds it. Remove access
+asks first; the dialog survives rotation. Removing the last folder needs no special
+case: the list reloads on resume, finds no source and goes to onboarding (D-022).
+**Why:** Granting, re-picking and the per-app state are the same concept on both
+screens; one ViewModel and one card keep them from drifting apart. The confirmation
+says that saved copies stay in the gallery, because "remove" could be read as deleting
+them, and losing the last folder means going through onboarding again. The release is
+guarded as in `grant`, since a device throws when releasing a grant it no longer holds
+(T1.5); Robolectric does not throw there, so the mutant that drops the guard survives
+the unit tests. Checked on API 35 and API 28: after Remove the persisted grant is gone
+(`persisted=0x0`) and the stored URI is deleted. On API 28 the running activity still
+held the picker's temporary, non-persisted grant until it finished; the app does not
+use it, because sources count only with a persisted grant.
+**Alternatives:** A separate settings ViewModel duplicating the pick-and-classify
+logic; navigating from settings straight to onboarding after the last revoke (a second
+path for what the list already does); revoking without asking.

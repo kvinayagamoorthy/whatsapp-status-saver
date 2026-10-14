@@ -163,8 +163,13 @@ button pauses a playing video first (D-032).
   it applies at once without a restart. On Android 12+ the choice is also handed to
   `UiModeManager.setApplicationNightMode`, so the system's launch screen is drawn in it.
   Below Android 12 the launch window follows the phone's setting (D-033).
-- Settings screen (`ui/settings/`): reached from the gear in the list's top bar; one
-  radio group for the theme mode for now (FR8 and About follow in T5.2, T5.3).
+- Settings screen (`ui/settings/`): reached from the gear in the list's top bar; a
+  radio group for the theme mode, then "Statuses folders" (FR8) with the same per-app
+  cards as onboarding (`ui/onboarding/SourceCard.kt`, `FolderAccessViewModel`, one
+  instance per screen): Grant access or Choose again opens the folder picker, and
+  Remove access (after a confirmation) calls `StatusSourceStore.revoke`, which forgets
+  the folder and releases its persisted read permission. Removing the last folder sends
+  the user to onboarding when the list reloads (D-022, D-034). About follows in T5.3.
 - Grid: `LazyVerticalGrid` adaptive columns (min ~110 dp), square tiles, Coil
   `AsyncImage`; videos via Coil `VideoFrameDecoder` registered in `StatusSaverApp`.
   Tabs are keyed by `MediaType`; grid items by document URI (D-020).
