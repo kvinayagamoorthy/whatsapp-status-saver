@@ -1,15 +1,15 @@
 # Status Board
 
-Last updated: 2026-10-14 (T5.8 done, not committed)
+Last updated: 2026-10-14 (all planned tasks done; T6.4 deferred)
 
 ## Resume here
 
 - **Current milestone:** M6 — Release (M5 complete)
-- **In progress:** none (T5.8 done, awaiting commit)
+- **In progress:** none
 - **Next task:** none planned after T6.5 (T6.4 deferred until a Play Store move, D-008)
 - **Blockers:** none
-- **Last task commit:** `c32f0bc` (T5.7). Earlier: `c80fcbe` (T6.5), `2d1c34b` (T6.3), `8354222` (T6.2), `88f94c1` (T5.6), `a725ae3` (T5.5), `3077f9d` (T5.4), `13c726b` (T5.3), `5a28682` (T5.2), `aeca0c6` (T5.1), `571647c` (T4.6), `d41eb39` (T4.5), `5a832c0` (T4.4), `201daee` (T4.3), `04909aa` (T4.2), `39c520a` (T4.1), `c64f0c2` (tools/emulator_touch.py), `c6c87be` (docs handoff), `6979ffc` (T3.4), `7ad1850` (T3.3), `3486a37` (T3.2), `2904702` (T3.1), `aa73d2c` (T2.5), `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
-- **Notes for next session:** T5.8 is done but not committed (commit it as T5.8 first). All planned tasks are then done except T6.4 (deferred, D-008); no pending checks are left. The release build stays installed on the user's phone. The user backed up the release keystore and `keystore.properties` (2026-10-14). The user allowed installing on their phone for T6.3 (serial `z9lzvojfkf7pknpv`).
+- **Last task commit:** `048e7ee` (T5.8). Earlier: `c32f0bc` (T5.7), `c80fcbe` (T6.5), `2d1c34b` (T6.3), `8354222` (T6.2), `88f94c1` (T5.6), `a725ae3` (T5.5), `3077f9d` (T5.4), `13c726b` (T5.3), `5a28682` (T5.2), `aeca0c6` (T5.1), `571647c` (T4.6), `d41eb39` (T4.5), `5a832c0` (T4.4), `201daee` (T4.3), `04909aa` (T4.2), `39c520a` (T4.1), `c64f0c2` (tools/emulator_touch.py), `c6c87be` (docs handoff), `6979ffc` (T3.4), `7ad1850` (T3.3), `3486a37` (T3.2), `2904702` (T3.1), `aa73d2c` (T2.5), `c572878` (T2.4), `000d410` (T2.3), `ccbec21` (T2.2), `a6e2a28` (T2.1), `77332dc` (T1.6), `39aace7` (T1.5), `b9c966c` (T1.4), `5defa0e` (T1.3), `30b0d14` (T1.2), `857cb99` (T1.1), `9e11289` (T0.6), docs-only handoff `4cdea90`.
+- **Notes for next session:** All planned tasks are done except T6.4 (deferred, D-008); no pending checks are left. The user's phone runs the signed release build of `048e7ee` (installed 2026-10-14 at the user's request, version 0.1.0).  The user backed up the release keystore and `keystore.properties` (2026-10-14). The user allowed installing on their phone for T6.3 (serial `z9lzvojfkf7pknpv`).
   Instrumented tests (`app/src/androidTest`) run with `install` + `am instrument`, not
   `connectedDebugAndroidTest` (CLAUDE.md, D-027). Two emulators now: `keepsake_api35`
   (`emulator-5554`) and `keepsake_api28` (`emulator-5556`, Android 9 path, D-028). A third,

@@ -16,6 +16,16 @@ Template:
 
 ---
 
+## 2026-10-14 — Phone updated to the latest build
+- Done: T5.8 committed (`048e7ee`). At the user's request the signed release APK of that
+  commit was installed over the existing app on their phone (`install -r`).
+- Verified: `apksigner` shows the release certificate; the update kept the persisted
+  folder grant; the app started and reported "Fully drawn" (+1197 ms, first start after
+  the update) with no crash in logcat.
+- Next: nothing planned; T6.4 waits for a Play Store move (D-008).
+- Notes: versionName is still 0.1.0 / versionCode 1; bump it before handing out a new APK
+  to other phones so About shows which build they have.
+
 ## 2026-10-14 — T5.8 spoken seek bar position
 - Done: T5.7 committed (`c32f0bc`). Added T5.8 from the last pending check: TalkBack reads
   the video seek bar as position and length (D-040). Not committed yet.
