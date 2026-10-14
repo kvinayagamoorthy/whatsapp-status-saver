@@ -55,6 +55,7 @@ import com.moorthy.statussaver.ui.rememberStoragePermissionGate
 import com.moorthy.statussaver.ui.statuses.SaveNoticeEffect
 import com.moorthy.statussaver.ui.statuses.StatusesUiState
 import com.moorthy.statussaver.ui.statuses.StatusesViewModel
+import com.moorthy.statussaver.ui.statuses.statusDescription
 import kotlinx.coroutines.launch
 
 /**
@@ -190,12 +191,20 @@ private fun ViewerPager(
             // Saved, so a page that failed before a rotation is checked again after it.
             var failed by rememberSaveable(item.uri) { mutableStateOf(false) }
             val onError = { failed = true }
+            // What TalkBack says for the picture; the same words as the tile in the list.
+            val description = statusDescription(item)
             when {
                 failed -> CannotShowMessage()
-                item.type == MediaType.IMAGE -> ZoomableImage(item = item, onError = onError)
+                item.type == MediaType.IMAGE ->
+                    ZoomableImage(item = item, description = description, onError = onError)
                 videoPlayer != null && page == pagerState.settledPage ->
-                    VideoPage(item = item, player = videoPlayer.player, onError = onError)
-                else -> VideoPreview(item)
+                    VideoPage(
+                        item = item,
+                        description = description,
+                        player = videoPlayer.player,
+                        onError = onError,
+                    )
+                else -> VideoPreview(item = item, description = description)
             }
             // Only the page the user is looking at may close the viewer, not a neighbour
             // that is drawn while swiping.
@@ -310,17 +319,18 @@ private fun CannotShowMessage() {
 
 /** A video page that is not playing: its first frame with a play badge. */
 @Composable
-private fun VideoPreview(item: StatusItem) {
+private fun VideoPreview(item: StatusItem, description: String) {
     Box(modifier = Modifier.fillMaxSize()) {
         AsyncImage(
             model = item.uri,
-            contentDescription = null,
+            contentDescription = description,
             contentScale = ContentScale.Fit,
             modifier = Modifier.fillMaxSize(),
         )
         Icon(
             painter = painterResource(R.drawable.ic_play_badge),
-            contentDescription = stringResource(R.string.statuses_video_badge),
+            // The page's description already says it is a video.
+            contentDescription = null,
             tint = Color.White,
             modifier = Modifier
                 .align(Alignment.Center)
@@ -336,7 +346,7 @@ private fun VideoPreview(item: StatusItem) {
  * page leaves the pager or the screen rotates, so each visit starts fitted.
  */
 @Composable
-private fun ZoomableImage(item: StatusItem, onError: () -> Unit) {
+private fun ZoomableImage(item: StatusItem, description: String, onError: () -> Unit) {
     val context = LocalContext.current
     val zoomState = remember(item.uri) { ZoomState() }
     // Decoded at full resolution rather than screen size, so zooming in shows real
@@ -349,7 +359,7 @@ private fun ZoomableImage(item: StatusItem, onError: () -> Unit) {
     }
     AsyncImage(
         model = request,
-        contentDescription = null,
+        contentDescription = description,
         contentScale = ContentScale.Fit,
         onSuccess = { success -> zoomState.setContentSize(success.painter.intrinsicSize) },
         onError = { onError() },

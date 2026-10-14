@@ -52,6 +52,7 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -318,6 +319,7 @@ private fun StatusTile(
     onTap: () -> Unit,
     onLongPress: () -> Unit,
 ) {
+    val description = statusDescription(item)
     val selectionState = if (isSelected) {
         stringResource(R.string.statuses_selected)
     } else {
@@ -345,6 +347,9 @@ private fun StatusTile(
                 onLongClickLabel = stringResource(R.string.statuses_select),
                 onLongClick = onLongPress,
             )
+            .semantics {
+                contentDescription = description
+            }
             .then(
                 if (isSelecting) {
                     Modifier.semantics {
@@ -357,7 +362,7 @@ private fun StatusTile(
             ),
     ) {
         // Coil decodes off the main thread at tile size and caches the result (NFR3).
-        // Tiles get their content descriptions in the accessibility pass (T5.4).
+        // The tile's description already says what it shows.
         AsyncImage(
             model = item.uri,
             contentDescription = null,
@@ -367,7 +372,8 @@ private fun StatusTile(
         if (item.type == MediaType.VIDEO) {
             Icon(
                 painter = painterResource(R.drawable.ic_play_badge),
-                contentDescription = stringResource(R.string.statuses_video_badge),
+                // The tile's description already says it is a video.
+                contentDescription = null,
                 tint = Color.White,
                 modifier = Modifier
                     .align(Alignment.Center)

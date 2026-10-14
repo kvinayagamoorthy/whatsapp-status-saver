@@ -548,3 +548,27 @@ use it, because sources count only with a persisted grant.
 **Alternatives:** A separate settings ViewModel duplicating the pick-and-classify
 logic; navigating from settings straight to onboarding after the last revoke (a second
 path for what the list already does); revoking without asking.
+
+## D-035 · 2026-10-14 · Accepted
+**Decision:** TalkBack describes a status by its kind and age: "Image status, 3 hours
+ago" / "Video status, Yesterday" (`statusDescription`, `DateUtils.getRelativeTimeSpanString`
+against the file's last-modified time, minute resolution). The same words label the
+grid tile (as its content description; the play badge is no longer read separately)
+and the viewer's picture (the image itself; for videos an empty layer with merged
+semantics on top of the player's view, since semantics on `ContentFrame` did not reach
+the interop view).
+**Why:** Before, image tiles had no label and every video tile said "Video", so a
+TalkBack user could not tell statuses apart, and touching the viewer's picture said
+nothing. File names (`IMG-…`) mean nothing when spoken; the age is what differs between
+statuses, which are all under a day old. Checked with TalkBack 15 on API 35: tiles read
+"Image status, 22 hours ago. In list", a saved one adds "Saved", selection mode prefixes
+"Selected" / "Not selected", the viewer reads "Image status, 22 hours ago. Image. In
+horizontal pager" and "Video status, 16 hours ago", buttons and radio buttons read their
+labels and states. All actionable nodes are at least 48 dp (API 35 and 28). At font
+scale 2.0 the list, selection bar, settings, viewer controls and snackbar still fit.
+**Known gap:** Media3's `ProgressSlider` reads its position as a fraction ("0.18.
+Slider"). It is Media3's control (D-025); the position and duration texts beside it are
+visible but not read with it. Left for a Media3 update or a later polish task.
+**Alternatives:** Reading the file name; numbering tiles ("Image 3 of 150", which
+changes whenever statuses arrive); a label on a wrapper around each viewer page (not
+focusable, so TalkBack skipped it).

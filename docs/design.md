@@ -163,6 +163,11 @@ button pauses a playing video first (D-032).
   it applies at once without a restart. On Android 12+ the choice is also handed to
   `UiModeManager.setApplicationNightMode`, so the system's launch screen is drawn in it.
   Below Android 12 the launch window follows the phone's setting (D-033).
+- Accessibility (NFR6, D-035): a status is described as its kind and age ("Image
+  status, 3 hours ago", `ui/statuses/StatusDescription.kt`), on the grid tile (merged
+  with "Saved" and, in selection mode, "Selected" / "Not selected") and on the viewer's
+  picture. The video picture is an Android view, so an empty labelled layer lies over
+  it. Every button has a label and a 48 dp target.
 - Settings screen (`ui/settings/`): reached from the gear in the list's top bar; a
   radio group for the theme mode, then "Statuses folders" (FR8) with the same per-app
   cards as onboarding (`ui/onboarding/SourceCard.kt`, `FolderAccessViewModel`, one

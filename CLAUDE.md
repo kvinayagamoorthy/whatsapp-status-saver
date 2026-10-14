@@ -221,6 +221,16 @@ adb -s emulator-5554 unroot
 The script's docstring explains the event format (each touch-down needs
 `ABS_MT_PRESSURE` > 0, and `sendevent` is too slow, so frames are pushed and `cat`-ed).
 
+TalkBack checks on `keepsake_api35` (TalkBack 15 is installed): enable it with
+`settings put secure enabled_accessibility_services com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService`
+(and `null` to turn it off). `adb shell input tap` bypasses TalkBack and activates
+directly; to explore by touch, use a real touch from the script,
+`tools/emulator_touch.py drag x y x y` (one stationary finger), then screenshot. To see
+what TalkBack says, its speech overlay is switched on in the emulator's TalkBack prefs
+(`pref_tts_overlay` in `/data/user_de/0/com.google.android.marvin.talkback/shared_prefs/`,
+written as root): the spoken text appears at the bottom of the screen. Swipe gestures
+sent by the script were not recognised as TalkBack gestures.
+
 Whether the app is playing sound: the app's entries under `players:` in
 `adb -s emulator-5554 shell dumpsys audio` (match `u/pid:<uid>/<pid>` with
 `pidof com.moorthy.statussaver`) show `state:started`, `paused`, `stopped`, and

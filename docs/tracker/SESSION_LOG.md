@@ -16,6 +16,18 @@ Template:
 
 ---
 
+## 2026-10-14 — T5.4 accessibility pass
+- Done: T5.3 committed (`13c726b`). T5.4: statuses get spoken descriptions (kind + age) on
+  tiles and viewer pictures; checklist recorded in STATUS (D-035). Not committed yet.
+- Verified: 87 unit tests (1 new), 3 of 3 mutations; lint only MissingApplicationIcon;
+  TalkBack 15 on API 35, a label/size audit on API 35 and 28, font scale 2.0 on API 35.
+- Next: commit T5.4, then T5.5 (adaptive launcher icon).
+- Notes: the API 35 emulator process died once during the checks (not caused by a
+  command; restarted, and auto-rotate was on again, now off). TalkBack is off again and
+  font scale back to 1.0. TalkBack's speech overlay pref stays set in its own settings on
+  the emulator. Saved copies were deleted by `_id`. Calendar was opened by mistake
+  from the home screen and force-stopped.
+
 ## 2026-10-14 — T5.3 About section
 - Done: T5.2 committed (`5a28682`). T5.3: About section at the end of settings with
   version, non-affiliation note and responsibility note. Not committed yet.

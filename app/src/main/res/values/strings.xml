@@ -19,7 +19,8 @@
     <string name="statuses_tab_videos">Videos</string>
     <string name="statuses_no_images">No image statuses right now.</string>
     <string name="statuses_no_videos">No video statuses right now.</string>
-    <string name="statuses_video_badge">Video</string>
+    <string name="status_description_image">Image status, %1$s</string>
+    <string name="status_description_video">Video status, %1$s</string>
     <string name="statuses_open">Open</string>
     <string name="statuses_vanished">This status is no longer available. WhatsApp removes statuses about a day after they are posted.</string>
     <string name="viewer_cannot_show">This status can’t be shown.</string>

@@ -16,6 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
@@ -38,7 +40,7 @@ import com.moorthy.statussaver.data.model.StatusItem
  */
 @androidx.annotation.OptIn(UnstableApi::class)
 @Composable
-fun VideoPage(item: StatusItem, player: Player, onError: () -> Unit) {
+fun VideoPage(item: StatusItem, description: String, player: Player, onError: () -> Unit) {
     KeepScreenOnWhilePlaying(player)
     val currentOnError by rememberUpdatedState(onError)
     DisposableEffect(player) {
@@ -69,6 +71,15 @@ fun VideoPage(item: StatusItem, player: Player, onError: () -> Unit) {
                     modifier = Modifier.fillMaxSize(),
                 )
             },
+        )
+        // The picture is an Android view, which TalkBack finds but cannot describe, and
+        // semantics on ContentFrame do not reach it. This empty layer on top says what the
+        // video shows; it has no touch handling, so taps still reach the picture. The
+        // controls below keep their own labels.
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .semantics(mergeDescendants = true) { contentDescription = description },
         )
         Surface(
             modifier = Modifier
